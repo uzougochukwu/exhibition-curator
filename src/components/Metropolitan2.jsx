@@ -21,7 +21,7 @@ export default function Metropolitan2() {
         `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`
       )
       .then((artworks) => {
-        console.log(artworks.data.data);
+        console.log(artworks.data.data[0].images.web.url);
 
         //console.log(response.data["objectIDs"], response.data);
         //console.log("here");
@@ -60,7 +60,8 @@ export default function Metropolitan2() {
             <p key={artwork.id}>
               {" "}
               {artwork.title}{" "}
-              {/* {artwork.images.full.url} */}
+              <img src={artwork.images?.web?.url}></img>
+            
               <a href={link}>
                 <button>Go to object</button>
               </a>
