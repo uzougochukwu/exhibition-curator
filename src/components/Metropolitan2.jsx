@@ -18,17 +18,17 @@ export default function Metropolitan2() {
     // // ... rest of axios call
     axios
       .get(
-        `http://localhost:8080/collectionapi.metmuseum.org/public/collection/v1/search?q=${term}?hasImages=true`
+        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`
       )
       .then((artworks) => {
-        console.log(artworks);
+        console.log(artworks.data.data);
 
         //console.log(response.data["objectIDs"], response.data);
-        console.log("here");
-        setArtworks(artworks.data["objectIDs"]);
+        //console.log("here");
+        setArtworks(artworks.data.data);
         //console.log(artworks);
-        console.log(artworks.data["objectIDs"]);
-        return artworks.data["objectIDs"];
+        //console.log(artworks.data["objectIDs"]);
+        return artworks.data.data;
       })
       .catch((err) => {
         setError(
@@ -50,16 +50,17 @@ export default function Metropolitan2() {
             onChange={(e) => setTerm(e.target.value)}
           />
         </p>
-        A list of the relevant Metropolitan artworks:{" "}
+        A list of the relevant artworks from the Cleveland Museum of Art:{" "}
         {metartworks.map((artwork) => {
           const link = "/objects/" + artwork;
-          console.log(link);
+          //console.log(artwork.id);
           //console.log(search_by);
 
           return (
-            <p key={artwork}>
+            <p key={artwork.id}>
               {" "}
-              {artwork}{" "}
+              {artwork.title}{" "}
+              {/* {artwork.images.full.url} */}
               <a href={link}>
                 <button>Go to object</button>
               </a>
