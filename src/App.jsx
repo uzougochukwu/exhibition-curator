@@ -6,13 +6,14 @@ import { Routes, Route } from "react-router-dom";
 import Harvard from "./components/Harvard";
 import Home from "./components/Home";
 import SpecificMetropolitan from "./components/SpecificMetropolitan";
+import PersonalExhibition from "./components/PersonalExhibition";
 
 function App() {
   return (
     <div>
       <Routes>
         <Route path="/" element={<Home/>} />
-        <Route path="/objects/:objectID" element={<SpecificMetropolitan/>} />
+        <Route path="/personalexhibition" element={<PersonalExhibition/>} />
       </Routes>
     </div>
   );

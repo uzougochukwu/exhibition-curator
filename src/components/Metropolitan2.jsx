@@ -13,6 +13,8 @@ export default function Metropolitan2() {
 
   const [error, setError] = useState();
 
+  const link = "/personalexhibition";
+
   const makeSearch = () => {
     console.log("Search button clicked. Starting API call for:", term);
     // setError(null); // Clear any previous error message
@@ -52,6 +54,9 @@ export default function Metropolitan2() {
   } else {
     return (
       <div>
+        <a href={link}>
+          <button>Go to Personal Exhibition</button>
+        </a>
         <button onClick={makeSearch}>Search</button>
         <p>
           <input
