@@ -1,24 +1,75 @@
-import React from "react";
-
+import React, { useState, useEffect, useCallback } from "react";
 
 export default function PersonalExhibition() {
+  const [collection, setCollection] = useState([]);
 
-  const storedData = sessionStorage.getItem(131669);
-  const storedArray = storedData.forEach(element => {element.key    
-  }
-);
+  // function to load the collection from sessionStorage
+  // We use useCallback so it can be safely called inside useEffect and removeFromCollection
+  const loadCollection = useCallback(() => {
+    const artworks = [];
+
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      const storedItem = sessionStorage.getItem(key);
+
+      try {
+        const parsedArtwork = JSON.parse(storedItem);
+        // Basic check to ensure it's a valid artwork object
+        if (parsedArtwork && parsedArtwork.title && parsedArtwork.id) {
+          artworks.push(parsedArtwork);
+        }
+      } catch (error) {
+        console.error(
+          `Error parsing sessionStorage item for key ${key}:`,
+          error
+        );
+      }
+    }
+    setCollection(artworks);
+  }, []); // empty dependency array means this function is only created once
+
+  useEffect(() => {
+    // load the collection when the component mounts
+    loadCollection();
+  }, [loadCollection]);
+
+  // function to remove an artwork from sessionStorage and refresh the display
+  const removeFromCollection = (artworkId) => {
+    // 1. Delete the item from sessionStorage using its ID as the key
+    sessionStorage.removeItem(artworkId);
+
+    // 2. Refresh the display by re-loading the entire collection
+    loadCollection();
+  };
 
 
-
-  const parsedData = JSON.parse(storedData);
-
+if (collection.length === 0) {
   return (
-    <div>PersonalExhibition
-      <p key={parsedData.id}>
-        {" "}
-        {parsedData.title} <img src={parsedData.images?.web?.url}></img>
-      </p>
-      
+    <div>
+      <h2>Personal Exhibition</h2>
+      <p>Your personal exhibition is empty. Add some artworks!</p>
+    </div>
+  );
+}
+
+return (
+    <div>
+      <h2>Personal Exhibition</h2>
+      {collection.map((artwork) => (
+        <div key={artwork.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
+          <h3>{artwork.title}</h3>
+          <p>{artwork.department}</p>
+          <img 
+            src={artwork.images?.web?.url} 
+            alt={artwork.title}
+            style={{ maxWidth: '200px', height: 'auto', display: 'block', marginBottom: '10px' }}
+          />
+          {/* 3. Add the Delete button and bind it to removeFromCollection */}
+          <button onClick={() => removeFromCollection(artwork.id)}>
+            Delete from Collection
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
