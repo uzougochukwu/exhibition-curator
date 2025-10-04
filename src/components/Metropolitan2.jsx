@@ -18,7 +18,7 @@ export default function Metropolitan2() {
     // setError(null); // Clear any previous error message
     // setArtworks([]); // Reset the artwork list before fetching new data
     // // ... rest of axios call
-    // orderby works for gallery and department
+    // orderby works for credit, catalogue_raisonne, collection, classification_type, department, gallery, medium, recently_acquired
     axios
       .get(
         `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${orderby}`
@@ -38,6 +38,13 @@ export default function Metropolitan2() {
           "A network error occurred or the search query returned nothing"
         );
       });
+  };
+
+  const addToCollection = (artwork) => {
+    console.log("added");
+    console.log(artwork.id);
+    
+    sessionStorage.setItem(artwork.id, JSON.stringify(artwork));
   };
 
   if (error) {
@@ -71,9 +78,7 @@ export default function Metropolitan2() {
             <p key={artwork.id}>
               {" "}
               {artwork.title} <img src={artwork.images?.web?.url}></img>
-              <a href={link}>
-                <button>Go to object</button>
-              </a>
+              <button onClick={() => addToCollection(artwork)}>Add to collection</button>
             </p>
           );
         })}
