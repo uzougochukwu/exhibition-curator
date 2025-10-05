@@ -42,27 +42,38 @@ export default function PersonalExhibition() {
     loadCollection();
   };
 
+  if (collection.length === 0) {
+    return (
+      <div>
+        <h2>Personal Exhibition</h2>
+        <p>Your personal exhibition is empty. Add some artworks!</p>
+      </div>
+    );
+  }
 
-if (collection.length === 0) {
   return (
     <div>
       <h2>Personal Exhibition</h2>
-      <p>Your personal exhibition is empty. Add some artworks!</p>
-    </div>
-  );
-}
-
-return (
-    <div>
-      <h2>Personal Exhibition</h2>
       {collection.map((artwork) => (
-        <div key={artwork.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
+        <div
+          key={artwork.id}
+          style={{
+            border: "1px solid #ccc",
+            padding: "10px",
+            margin: "10px 0",
+          }}
+        >
           <h3>{artwork.title}</h3>
           <p>{artwork.department}</p>
-          <img 
-            src={artwork.images?.web?.url} 
+          <img
+            src={artwork.images?.web?.url}
             alt={artwork.title}
-            style={{ maxWidth: '200px', height: 'auto', display: 'block', marginBottom: '10px' }}
+            style={{
+              maxWidth: "200px",
+              height: "auto",
+              display: "block",
+              marginBottom: "10px",
+            }}
           />
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>

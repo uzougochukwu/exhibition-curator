@@ -45,7 +45,7 @@ export default function Metropolitan2() {
   const addToCollection = (artwork) => {
     console.log("added");
     console.log(artwork.id);
-    
+
     sessionStorage.setItem(artwork.id, JSON.stringify(artwork));
   };
 
@@ -65,7 +65,7 @@ export default function Metropolitan2() {
             onChange={(e) => setTerm(e.target.value)}
           />
         </p>
-        <button>Order By</button>
+        <button>Sort</button>
         <p>
           <input
             type="text"
@@ -83,7 +83,9 @@ export default function Metropolitan2() {
             <p key={artwork.id}>
               {" "}
               {artwork.title} <img src={artwork.images?.web?.url}></img>
-              <button onClick={() => addToCollection(artwork)}>Add to collection</button>
+              <button onClick={() => addToCollection(artwork)}>
+                Add to collection
+              </button>
             </p>
           );
         })}
