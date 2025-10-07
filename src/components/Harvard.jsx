@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import smithsonian_api_key from "../extra/API-KEY.js"
+import smithsonian_api_key from "../extra/API-KEY.js";
 
 export default function Harvard() {
   const parameter = useParams();
@@ -28,7 +28,7 @@ export default function Harvard() {
       )
       .then((artworks) => {
         console.log("here");
-        
+
         // console.log(artworks.data.data[0].images.web.url);
         console.log(artworks.data.response.rows);
         setArtworks(artworks.data.response.rows);
@@ -37,7 +37,7 @@ export default function Harvard() {
         // Keep it empty, as the rendering logic will now default to hidden.
         setImageVisibility({});
 
-        return artworks.data.response.rows;
+        return artworks.data.response;
       })
       .catch((err) => {
         setError(
@@ -103,7 +103,8 @@ export default function Harvard() {
           const isVisible = imageVisibility[artwork.id] === true;
 
           const isInfoVisible = infoVisibility[artwork.id] === true;
-
+          //console.log(artwork.content);
+          
           return (
             <div key={artwork.id}>
               {/* Always display the title */}
@@ -114,7 +115,7 @@ export default function Harvard() {
                   <p>Created: {artwork.date_text}</p>
                   <p>Department: {artwork.department}</p>
                   <p>Description: {artwork.description}</p>
-                  <a href={artwork.url}>Find out more</a>
+                  <a href={artwork.content.descriptiveNonRepeating.guid}>Find out more</a>
                 </div>
               )}
 
@@ -128,10 +129,14 @@ export default function Harvard() {
                 />
               )}
 
-              {!hasImage && <p>[No Image Available]
-                <button onClick={() => toggleInfoVisibility(artwork.id)}>
+              {!hasImage && (
+                <p>
+                  [No Image Available]
+                  <button onClick={() => toggleInfoVisibility(artwork.id)}>
                     {isInfoVisible ? "Hide Info" : "Show Info"}
-                  </button></p>}
+                  </button>
+                </p>
+              )}
 
               {/* Only display the control buttons if an image URL exists */}
               {hasImage && (
