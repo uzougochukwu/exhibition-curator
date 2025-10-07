@@ -125,6 +125,11 @@ export default function Metropolitan2() {
                 />
               )}
 
+              {!hasImage && <p>[No Image Available]
+                <button onClick={() => toggleInfoVisibility(artwork.id)}>
+                    {isInfoVisible ? "Hide Info" : "Show Info"}
+                  </button></p>}
+
               {/* Only display the control buttons if an image URL exists */}
               {hasImage && (
                 <>
