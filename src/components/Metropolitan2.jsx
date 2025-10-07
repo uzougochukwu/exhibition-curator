@@ -1,43 +1,34 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function Metropolitan2() {
   const parameter = useParams();
 
   const [term, setTerm] = useState("");
-
   const [orderby, setOrderBy] = useState("");
-
   const [metartworks, setArtworks] = useState([]);
-
   const [error, setError] = useState();
-
-  const [imageVisibility, setImageVisibility] = useState({});
+  
+  // State object to track visibility for each artwork by its unique ID: { id: boolean }
+  const [imageVisibility, setImageVisibility] = useState({}); 
 
   const link = "/personalexhibition";
 
   const makeSearch = () => {
     console.log("Search button clicked. Starting API call for:", term);
-    // setError(null); // Clear any previous error message
-    // setArtworks([]); // Reset the artwork list before fetching new data
-    // // ... rest of axios call
-    // orderby works for credit, catalogue_raisonne, collection, classification_type, department, gallery, medium, recently_acquired
+    
     axios
       .get(
         `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${orderby}`
       )
       .then((artworks) => {
-        console.log(artworks.data.data[0].images.web.url);
-
-        //console.log(response.data["objectIDs"], response.data);
-        //console.log("here");
+        // console.log(artworks.data.data[0].images.web.url);
         setArtworks(artworks.data.data);
-
-        setImageVisibility({});
-
-        //console.log(artworks);
-        //console.log(artworks.data["objectIDs"]);
+        
+        // Reset visibility state for new search results (optional, but good practice)
+        setImageVisibility({}); 
+        
         return artworks.data.data;
       })
       .catch((err) => {
@@ -48,17 +39,17 @@ export default function Metropolitan2() {
   };
 
   const toggleVisibility = (id) => {
-    setImageVisibility((prevVisibility) => ({
+    // Toggles the visibility state for the specific artwork ID
+    setImageVisibility(prevVisibility => ({
       ...prevVisibility,
-      // Toggle the boolean value for the specific ID
-      [id]: !prevVisibility[id],
+      // Use logical NOT (!) to toggle the current state. Defaults to true if undefined/falsy.
+      [id]: prevVisibility[id] === undefined ? false : !prevVisibility[id]
     }));
   };
-
+  
   const addToCollection = (artwork) => {
     console.log("added");
     console.log(artwork.id);
-
     sessionStorage.setItem(artwork.id, JSON.stringify(artwork));
   };
 
@@ -88,30 +79,38 @@ export default function Metropolitan2() {
         </p>
         A list of the relevant artworks from the Cleveland Museum of Art:{" "}
         {metartworks.map((artwork) => {
-          const link = "/objects/" + artwork;
-          // get specific visibility: default to true (visible) if not set
-          const isVisible = imageVisibility[artwork.id] !== false;
+          
+          // Check if an image URL is available for this artwork
           const hasImage = artwork.images?.web?.url;
+          
+          // Determine the visibility state for this specific artwork.
+          // If the ID is not in state, default it to true (visible).
+          const isVisible = imageVisibility[artwork.id] !== false;
 
           return (
             <div key={artwork.id}>
-              <p> {artwork.title}</p>
+              {/* Always display the title */}
+              <p>{artwork.title}</p>
+              
+              {/* Conditional rendering for the image: must have a URL AND be set to visible */}
               {hasImage && isVisible && (
-                <img
-                  src={artwork.images.web.url}
-                  width="500"
-                  height="500"
-                  alt={artwork.title}
-                ></img>
+                <img 
+                  src={artwork.images.web.url} 
+                  width="500" 
+                  height="500" 
+                  alt={artwork.title || "Artwork image"}
+                />
               )}
-
-              {/* only show buttons if the artwork has an image url*/}
+              
+              {/* Only display the control buttons if an image URL exists */}
               {hasImage && (
                 <>
+                  {/* Button to toggle the visibility of THIS image */}
                   <button onClick={() => toggleVisibility(artwork.id)}>
-                    {isVisible ? "Hide Image" : "Show Image"}
+                    {isVisible ? 'Hide Image' : 'Show Image'}
                   </button>
-
+                  
+                  {/* Add to collection button */}
                   <button onClick={() => addToCollection(artwork)}>
                     Add to collection
                   </button>
