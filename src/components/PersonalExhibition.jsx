@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 export default function PersonalExhibition() {
+  const link = "/"
+
   const [collection, setCollection] = useState([]);
 
   // function to load the collection from sessionStorage
@@ -54,6 +56,7 @@ export default function PersonalExhibition() {
   return (
     <div>
       <h2>Personal Exhibition</h2>
+      <a href={link}><button> Go to the Home page</button></a>
       {collection.map((artwork) => (
         <div
           key={artwork.id}
