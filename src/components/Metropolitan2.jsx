@@ -107,7 +107,7 @@ export default function Metropolitan2() {
               <p>{artwork.title}</p>
 
               {isInfoVisible && (
-                <p>{artwork.accession_date}</p>
+                <p>{artwork.date_text}</p>
               )}
 
               {/* Conditional rendering for the image: must have a URL AND be set to visible */}
