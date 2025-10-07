@@ -11,6 +11,7 @@ export default function Metropolitan2() {
   const [error, setError] = useState();
   
   // State object to track visibility for each artwork by its unique ID: { id: boolean }
+  // We don't need to change the initial state, as the logic below will handle the default.
   const [imageVisibility, setImageVisibility] = useState({}); 
 
   const link = "/personalexhibition";
@@ -26,7 +27,8 @@ export default function Metropolitan2() {
         // console.log(artworks.data.data[0].images.web.url);
         setArtworks(artworks.data.data);
         
-        // Reset visibility state for new search results (optional, but good practice)
+        // Reset visibility state for new search results
+        // Keep it empty, as the rendering logic will now default to hidden.
         setImageVisibility({}); 
         
         return artworks.data.data;
@@ -42,8 +44,9 @@ export default function Metropolitan2() {
     // Toggles the visibility state for the specific artwork ID
     setImageVisibility(prevVisibility => ({
       ...prevVisibility,
-      // Use logical NOT (!) to toggle the current state. Defaults to true if undefined/falsy.
-      [id]: prevVisibility[id] === undefined ? false : !prevVisibility[id]
+      // If the ID is undefined (first click), set it to true (show). 
+      // Otherwise, use logical NOT (!) to toggle the existing state.
+      [id]: prevVisibility[id] === undefined ? true : !prevVisibility[id]
     }));
   };
   
@@ -83,9 +86,10 @@ export default function Metropolitan2() {
           // Check if an image URL is available for this artwork
           const hasImage = artwork.images?.web?.url;
           
-          // Determine the visibility state for this specific artwork.
-          // If the ID is not in state, default it to true (visible).
-          const isVisible = imageVisibility[artwork.id] !== false;
+          // 🛑 CRITICAL CHANGE: Determine the visibility state for this specific artwork.
+          // If the ID is NOT in state (undefined), it defaults to false (hidden).
+          // We only check if the stored value is explicitly TRUE.
+          const isVisible = imageVisibility[artwork.id] === true;
 
           return (
             <div key={artwork.id}>
