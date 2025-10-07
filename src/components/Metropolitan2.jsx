@@ -13,6 +13,8 @@ export default function Metropolitan2() {
 
   const [error, setError] = useState();
 
+  const [imageVisibility, setImageVisibility] = useState({});
+
   const link = "/personalexhibition";
 
   const makeSearch = () => {
@@ -31,6 +33,9 @@ export default function Metropolitan2() {
         //console.log(response.data["objectIDs"], response.data);
         //console.log("here");
         setArtworks(artworks.data.data);
+
+        setImageVisibility({});
+
         //console.log(artworks);
         //console.log(artworks.data["objectIDs"]);
         return artworks.data.data;
@@ -40,6 +45,14 @@ export default function Metropolitan2() {
           "A network error occurred or the search query returned nothing"
         );
       });
+  };
+
+  const toggleVisibility = (id) => {
+    setImageVisibility((prevVisibility) => ({
+      ...prevVisibility,
+      // Toggle the boolean value for the specific ID
+      [id]: !prevVisibility[id],
+    }));
   };
 
   const addToCollection = (artwork) => {
@@ -76,17 +89,35 @@ export default function Metropolitan2() {
         A list of the relevant artworks from the Cleveland Museum of Art:{" "}
         {metartworks.map((artwork) => {
           const link = "/objects/" + artwork;
-          //console.log(artwork.id);
-          //console.log(search_by);
+          // get specific visibility: default to true (visible) if not set
+          const isVisible = imageVisibility[artwork.id] !== false;
+          const hasImage = artwork.images?.web?.url;
 
           return (
-            <p key={artwork.id}>
-              {" "}
-              {artwork.title} <img src={artwork.images?.web?.url}></img>
-              <button onClick={() => addToCollection(artwork)}>
-                Add to collection
-              </button>
-            </p>
+            <div key={artwork.id}>
+              <p> {artwork.title}</p>
+              {hasImage && isVisible && (
+                <img
+                  src={artwork.images.web.url}
+                  width="500"
+                  height="500"
+                  alt={artwork.title}
+                ></img>
+              )}
+
+              {/* only show buttons if the artwork has an image url*/}
+              {hasImage && (
+                <>
+                  <button onClick={() => toggleVisibility(artwork.id)}>
+                    {isVisible ? "Hide Image" : "Show Image"}
+                  </button>
+
+                  <button onClick={() => addToCollection(artwork)}>
+                    Add to collection
+                  </button>
+                </>
+              )}
+            </div>
           );
         })}
       </div>
