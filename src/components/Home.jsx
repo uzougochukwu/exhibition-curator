@@ -3,9 +3,15 @@ import Harvard from './Harvard'
 import Metropolitan from './Metropolitan'
 import Metropolitan2 from './Metropolitan2'
 function Home() {
+
+  const cleveland_link = "/cleveland"
+  const personal_exhibition = "/personalexhibition"
+  const smithsonian_link = "/smithsonian"
   return (
-    <div><Harvard/>
-    <Metropolitan2/>
+    <div>
+    <a href={personal_exhibition}>Personal Exhibition</a><p></p>
+    <a href={cleveland_link}>Cleveland</a><p></p>
+    <a href={smithsonian_link}>Smithsonian</a>
     </div>
   )
 }
