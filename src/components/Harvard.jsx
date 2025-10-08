@@ -95,7 +95,7 @@ export default function Harvard() {
             onChange={(e) => setTerm(e.target.value)}
           />
         </p>
-        <button>Sort</button>
+        Sort
         <p>
           <input
             type="text"

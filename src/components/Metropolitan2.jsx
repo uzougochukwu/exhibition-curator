@@ -79,8 +79,8 @@ export default function Metropolitan2() {
           <button>Go to Home</button>
         </a>
         <a href={link}>
-          <button>Go to Personal Exhibition</button>
-        </a>
+          <button>Your Personal Exhibition</button>
+        </a><p></p>
         <button onClick={makeSearch}>Search</button>
         <p>
           <input
@@ -89,7 +89,7 @@ export default function Metropolitan2() {
             onChange={(e) => setTerm(e.target.value)}
           />
         </p>
-        <button>Sort</button>
+        Sort
         <p>
           <input
             type="text"
