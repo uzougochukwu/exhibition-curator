@@ -6,7 +6,9 @@ export default function Metropolitan2() {
   const parameter = useParams();
 
   const [term, setTerm] = useState("");
-  const [orderby, setOrderBy] = useState("");
+  // Initial orderby state is set to an empty string, which is fine, 
+  // but setting a default sort option can improve UX.
+  const [orderby, setOrderBy] = useState(""); 
   const [metartworks, setArtworks] = useState([]);
   const [error, setError] = useState();
 
@@ -21,10 +23,12 @@ export default function Metropolitan2() {
   const home_link = "/";
 
   const makeSearch = () => {
-    console.log("Search button clicked. Starting API call for:", term);
+    console.log("Search button clicked. Starting API call for:", term, "with orderby:", orderby);
 
+    // Ensure the API call correctly uses the 'orderby' state
     axios
       .get(
+        // The API request is correctly constructed using the 'orderby' state
         `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${orderby}`
       )
       .then((artworks) => {
@@ -80,7 +84,8 @@ export default function Metropolitan2() {
         </a>
         <a href={link}>
           <button>Your Personal Exhibition</button>
-        </a><p></p>
+        </a>
+        <p></p>
         <button onClick={makeSearch}>Search</button>
         <p>
           <input
@@ -91,13 +96,25 @@ export default function Metropolitan2() {
         </p>
         Sort
         <p>
-          <input
-            type="text"
+          {/* The <select> element is correctly bound to the 'orderby' state */}
+          <select
+            // Removed type="text" as it's not a valid attribute for <select>
             value={orderby}
             onChange={(e) => setOrderBy(e.target.value)}
-          />
+          >
+            {/* Added a default option */}
+            <option value="">No sort</option> 
+            {/* Options with meaningful values that the API expects */}
+            <option value="catalogue_raisonne">Catalogue Raisonne</option>
+            <option value="collection">Collection</option>
+            <option value="credit">Credit</option>
+            <option value="classification_type">Classification Type</option>
+            <option value="department">Department</option>
+            <option value="gallery">Gallery</option>
+            <option value="medium">Medium</option>
+            <option value="recently_acquired">Newest</option>
+          </select>
         </p>
-
         {metartworks.map((artwork) => {
           // Check if an image URL is available for this artwork
           const hasImage = artwork.images?.web?.url;
