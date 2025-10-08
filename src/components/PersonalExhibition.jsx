@@ -72,7 +72,7 @@ export default function PersonalExhibition() {
           <p>{artwork.department}</p>
           <img
             src={artwork.images?.web?.url}
-            alt={artwork.title}
+            // alt={artwork.title}
             style={{
               maxWidth: "200px",
               height: "auto",
@@ -82,7 +82,7 @@ export default function PersonalExhibition() {
           />
                     <img
           src={artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]?.thumbnail}
-          alt={artwork.title}
+          // alt={artwork.title}
           style={{
             maxWidth: "200px",
             height: "auto",

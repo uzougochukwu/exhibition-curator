@@ -97,7 +97,7 @@ export default function Metropolitan2() {
             onChange={(e) => setOrderBy(e.target.value)}
           />
         </p>
-       
+
         {metartworks.map((artwork) => {
           // Check if an image URL is available for this artwork
           const hasImage = artwork.images?.web?.url;
@@ -108,10 +108,9 @@ export default function Metropolitan2() {
 
           return (
             <div key={artwork.id}>
-              A list of the relevant artworks from the Cleveland Museum of Art: {" "}
+              A list of the relevant artworks from the Cleveland Museum of Art:{" "}
               {/* Always display the title */}
               <p>{artwork.title}</p>
-
               {isInfoVisible && (
                 <div>
                   <p>Created: {artwork.date_text}</p>
@@ -120,17 +119,15 @@ export default function Metropolitan2() {
                   <a href={artwork.url}>Find out more</a>
                 </div>
               )}
-
               {/* Conditional rendering for the image: must have a URL AND be set to visible */}
               {hasImage && isVisible && (
                 <img
                   src={artwork.images.web.url}
                   width="500"
                   height="500"
-                  alt={artwork.title || "Artwork image"}
+                  // alt={artwork.title || "Artwork image"}
                 />
               )}
-
               {!hasImage && (
                 <p>
                   [No Image Available]
@@ -139,7 +136,6 @@ export default function Metropolitan2() {
                   </button>
                 </p>
               )}
-
               {/* Only display the control buttons if an image URL exists */}
               {hasImage && (
                 <>

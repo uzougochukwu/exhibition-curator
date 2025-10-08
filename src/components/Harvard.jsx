@@ -161,7 +161,7 @@ export default function Harvard() {
                   src={imageSrc} // Use the safely retrieved source
                   width="50"
                   height="50"
-                  alt={artwork.title || "Artwork image"}
+                  // alt={artwork.title || "Artwork image"}
                 />
               )}
 
