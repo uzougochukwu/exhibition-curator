@@ -103,7 +103,7 @@ export default function Harvard() {
             onChange={(e) => setOrderBy(e.target.value)}
           />
         </p>
-        A list of the relevant artworks from the Smithsonian:{" "}
+       
         {metartworks.map((artwork) => {
           // FIX: Use optional chaining to safely get the image source URL
           const imageSrc =
@@ -127,7 +127,7 @@ export default function Harvard() {
                 margin: "10px",
                 padding: "10px",
               }}
-            >
+            > A list of the relevant artworks from the Smithsonian:{" "}
               {/* Always display the title */}
               <h3>{artwork.title}</h3>
 
