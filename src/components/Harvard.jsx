@@ -12,7 +12,6 @@ export default function Harvard() {
   const [error, setError] = useState();
 
   // State object to track visibility for each artwork by its unique ID: { id: boolean }
-  // We don't need to change the initial state, as the logic below will handle the default.
   const [imageVisibility, setImageVisibility] = useState({});
 
   const [infoVisibility, setInfoVisibility] = useState({});
@@ -27,21 +26,24 @@ export default function Harvard() {
         `http://localhost:8080/api.si.edu/openaccess/api/v1.0/search?q=${term}&sort=${orderby}&api_key=${smithsonian_api_key}`
       )
       .then((artworks) => {
-        console.log("here");
+        console.log("API call successful.");
 
-        // console.log(artworks.data.data[0].images.web.url);
-        //console.log(artworks.data.response.rows);
-        console.log(artworks.data.response.rows[0].content.descriptiveNonRepeating.data_source);
-        
+        // FIX: Safely access the thumbnail URL for console logging using optional chaining
+        console.log(
+          "Example thumbnail URL:",
+          artworks.data.response.rows[0]?.content?.descriptiveNonRepeating
+            ?.online_media?.media?.[0]?.thumbnail
+        );
+
         setArtworks(artworks.data.response.rows);
 
         // Reset visibility state for new search results
-        // Keep it empty, as the rendering logic will now default to hidden.
         setImageVisibility({});
 
         return artworks.data.response;
       })
       .catch((err) => {
+        console.error("API error:", err);
         setError(
           "A network error occurred or the search query returned nothing"
         );
@@ -68,8 +70,7 @@ export default function Harvard() {
   };
 
   const addToCollection = (artwork) => {
-    console.log("added");
-    console.log(artwork.id);
+    console.log("added artwork with id:", artwork.id);
     sessionStorage.setItem(artwork.id, JSON.stringify(artwork));
   };
 
@@ -99,66 +100,85 @@ export default function Harvard() {
         </p>
         A list of the relevant artworks from the Smithsonian:{" "}
         {metartworks.map((artwork) => {
-          // Check if an image URL is available for this artwork
-          const hasImage = artwork.images?.web?.url;
+          // FIX: Use optional chaining to safely get the image source URL
+          const imageSrc =
+            artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]
+              ?.thumbnail;
 
           const isVisible = imageVisibility[artwork.id] === true;
-
           const isInfoVisible = infoVisibility[artwork.id] === true;
-          //console.log(artwork.content);
-          
-          return (
-            <div key={artwork.id}>
-              {/* Always display the title */}
-              <p>{artwork.title}</p>
 
+          // Check for required info data
+          const hasDate = artwork.content?.freetext?.date?.[0]?.content;
+          const hasDataSource =
+            artwork.content?.descriptiveNonRepeating?.data_source;
+          const hasGuid = artwork.content?.descriptiveNonRepeating?.guid;
+
+          return (
+            <div
+              key={artwork.id}
+              style={{
+                border: "1px solid #ccc",
+                margin: "10px",
+                padding: "10px",
+              }}
+            >
+              {/* Always display the title */}
+              <h3>{artwork.title}</h3>
+
+              {/* Conditionally display info if set to visible */}
               {isInfoVisible && (
                 <div>
-                  <p>Created: {artwork.content.freetext.date[0].content}</p>
-                  <p>Department: {artwork.content.descriptiveNonRepeating.data_source}</p>
-                  <p>Description: {artwork.description}</p>
-                  <a href={artwork.content.descriptiveNonRepeating.guid}>Find out more</a>
+                  {/* Safely display date, department, and link */}
+                  {hasDate && (
+                    <p>Created: {artwork.content.freetext.date[0].content}</p>
+                  )}
+                  {hasDataSource && (
+                    <p>
+                      Department:{" "}
+                      {artwork.content.descriptiveNonRepeating.data_source}
+                    </p>
+                  )}
+                  {artwork.description && (
+                    <p>Description: {artwork.description}</p>
+                  )}
+                  {hasGuid && (
+                    <a href={artwork.content.descriptiveNonRepeating.guid}>
+                      Find out more
+                    </a>
+                  )}
                 </div>
               )}
 
-              {/* Conditional rendering for the image: must have a URL AND be set to visible */}
-              {hasImage && isVisible && (
+              {/* FIX: Conditional rendering for the image: must have a URL AND be set to visible */}
+              {imageSrc && isVisible && (
                 <img
-                  src={artwork.images.web.url}
-                  width="500"
-                  height="500"
+                  src={imageSrc} // Use the safely retrieved source
+                  width="50"
+                  height="50"
                   alt={artwork.title || "Artwork image"}
                 />
               )}
 
-              {!hasImage && (
-                <p>
-                  [No Image Available]
-                  <button onClick={() => toggleInfoVisibility(artwork.id)}>
-                    {isInfoVisible ? "Hide Info" : "Show Info"}
-                  </button>
-                </p>
+              {/* Message if no image is available */}
+              {!imageSrc && <p>[No Image Available for this item]</p>}
+
+              {/* Only display the "Show/Hide Image" button if an image source exists */}
+              {imageSrc && (
+                <button onClick={() => toggleVisibility(artwork.id)}>
+                  {isVisible ? "Hide Image" : "Show Image"}
+                </button>
               )}
 
-              {/* Only display the control buttons if an image URL exists */}
-              {hasImage && (
-                <>
-                  {/* Button to toggle the visibility of THIS image */}
-                  <button onClick={() => toggleVisibility(artwork.id)}>
-                    {isVisible ? "Hide Image" : "Show Image"}
-                  </button>
+              {/* Button to toggle visibility of info */}
+              <button onClick={() => toggleInfoVisibility(artwork.id)}>
+                {isInfoVisible ? "Hide Info" : "Show Info"}
+              </button>
 
-                  {/* Button to toggle visibility of info */}
-                  <button onClick={() => toggleInfoVisibility(artwork.id)}>
-                    {isInfoVisible ? "Hide Info" : "Show Info"}
-                  </button>
-
-                  {/* Add to collection button */}
-                  <button onClick={() => addToCollection(artwork)}>
-                    Add to collection
-                  </button>
-                </>
-              )}
+              {/* Add to collection button */}
+              <button onClick={() => addToCollection(artwork)}>
+                Add to collection
+              </button>
             </div>
           );
         })}
