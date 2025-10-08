@@ -102,8 +102,7 @@ export default function Harvard() {
         {metartworks.map((artwork) => {
           // FIX: Use optional chaining to safely get the image source URL
           const imageSrc =
-            artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]
-              ?.thumbnail;
+            artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]?.thumbnail;
 
           const isVisible = imageVisibility[artwork.id] === true;
           const isInfoVisible = infoVisibility[artwork.id] === true;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-export default function PersonalExhibition() {
+
+export default function Personal_exhib_smithsonian() {
   const link = "/";
 
   const [collection, setCollection] = useState([]);
@@ -79,8 +80,8 @@ export default function PersonalExhibition() {
               display: "block",
               marginBottom: "10px",
             }}
-          />
-                    <img
+          /><p>hey</p>
+          <img
           src={artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]?.thumbnail}
           alt={artwork.title}
           style={{
