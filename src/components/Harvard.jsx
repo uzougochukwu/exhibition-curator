@@ -81,9 +81,9 @@ export default function Harvard() {
   } else {
     return (
       <div>
-        <a href={home_link}><button>
-          Home
-          </button></a>
+        <a href={home_link}>
+          <button>Home</button>
+        </a>
         <a href={link}>
           <button>Go to Personal Exhibition</button>
         </a>
@@ -97,13 +97,21 @@ export default function Harvard() {
         </p>
         Sort
         <p>
-          <input
-            type="text"
+          <select
+            // Removed type="text" as it's not a valid attribute for <select>
             value={orderby}
             onChange={(e) => setOrderBy(e.target.value)}
-          />
+          >
+            {/* Added a default option */}
+            <option value="">No sort</option>
+            {/* Options with meaningful values that the API expects */}
+            <option value="relevancy">Relevancy</option>
+            <option value="id">ID</option>
+            <option value="newest">Newest</option>
+            <option value="updated">Updated</option>
+            <option value="random">Random</option>
+          </select>
         </p>
-       
         {metartworks.map((artwork) => {
           // FIX: Use optional chaining to safely get the image source URL
           const imageSrc =
@@ -127,10 +135,11 @@ export default function Harvard() {
                 margin: "10px",
                 padding: "10px",
               }}
-            > A list of the relevant artworks from the Smithsonian:{" "}
+            >
+              {" "}
+              A list of the relevant artworks from the Smithsonian:{" "}
               {/* Always display the title */}
               <h3>{artwork.title}</h3>
-
               {/* Conditionally display info if set to visible */}
               {isInfoVisible && (
                 <div>
@@ -154,7 +163,6 @@ export default function Harvard() {
                   )}
                 </div>
               )}
-
               {/* FIX: Conditional rendering for the image: must have a URL AND be set to visible */}
               {imageSrc && isVisible && (
                 <img
@@ -164,22 +172,18 @@ export default function Harvard() {
                   // alt={artwork.title || "Artwork image"}
                 />
               )}
-
               {/* Message if no image is available */}
               {!imageSrc && <p>[No Image Available for this item]</p>}
-
               {/* Only display the "Show/Hide Image" button if an image source exists */}
               {imageSrc && (
                 <button onClick={() => toggleVisibility(artwork.id)}>
                   {isVisible ? "Hide Image" : "Show Image"}
                 </button>
               )}
-
               {/* Button to toggle visibility of info */}
               <button onClick={() => toggleInfoVisibility(artwork.id)}>
                 {isInfoVisible ? "Hide Info" : "Show Info"}
               </button>
-
               {/* Add to collection button */}
               <button onClick={() => addToCollection(artwork)}>
                 Add to collection
