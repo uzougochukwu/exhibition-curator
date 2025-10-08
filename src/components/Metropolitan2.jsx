@@ -18,6 +18,8 @@ export default function Metropolitan2() {
 
   const link = "/personalexhibition";
 
+  const home_link = "/"
+
   const makeSearch = () => {
     console.log("Search button clicked. Starting API call for:", term);
 
@@ -73,6 +75,8 @@ export default function Metropolitan2() {
   } else {
     return (
       <div>
+        <a href={home_link}><button>
+          Go to Home</button></a>
         <a href={link}>
           <button>Go to Personal Exhibition</button>
         </a>
