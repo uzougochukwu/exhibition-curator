@@ -31,7 +31,7 @@ export default function Harvard() {
 
         // console.log(artworks.data.data[0].images.web.url);
         //console.log(artworks.data.response.rows);
-        console.log(artworks.data.response.rows[0].content.freetext.date[0].content);
+        console.log(artworks.data.response.rows[0].content.descriptiveNonRepeating.data_source);
         
         setArtworks(artworks.data.response.rows);
 
@@ -115,7 +115,7 @@ export default function Harvard() {
               {isInfoVisible && (
                 <div>
                   <p>Created: {artwork.content.freetext.date[0].content}</p>
-                  <p>Department: {artwork.content.freetext.date[0].content}</p>
+                  <p>Department: {artwork.content.descriptiveNonRepeating.data_source}</p>
                   <p>Description: {artwork.description}</p>
                   <a href={artwork.content.descriptiveNonRepeating.guid}>Find out more</a>
                 </div>
