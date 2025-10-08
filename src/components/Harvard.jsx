@@ -30,7 +30,9 @@ export default function Harvard() {
         console.log("here");
 
         // console.log(artworks.data.data[0].images.web.url);
-        console.log(artworks.data.response.rows);
+        //console.log(artworks.data.response.rows);
+        console.log(artworks.data.response.rows[0].content.freetext.date[0].content);
+        
         setArtworks(artworks.data.response.rows);
 
         // Reset visibility state for new search results
@@ -112,8 +114,8 @@ export default function Harvard() {
 
               {isInfoVisible && (
                 <div>
-                  <p>Created: {artwork.date_text}</p>
-                  <p>Department: {artwork.department}</p>
+                  <p>Created: {artwork.content.freetext.date[0].content}</p>
+                  <p>Department: {artwork.content.freetext.date[0].content}</p>
                   <p>Description: {artwork.description}</p>
                   <a href={artwork.content.descriptiveNonRepeating.guid}>Find out more</a>
                 </div>
