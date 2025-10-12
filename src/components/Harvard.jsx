@@ -25,7 +25,6 @@ export default function Harvard() {
     console.log("Search button clicked. Starting API call for:", term);
 
     // console.log(`http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`);
-    
 
     axios
       .get(
@@ -34,8 +33,7 @@ export default function Harvard() {
       .then((artworks) => {
         console.log("API call successful.");
 
-        console.log(artworks);
-        
+        console.log(artworks.data.records);
 
         // FIX: Safely access the thumbnail URL for console logging using optional chaining
         // console.log(
@@ -119,11 +117,11 @@ export default function Harvard() {
             <option value="random">Random</option>
           </select>
         </p>
+        A list of the relevant artworks from the Smithsonian:{" "}
         {metartworks.map((artwork) => {
           // FIX: Use optional chaining to safely get the image source URL
           const imageSrc =
-            artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]
-              ?.thumbnail;
+            artwork.primaryimageurl;
 
           const isVisible = imageVisibility[artwork.id] === true;
           const isInfoVisible = infoVisibility[artwork.id] === true;
@@ -144,7 +142,6 @@ export default function Harvard() {
               }}
             >
               {" "}
-              A list of the relevant artworks from the Smithsonian:{" "}
               {/* Always display the title */}
               <h3>{artwork.title}</h3>
               {/* Conditionally display info if set to visible */}
@@ -174,8 +171,8 @@ export default function Harvard() {
               {imageSrc && isVisible && (
                 <img
                   src={imageSrc} // Use the safely retrieved source
-                  width="50"
-                  height="50"
+                  width="300"
+                  height="300"
                   // alt={artwork.title || "Artwork image"}
                 />
               )}
