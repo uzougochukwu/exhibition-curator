@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import smithsonian_api_key from "../extra/API-KEY.js";
+import harvard_api_key from "../extra/API-KEY.js";
 
 export default function Harvard() {
   const parameter = useParams();
@@ -23,26 +24,32 @@ export default function Harvard() {
   const makeSearch = () => {
     console.log("Search button clicked. Starting API call for:", term);
 
+    // console.log(`http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`);
+    
+
     axios
       .get(
-        `http://localhost:8080/api.si.edu/openaccess/api/v1.0/search?q=${term}&sort=${orderby}&api_key=${smithsonian_api_key}`
+        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`
       )
       .then((artworks) => {
         console.log("API call successful.");
 
-        // FIX: Safely access the thumbnail URL for console logging using optional chaining
-        console.log(
-          "Example thumbnail URL:",
-          artworks.data.response.rows[0]?.content?.descriptiveNonRepeating
-            ?.online_media?.media?.[0]?.thumbnail
-        );
+        console.log(artworks);
+        
 
-        setArtworks(artworks.data.response.rows);
+        // FIX: Safely access the thumbnail URL for console logging using optional chaining
+        // console.log(
+        //   "Example thumbnail URL:",
+        //   artworks.data.response.rows[0]?.content?.descriptiveNonRepeating
+        //     ?.online_media?.media?.[0]?.thumbnail
+        // );
+
+        setArtworks(artworks.data.records);
 
         // Reset visibility state for new search results
         setImageVisibility({});
 
-        return artworks.data.response;
+        return artworks.data.records;
       })
       .catch((err) => {
         console.error("API error:", err);
