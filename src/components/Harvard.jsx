@@ -1,7 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import smithsonian_api_key from "../extra/API-KEY.js";
 import harvard_api_key from "../extra/API-KEY.js";
 
 export default function Harvard() {
@@ -120,8 +119,7 @@ export default function Harvard() {
         A list of the relevant artworks from the Smithsonian:{" "}
         {metartworks.map((artwork) => {
           // FIX: Use optional chaining to safely get the image source URL
-          const imageSrc =
-            artwork.primaryimageurl;
+          const imageSrc = artwork.primaryimageurl;
 
           const isVisible = imageVisibility[artwork.id] === true;
           const isInfoVisible = infoVisibility[artwork.id] === true;
