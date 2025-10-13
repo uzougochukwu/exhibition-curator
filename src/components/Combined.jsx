@@ -27,7 +27,7 @@ export default function Combined() {
     // --- Harvard API Call ---
     axios
       .get(
-        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`
+        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}`
       )
       .then((harvardArtworks) => {
         //console.log("API call successful.");
@@ -56,7 +56,7 @@ export default function Combined() {
     // The logic below maps the value selected in the dropdown ('orderby')
     // to a corresponding sort parameter for the Cleveland API.
     switch (orderby) {
-      case "begindate": // Newest in your dropdown
+      case "newest": // Newest in your dropdown
         cleveland_sort_value = "recently_acquired";
         break;
       case "title":
@@ -65,8 +65,10 @@ export default function Combined() {
       // Add more cases here as needed for other sorting options
       case "venues":
         cleveland_sort_value = "gallery";
+        break;
       case "people":
         cleveland_sort_value = "artists";
+        break;
       default:
         // Use an appropriate default or an empty string for no specific sort
         cleveland_sort_value = "";
@@ -129,7 +131,7 @@ export default function Combined() {
           {/* Options with meaningful values that the API expects harvard options */}
 
           <option value="title">Title</option>
-          <option value="begindate">Newest</option>
+          <option value="newest">Newest</option>
           <option value="venues">Gallery</option>
           <option value="people">Artist</option>
         </select>
