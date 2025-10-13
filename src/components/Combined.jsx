@@ -8,6 +8,8 @@ export default function Combined() {
   // 'orderby' will store the value selected in the dropdown, which is used for Harvard
   const [orderby, setOrderBy] = useState("");
 
+  const [hasImage, setHasImage] = useState("");
+
   // This state is not needed anymore for the solution below, but kept it commented out
   // const [new_order, setNewOrder] = useState("");
 
@@ -27,7 +29,7 @@ export default function Combined() {
     // --- Harvard API Call ---
     axios
       .get(
-        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}`
+        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}&hasimage=${hasImage}`
       )
       .then((harvardArtworks) => {
         //console.log("API call successful.");
@@ -83,7 +85,7 @@ export default function Combined() {
     axios
       .get(
         // Use the mapped value 'cleveland_sort_value' directly in the URL
-        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}`
+        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&hasimage=${hasImage}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
@@ -134,6 +136,20 @@ export default function Combined() {
           <option value="newest">Newest</option>
           <option value="venues">Gallery</option>
           <option value="people">Artist</option>
+        </select>
+      </p>
+      Do you want images?
+      <p>
+        <select
+          // Removed type="text" as it's not a valid attribute for <select>
+          value={hasImage}
+          onChange={(e) => setHasImage(e.target.value)}
+        >
+          {/* Added a default option */}
+          <option value="1">Yes</option>
+          {/* Options with meaningful values that the API expects harvard options */}
+
+          <option value="0">No</option>
         </select>
       </p>
       {harvardArtworks.map((harvardArtwork) => {
