@@ -47,9 +47,9 @@ export default function Combined() {
           "A network error occurred or the search query returned nothing"
         );
       });
-    
+
     // --- Cleveland API Logic and Call ---
-    
+
     // 1. Determine the appropriate sort value for Cleveland based on the Harvard 'orderby'
     let cleveland_sort_value = "";
 
@@ -59,17 +59,23 @@ export default function Combined() {
       case "begindate": // Newest in your dropdown
         cleveland_sort_value = "recently_acquired";
         break;
-      case "relevancy":
-        cleveland_sort_value = "relevance";
+      case "title":
+        cleveland_sort_value = "title";
         break;
       // Add more cases here as needed for other sorting options
+      case "venues":
+        cleveland_sort_value = "gallery";
+      case "people":
+        cleveland_sort_value = "artists";
       default:
         // Use an appropriate default or an empty string for no specific sort
-        cleveland_sort_value = ""; 
+        cleveland_sort_value = "";
         break;
     }
 
-    console.log(`Mapping Harvard 'orderby': ${orderby} to Cleveland 'orderby': ${cleveland_sort_value}`);
+    console.log(
+      `Mapping Harvard 'orderby': ${orderby} to Cleveland 'orderby': ${cleveland_sort_value}`
+    );
 
     // 2. Make the Cleveland API call using the determined 'cleveland_sort_value'
     axios
@@ -116,18 +122,16 @@ export default function Combined() {
         <select
           // Removed type="text" as it's not a valid attribute for <select>
           value={orderby}
-          onChange={(e) => setOrderBy(e.target.value)}>
-          
-        
+          onChange={(e) => setOrderBy(e.target.value)}
+        >
           {/* Added a default option */}
           <option value="">No sort</option>
           {/* Options with meaningful values that the API expects harvard options */}
 
-          <option value="relevancy">Relevancy</option>
-          <option value="id">ID</option>
+          <option value="title">Title</option>
           <option value="begindate">Newest</option>
-          <option value="updated">Updated</option>
-          <option value="random">Random</option>
+          <option value="venues">Gallery</option>
+          <option value="people">Artist</option>
         </select>
       </p>
       {harvardArtworks.map((harvardArtwork) => {
