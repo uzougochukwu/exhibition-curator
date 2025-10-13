@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 // FIX: Removed the failing import statement.
-// Use a placeholder constant for the API key instead of the external import, 
+// Use a placeholder constant for the API key instead of the external import,
 // as the "../extra/API-KEY" file cannot be resolved in this environment.
 // NOTE: In a real application, replace "YOUR_HARVARD_API_KEY_HERE" with your actual key.
 import harvard_api_key from "../extra/API-KEY";
@@ -84,6 +84,8 @@ export default function Combined() {
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
+        //console.log(clevelandArtworks.data.data.creators[0].description);
+        
         setClevelandArtworks(clevelandArtworks.data.data);
         setImageVisibility({});
         return clevelandArtworks.data.data;
@@ -117,7 +119,10 @@ export default function Combined() {
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="flex-grow">
-          <label htmlFor="search-term" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="search-term"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Search Term
           </label>
           <input
@@ -131,7 +136,10 @@ export default function Combined() {
         </div>
 
         <div>
-          <label htmlFor="sort-order" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="sort-order"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Sort By
           </label>
           <select
@@ -146,10 +154,13 @@ export default function Combined() {
             <option value="venues">Gallery</option>
             <option value="people">Artist</option>
           </select>
-        </div >
+        </div>
 
         <div>
-          <label htmlFor="image-filter" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="image-filter"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Do you want images?
           </label>
           {/* This select uses user-friendly text (Yes/No) but passes API-friendly values (1/0)
@@ -167,7 +178,7 @@ export default function Combined() {
           </select>
         </div>
 
-        <button 
+        <button
           onClick={harvardSearch}
           className="mt-6 sm:mt-5 px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
         >
@@ -185,48 +196,78 @@ export default function Combined() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
         {/* Harvard Results */}
         <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">Harvard Results ({harvardArtworks.length})</h2>
-            {harvardArtworks.map((harvardArtwork) => (
-              <div key={harvardArtwork.id} className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center">
-                <h3 className="text-lg font-medium mb-2">{harvardArtwork.title}</h3>
-                {harvardArtwork.primaryimageurl ? (
-                  <img
-                    src={harvardArtwork.primaryimageurl}
-                    width="300"
-                    height="300"
-                    className="rounded-lg object-cover w-full h-64 sm:w-64"
-                    alt={harvardArtwork.title || "Harvard Artwork"}
-                  />
-                ) : (
-                  <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <p className="text-gray-500">No Image Available</p>
-                  </div>
-                )}
-              </div>
-            ))}
+          <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
+            Harvard Results ({harvardArtworks.length})
+          </h2>
+          {harvardArtworks.map((harvardArtwork) => (
+            <div
+              key={harvardArtwork.id}
+              className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center"
+            >
+              <h3 className="text-lg font-medium mb-2">
+                {harvardArtwork.title}
+              </h3>
+              {harvardArtwork.primaryimageurl ? (
+                <img
+                  src={harvardArtwork.primaryimageurl}
+                  width="300"
+                  height="300"
+                  className="rounded-lg object-cover w-full h-64 sm:w-64"
+                  alt={harvardArtwork.title || "Harvard Artwork"}
+                />
+              ) : (
+                <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
+                  <p className="text-gray-500">No Image Available</p>
+                </div>
+              )}
+              <p></p>
+              Creation Date: {harvardArtwork.begindate}
+              <p></p>
+              Created By: {harvardArtwork.people?.[0]?.name}
+              <p></p>
+              Description: {harvardArtwork.description}
+              <p></p>
+              <a href={harvardArtwork.url}>Find out more</a>
+            </div>
+          ))}
         </div>
 
         {/* Cleveland Results */}
         <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-orange-800 border-b pb-2">Cleveland Results ({clevelandArtworks.length})</h2>
-            {clevelandArtworks.map((clevelandArtwork) => (
-              <div key={clevelandArtwork.id} className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center">
-                <h3 className="text-lg font-medium mb-2">{clevelandArtwork.title}</h3>
-                {clevelandArtwork.images?.web?.url ? (
-                  <img
-                    src={clevelandArtwork.images.web.url}
-                    width="300"
-                    height="300"
-                    className="rounded-lg object-cover w-full h-64 sm:w-64"
-                    alt={clevelandArtwork.title || "Cleveland Artwork"}
-                  />
-                ) : (
-                  <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <p className="text-gray-500">No Image Available</p>
-                  </div>
-                )}
-              </div>
-            ))}
+          <h2 className="text-xl font-semibold text-orange-800 border-b pb-2">
+            Cleveland Results ({clevelandArtworks.length})
+          </h2>
+          {clevelandArtworks.map((clevelandArtwork) => (
+            <div
+              key={clevelandArtwork.id}
+              className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center"
+            >
+              <h3 className="text-lg font-medium mb-2">
+                {clevelandArtwork.title}
+              </h3>
+              {clevelandArtwork.images?.web?.url ? (
+                <img
+                  src={clevelandArtwork.images.web.url}
+                  width="300"
+                  height="300"
+                  className="rounded-lg object-cover w-full h-64 sm:w-64"
+                  alt={clevelandArtwork.title || "Cleveland Artwork"}
+                />
+              ) : (
+                <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
+                  <p className="text-gray-500">No Image Available</p>
+                </div>
+              )}
+              <p></p>
+              Creation Date: {clevelandArtwork.creation_date}
+              <p></p>
+              Created By: {clevelandArtwork.creators?.[0]?.description}
+              <p></p>
+              Description: {clevelandArtwork.description}
+              <p></p>
+              <a href={clevelandArtwork.url}>Find out more</a>
+            </div>
+          ))}
         </div>
       </div>
     </div>
