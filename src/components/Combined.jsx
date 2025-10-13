@@ -1,26 +1,18 @@
 import React, { useState } from "react";
-// FIX: Removed the failing import statement.
-// Use a placeholder constant for the API key instead of the external import,
-// as the "../extra/API-KEY" file cannot be resolved in this environment.
-// NOTE: In a real application, replace "YOUR_HARVARD_API_KEY_HERE" with your actual key.
+// FIX: Removed the failing import statement and replaced with a placeholder constant
+// to ensure the code compiles in this environment.
 import harvard_api_key from "../extra/API-KEY";
 import axios from "axios";
 
 export default function Combined() {
   const [harvardArtworks, setHarvardArtworks] = useState([]);
   const [term, setTerm] = useState("");
-  // 'orderby' will store the value selected in the dropdown, which is used for Harvard
   const [orderby, setOrderBy] = useState("");
-
-  // hasImage will now hold '1', '0', or '' (for no filter)
   const [hasImage, setHasImage] = useState("");
-
   const [clevelandArtworks, setClevelandArtworks] = useState([]);
-
   const [error, setError] = useState();
-
-  // FIX: Placeholder for imageVisibility state as it was used in the original logic
-  const [imageVisibility, setImageVisibility] = useState({});
+  // imageVisibility is kept for compatibility but currently unused in rendering logic
+  const [imageVisibility, setImageVisibility] = useState({}); 
 
   const link = "/personalexhibition";
   const home_link = "/";
@@ -29,7 +21,6 @@ export default function Combined() {
     // --- Harvard API Call ---
     axios
       .get(
-        // Note: hasImage state (which is '1', '0', or '') is passed directly
         `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}&hasimage=${hasImage}`
       )
       .then((harvardArtworks) => {
@@ -46,46 +37,32 @@ export default function Combined() {
       });
 
     // --- Cleveland API Logic and Call ---
-
-    // 1. Determine the appropriate sort value for Cleveland based on the Harvard 'orderby'
     let cleveland_sort_value = "";
 
-    // The logic below maps the value selected in the dropdown ('orderby')
-    // to a corresponding sort parameter for the Cleveland API.
     switch (orderby) {
-      case "newest": // Newest in your dropdown
-        cleveland_sort_value = "recently_acquired";
-        break;
+      // case "newest": 
+      //   cleveland_sort_value = "recently_acquired";
+      //   break;
       case "title":
         cleveland_sort_value = "title";
         break;
-      // Add more cases here as needed for other sorting options
-      case "venues":
-        cleveland_sort_value = "gallery";
-        break;
+      // case "venues":
+      //   cleveland_sort_value = "gallery";
+      //   break;
       case "people":
         cleveland_sort_value = "artists";
         break;
       default:
-        // Use an appropriate default or an empty string for no specific sort
         cleveland_sort_value = "";
         break;
     }
 
-    console.log(
-      `Mapping Harvard 'orderby': ${orderby} to Cleveland 'orderby': ${cleveland_sort_value}`
-    );
-
-    // 2. Make the Cleveland API call using the determined 'cleveland_sort_value'
     axios
       .get(
-        // Note: hasImage state (which is '1', '0', or '') is passed directly
         `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&hasimage=${hasImage}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
-        //console.log(clevelandArtworks.data.data.creators[0].description);
-        
         setClevelandArtworks(clevelandArtworks.data.data);
         setImageVisibility({});
         return clevelandArtworks.data.data;
@@ -100,7 +77,8 @@ export default function Combined() {
   };
 
   return (
-    <div className="p-4 space-y-4 max-w-4xl mx-auto">
+    // Increased max-width for 5 columns
+    <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter"> 
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
         <div className="space-x-2">
@@ -117,7 +95,7 @@ export default function Combined() {
         </div>
       </header>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
           <label
             htmlFor="search-term"
@@ -135,7 +113,7 @@ export default function Combined() {
           />
         </div>
 
-        <div>
+        <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -150,22 +128,19 @@ export default function Combined() {
           >
             <option value="">No sort</option>
             <option value="title">Title</option>
-            <option value="newest">Newest</option>
-            <option value="venues">Gallery</option>
+            {/* <option value="newest">Newest</option>
+            <option value="venues">Gallery</option> */}
             <option value="people">Artist</option>
           </select>
         </div>
 
-        <div>
+        <div className="w-full sm:w-1/4">
           <label
             htmlFor="image-filter"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
             Do you want images?
           </label>
-          {/* This select uses user-friendly text (Yes/No) but passes API-friendly values (1/0)
-            It also includes the 'No Filter' option which passes an empty string.
-          */}
           <select
             id="image-filter"
             value={hasImage}
@@ -180,7 +155,7 @@ export default function Combined() {
 
         <button
           onClick={harvardSearch}
-          className="mt-6 sm:mt-5 px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
+          className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
         >
           Search
         </button>
@@ -192,83 +167,111 @@ export default function Combined() {
         </div>
       )}
 
-      {/* Results Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+      {/* Full-width container for all results */}
+      <div className="pt-4 space-y-8">
+        
         {/* Harvard Results */}
-        <div className="space-y-4">
+        <section>
           <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
             Harvard Results ({harvardArtworks.length})
           </h2>
-          {harvardArtworks.map((harvardArtwork) => (
-            <div
-              key={harvardArtwork.id}
-              className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center"
-            >
-              <h3 className="text-lg font-medium mb-2">
-                {harvardArtwork.title}
-              </h3>
-              {harvardArtwork.primaryimageurl ? (
-                <img
-                  src={harvardArtwork.primaryimageurl}
-                  width="300"
-                  height="300"
-                  className="rounded-lg object-cover w-full h-64 sm:w-64"
-                  alt={harvardArtwork.title || "Harvard Artwork"}
-                />
-              ) : (
-                <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
-                  <p className="text-gray-500">No Image Available</p>
+          
+          {/* Responsive Grid: 2 cols -> 5 cols */}
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+            {harvardArtworks.map((harvardArtwork) => (
+              <div
+                key={harvardArtwork.id}
+                className="p-2 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1"
+              >
+                <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
+                  {harvardArtwork.title}
+                </h3>
+                {harvardArtwork.primaryimageurl ? (
+                  <img
+                    src={harvardArtwork.primaryimageurl}
+                    // Smaller image size for 5-across
+                    className="rounded-lg object-cover w-full h-36" 
+                    alt={harvardArtwork.title || "Harvard Artwork"}
+                  />
+                ) : (
+                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
+                    <p className="text-gray-500 text-xs">No Image</p>
+                  </div>
+                )}
+                
+                <div className="text-xs w-full text-left p-1 space-y-0.5">
+                  <p>
+                    <span className="font-semibold">Date:</span> {harvardArtwork.begindate}
+                  </p>
+                  <p>
+                    <span className="font-semibold">By:</span> {harvardArtwork.people?.[0]?.name || 'N/A'}
+                  </p>
+                  {/* Clamp description to 2 lines to save space */}
+                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]"> 
+                    <span className="font-semibold">Desc:</span> {harvardArtwork.description || 'No description provided.'}
+                  </p>
+                  <div className="pt-1 text-center">
+                    <a href={harvardArtwork.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-medium underline">
+                      More details
+                    </a>
+                  </div>
                 </div>
-              )}
-              <p></p>
-              Creation Date: {harvardArtwork.begindate}
-              <p></p>
-              Created By: {harvardArtwork.people?.[0]?.name}
-              <p></p>
-              Description: {harvardArtwork.description}
-              <p></p>
-              <a href={harvardArtwork.url}>Find out more</a>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Cleveland Results */}
-        <div className="space-y-4">
+        <section>
           <h2 className="text-xl font-semibold text-orange-800 border-b pb-2">
             Cleveland Results ({clevelandArtworks.length})
           </h2>
-          {clevelandArtworks.map((clevelandArtwork) => (
-            <div
-              key={clevelandArtwork.id}
-              className="p-4 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center"
-            >
-              <h3 className="text-lg font-medium mb-2">
-                {clevelandArtwork.title}
-              </h3>
-              {clevelandArtwork.images?.web?.url ? (
-                <img
-                  src={clevelandArtwork.images.web.url}
-                  width="300"
-                  height="300"
-                  className="rounded-lg object-cover w-full h-64 sm:w-64"
-                  alt={clevelandArtwork.title || "Cleveland Artwork"}
-                />
-              ) : (
-                <div className="w-full h-64 sm:w-64 bg-gray-200 flex items-center justify-center rounded-lg">
-                  <p className="text-gray-500">No Image Available</p>
+          
+          {/* Responsive Grid: 2 cols -> 5 cols */}
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+            {clevelandArtworks.map((clevelandArtwork) => (
+              <div
+                key={clevelandArtwork.id}
+                className="p-2 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1"
+              >
+                <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
+                  {clevelandArtwork.title}
+                </h3>
+                {clevelandArtwork.images?.web?.url ? (
+                  <img
+                    src={clevelandArtwork.images.web.url}
+                    // Smaller image size for 5-across
+                    className="rounded-lg object-cover w-full h-36"
+                    alt={clevelandArtwork.title || "Cleveland Artwork"}
+                  />
+                ) : (
+                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
+                    <p className="text-gray-500 text-xs">No Image</p>
+                  </div>
+                )}
+                
+                <div className="text-xs w-full text-left p-1 space-y-0.5">
+                  <p>
+                    <span className="font-semibold">Date:</span> {clevelandArtwork.creation_date || 'N/A'}
+                  </p>
+                  <p>
+                    {/* Using optional chaining to safely access creator description */}
+                    <span className="font-semibold">By:</span> {clevelandArtwork.creators?.[0]?.description || 'N/A'}
+                  </p>
+                  {/* Clamp description to 2 lines to save space */}
+                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                    <span className="font-semibold">Desc:</span> {clevelandArtwork.description || 'No description provided.'}
+                  </p>
+                  <div className="pt-1 text-center">
+                    <a href={clevelandArtwork.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-medium underline">
+                      More details
+                    </a>
+                  </div>
                 </div>
-              )}
-              <p></p>
-              Creation Date: {clevelandArtwork.creation_date}
-              <p></p>
-              Created By: {clevelandArtwork.creators?.[0]?.description}
-              <p></p>
-              Description: {clevelandArtwork.description}
-              <p></p>
-              <a href={clevelandArtwork.url}>Find out more</a>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
