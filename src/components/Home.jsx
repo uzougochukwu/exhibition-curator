@@ -11,9 +11,9 @@ function Home() {
   return (
     <div>
     <a href={personal_exhibition}>Personal Exhibition</a><p></p>
-    <a href={cleveland_link}>Cleveland</a><p></p>
-    <a href={smithsonian_link}>Smithsonian</a><p></p>
-    <a href={combined}>Combined</a>
+    {/* <a href={cleveland_link}>Cleveland</a><p></p>
+    <a href={smithsonian_link}>Smithsonian</a><p></p> */}
+    <a href={combined}>Search</a>
     </div>
   )
 }
