@@ -5,19 +5,26 @@ import axios from "axios";
 export default function Combined() {
   const [harvardArtworks, setHarvardArtworks] = useState([]);
   const [term, setTerm] = useState("");
+  // 'orderby' will store the value selected in the dropdown, which is used for Harvard
   const [orderby, setOrderBy] = useState("");
 
-  const [new_order, setNewOrder] = useState("");
+  // This state is not needed anymore for the solution below, but kept it commented out
+  // const [new_order, setNewOrder] = useState("");
 
   const [clevelandArtworks, setClevelandArtworks] = useState([]);
 
   const [error, setError] = useState();
+
+  // FIX: This image visibility state was in the original code, but not defined.
+  // Defining it here so the original structure of your code is preserved and runnable.
+  const [imageVisibility, setImageVisibility] = useState({});
 
   const link = "/personalexhibition";
 
   const home_link = "/";
 
   const harvardSearch = () => {
+    // --- Harvard API Call ---
     axios
       .get(
         `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`
@@ -25,19 +32,12 @@ export default function Combined() {
       .then((harvardArtworks) => {
         //console.log("API call successful.");
 
-        console.log(harvardArtworks.data.records);
-
-        // FIX: Safely access the thumbnail URL for console logging using optional chaining
-        // console.log(
-        //   "Example thumbnail URL:",
-        //   artworks.data.response.rows[0]?.content?.descriptiveNonRepeating
-        //     ?.online_media?.media?.[0]?.thumbnail
-        // );
+        console.log("Harvard Results:", harvardArtworks.data.records);
 
         setHarvardArtworks(harvardArtworks.data.records);
 
         // Reset visibility state for new search results
-        //setImageVisibility({});
+        setImageVisibility({});
 
         return harvardArtworks.data.records;
       })
@@ -47,34 +47,41 @@ export default function Combined() {
           "A network error occurred or the search query returned nothing"
         );
       });
+    
+    // --- Cleveland API Logic and Call ---
+    
+    // 1. Determine the appropriate sort value for Cleveland based on the Harvard 'orderby'
+    let cleveland_sort_value = "";
 
-    // const clevelandSearch = () => {
-
-    //console.log("Search button clicked. Starting API call for:", cleveland_term, "with orderby:", cleveland_orderby);
-
-    // Ensure the API call correctly uses the 'orderby' state
-
-    if (orderby == "begindate") {
-      console.log("it is newest");
-      
-      let cleveland_order = "recently_acquired";
-      setNewOrder(cleveland_order);
-      console.log(cleveland_order);
-      
+    // The logic below maps the value selected in the dropdown ('orderby')
+    // to a corresponding sort parameter for the Cleveland API.
+    switch (orderby) {
+      case "begindate": // Newest in your dropdown
+        cleveland_sort_value = "recently_acquired";
+        break;
+      case "relevancy":
+        cleveland_sort_value = "relevance";
+        break;
+      // Add more cases here as needed for other sorting options
+      default:
+        // Use an appropriate default or an empty string for no specific sort
+        cleveland_sort_value = ""; 
+        break;
     }
 
+    console.log(`Mapping Harvard 'orderby': ${orderby} to Cleveland 'orderby': ${cleveland_sort_value}`);
+
+    // 2. Make the Cleveland API call using the determined 'cleveland_sort_value'
     axios
       .get(
-        // The API request is correctly constructed using the 'orderby' state
-        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${new_order}`
+        // Use the mapped value 'cleveland_sort_value' directly in the URL
+        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}`
       )
       .then((clevelandArtworks) => {
-        // console.log(artworks.data.data[0].images.web.url);
-        console.log(clevelandArtworks.data.data);
+        console.log("Cleveland Results:", clevelandArtworks.data.data);
         setClevelandArtworks(clevelandArtworks.data.data);
 
         // Reset visibility state for new search results
-        // Keep it empty, as the rendering logic will now default to hidden.
         setImageVisibility({});
 
         return clevelandArtworks.data.data;
@@ -84,40 +91,9 @@ export default function Combined() {
           "A network error occurred or the search query returned nothing"
         );
       });
-    // };
 
     console.log("Search button clicked. Starting API call for:", term);
-
-    // console.log(`http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&sort=${orderby}`);
   };
-
-  // const clevelandSearch = () => {
-
-  //   console.log("Search button clicked. Starting API call for:", cleveland_term, "with orderby:", cleveland_orderby);
-
-  //   // Ensure the API call correctly uses the 'orderby' state
-  //   axios
-  //     .get(
-  //       // The API request is correctly constructed using the 'orderby' state
-  //       `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${cleveland_term}&orderby=${cleveland_orderby}`
-  //     )
-  //     .then((clevelandArtworks) => {
-  //       // console.log(artworks.data.data[0].images.web.url);
-  //       console.log(clevelandArtworks.data.data);
-  //       setClevelandArtworks(clevelandArtworks.data.data);
-
-  //       // Reset visibility state for new search results
-  //       // Keep it empty, as the rendering logic will now default to hidden.
-  //       setImageVisibility({});
-
-  //       return clevelandArtworks.data.data;
-  //     })
-  //     .catch((err) => {
-  //       setError(
-  //         "A network error occurred or the search query returned nothing"
-  //       );
-  //     });
-  // };
 
   return (
     <div>
