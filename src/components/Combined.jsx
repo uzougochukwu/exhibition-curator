@@ -12,7 +12,7 @@ export default function Combined() {
   const [clevelandArtworks, setClevelandArtworks] = useState([]);
   const [error, setError] = useState();
   // imageVisibility is kept for compatibility but currently unused in rendering logic
-  const [imageVisibility, setImageVisibility] = useState({}); 
+  const [imageVisibility, setImageVisibility] = useState({});
 
   const link = "/personalexhibition";
   const home_link = "/";
@@ -21,7 +21,7 @@ export default function Combined() {
     // --- Harvard API Call ---
     axios
       .get(
-        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}&hasimage=${hasImage}`
+        `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}&hasimage=${hasImage}`
       )
       .then((harvardArtworks) => {
         console.log("Harvard Results:", harvardArtworks.data.records);
@@ -40,7 +40,7 @@ export default function Combined() {
     let cleveland_sort_value = "";
 
     switch (orderby) {
-      // case "newest": 
+      // case "newest":
       //   cleveland_sort_value = "recently_acquired";
       //   break;
       case "title":
@@ -59,7 +59,7 @@ export default function Combined() {
 
     axios
       .get(
-        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&hasimage=${hasImage}`
+        `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&hasimage=${hasImage}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
@@ -78,7 +78,7 @@ export default function Combined() {
 
   return (
     // Increased max-width for 5 columns
-    <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter"> 
+    <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
         <div className="space-x-2">
@@ -169,13 +169,12 @@ export default function Combined() {
 
       {/* Full-width container for all results */}
       <div className="pt-4 space-y-8">
-        
         {/* Harvard Results */}
         <section>
           <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
             Harvard Results ({harvardArtworks.length})
           </h2>
-          
+
           {/* Responsive Grid: 2 cols -> 5 cols */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
             {harvardArtworks.map((harvardArtwork) => (
@@ -190,7 +189,7 @@ export default function Combined() {
                   <img
                     src={harvardArtwork.primaryimageurl}
                     // Smaller image size for 5-across
-                    className="rounded-lg object-cover w-full h-36" 
+                    className="rounded-lg object-cover w-full h-36"
                     alt={harvardArtwork.title || "Harvard Artwork"}
                   />
                 ) : (
@@ -198,20 +197,28 @@ export default function Combined() {
                     <p className="text-gray-500 text-xs">No Image</p>
                   </div>
                 )}
-                
+
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
                   <p>
-                    <span className="font-semibold">Date:</span> {harvardArtwork.begindate}
+                    <span className="font-semibold">Date:</span>{" "}
+                    {harvardArtwork.begindate}
                   </p>
                   <p>
-                    <span className="font-semibold">By:</span> {harvardArtwork.people?.[0]?.name || 'N/A'}
+                    <span className="font-semibold">By:</span>{" "}
+                    {harvardArtwork.people?.[0]?.name || "N/A"}
                   </p>
                   {/* Clamp description to 2 lines to save space */}
-                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]"> 
-                    <span className="font-semibold">Desc:</span> {harvardArtwork.description || 'No description provided.'}
+                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                    <span className="font-semibold">Desc:</span>{" "}
+                    {harvardArtwork.description || "No description provided."}
                   </p>
                   <div className="pt-1 text-center">
-                    <a href={harvardArtwork.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-medium underline">
+                    <a
+                      href={harvardArtwork.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                    >
                       More details
                     </a>
                   </div>
@@ -226,7 +233,7 @@ export default function Combined() {
           <h2 className="text-xl font-semibold text-orange-800 border-b pb-2">
             Cleveland Results ({clevelandArtworks.length})
           </h2>
-          
+
           {/* Responsive Grid: 2 cols -> 5 cols */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
             {clevelandArtworks.map((clevelandArtwork) => (
@@ -249,21 +256,29 @@ export default function Combined() {
                     <p className="text-gray-500 text-xs">No Image</p>
                   </div>
                 )}
-                
+
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
                   <p>
-                    <span className="font-semibold">Date:</span> {clevelandArtwork.creation_date || 'N/A'}
+                    <span className="font-semibold">Date:</span>{" "}
+                    {clevelandArtwork.creation_date || "N/A"}
                   </p>
                   <p>
                     {/* Using optional chaining to safely access creator description */}
-                    <span className="font-semibold">By:</span> {clevelandArtwork.creators?.[0]?.description || 'N/A'}
+                    <span className="font-semibold">By:</span>{" "}
+                    {clevelandArtwork.creators?.[0]?.description || "N/A"}
                   </p>
                   {/* Clamp description to 2 lines to save space */}
                   <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                    <span className="font-semibold">Desc:</span> {clevelandArtwork.description || 'No description provided.'}
+                    <span className="font-semibold">Desc:</span>{" "}
+                    {clevelandArtwork.description || "No description provided."}
                   </p>
                   <div className="pt-1 text-center">
-                    <a href={clevelandArtwork.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-medium underline">
+                    <a
+                      href={clevelandArtwork.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                    >
                       More details
                     </a>
                   </div>
