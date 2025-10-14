@@ -71,7 +71,7 @@ export default function PersonalExhibition() {
           <h3>{artwork.title}</h3>
           <p>{artwork.department}</p>
           <img
-            src={artwork.images?.web?.url}
+            src={artwork.primaryimageurl}
             // alt={artwork.title}
             style={{
               maxWidth: "200px",
@@ -81,7 +81,7 @@ export default function PersonalExhibition() {
             }}
           />
                     <img
-          src={artwork.content?.descriptiveNonRepeating?.online_media?.media?.[0]?.thumbnail}
+          src={artwork.images?.web?.url}
           // alt={artwork.title}
           style={{
             maxWidth: "200px",

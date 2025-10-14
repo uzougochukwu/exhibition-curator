@@ -17,11 +17,13 @@ export default function Combined() {
   const link = "/personalexhibition";
   const home_link = "/";
 
+  let before = ""
+
   const harvardSearch = () => {
     // --- Harvard API Call ---
     axios
       .get(
-        `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&keyword=${orderby}&hasimage=${hasImage}`
+        `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}`
       )
       .then((harvardArtworks) => {
         console.log("Harvard Results:", harvardArtworks.data.records);
@@ -43,12 +45,12 @@ export default function Combined() {
       // case "newest":
       //   cleveland_sort_value = "recently_acquired";
       //   break;
-      case "title":
-        cleveland_sort_value = "title";
-        break;
-      // case "venues":
-      //   cleveland_sort_value = "gallery";
+      // case "title":
+      //   cleveland_sort_value = "title";
       //   break;
+      case "venues":
+        cleveland_sort_value = "gallery";
+        break;
       case "people":
         cleveland_sort_value = "artists";
         break;
@@ -59,7 +61,7 @@ export default function Combined() {
 
     axios
       .get(
-        `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&hasimage=${hasImage}`
+        `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
@@ -75,6 +77,18 @@ export default function Combined() {
 
     console.log("Search button clicked. Starting API call for:", term);
   };
+
+  const addToCollectionHarvard = (harvardArtwork) => {
+    console.log("added");
+    console.log(harvardArtwork.id);
+    sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
+  }
+
+  const addToCollectionCleveland = (clevelandArtwork) => {
+    console.log("added");
+    console.log(clevelandArtwork.id);
+    sessionStorage.setItem(clevelandArtwork.id, JSON.stringify(clevelandArtwork));
+  }
 
   return (
     // Increased max-width for 5 columns
@@ -113,6 +127,8 @@ export default function Combined() {
           />
         </div>
 
+        
+
         <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
@@ -127,14 +143,34 @@ export default function Combined() {
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">No sort</option>
-            <option value="title">Title</option>
-            {/* <option value="newest">Newest</option>
-            <option value="venues">Gallery</option> */}
+            {/* <option value="title">Title</option> */}
+            {/* <option value="newest">Newest</option>*/}
+            <option value="venues">Gallery</option>
             <option value="people">Artist</option>
           </select>
         </div>
 
-        <div className="w-full sm:w-1/4">
+        {/* <div className="flex-grow">
+          <label
+            htmlFor="before"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Made before year:
+          </label>
+          <input
+            id="before"
+            type="text"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="e.g., Monet, landscapes"
+          />
+        </div> */}
+
+
+
+
+        {/* <div className="w-full sm:w-1/4">
           <label
             htmlFor="image-filter"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -151,7 +187,7 @@ export default function Combined() {
             <option value="1">Yes</option>
             <option value="0">No</option>
           </select>
-        </div>
+        </div> */}
 
         <button
           onClick={harvardSearch}
@@ -222,6 +258,9 @@ export default function Combined() {
                       More details
                     </a>
                   </div>
+                  <button onClick={() => addToCollectionHarvard(harvardArtwork)}>
+                    Add to collection
+                  </button>
                 </div>
               </div>
             ))}
@@ -282,6 +321,9 @@ export default function Combined() {
                       More details
                     </a>
                   </div>
+                  <button onClick={() => addToCollectionCleveland(clevelandArtwork)}>
+                    Add to collection
+                  </button>
                 </div>
               </div>
             ))}
