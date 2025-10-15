@@ -156,7 +156,7 @@ export default function Combined() {
     }
 
     // Use &size=100 (or more) to fetch enough data for client-side pagination
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`; 
+    let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`; 
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
@@ -195,7 +195,7 @@ export default function Combined() {
     }
 
     // Use &limit=100 (or more) to fetch enough data for client-side pagination
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`; 
+    let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`; 
 
     if (cleveland_sort_value) {
         cleveland_url += `&sort=${cleveland_sort_value}`;
