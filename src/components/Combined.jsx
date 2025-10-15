@@ -22,14 +22,24 @@ export default function Combined() {
 
   const harvardSearch = () => {
 
+    let harvard_before_year = ""
+
+    if (beforeYear != undefined){
+
     let harvard_before_year = "-01-01";
 
     harvard_before_year = beforeYear + harvard_before_year;
+    }
+
+// http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}
+
+let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}`
+
 
     // --- Harvard API Call ---
     axios
       .get(
-        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}`
+        `${harvard_url}`
       )
       .then((harvardArtworks) => {
         console.log("Harvard Results:", harvardArtworks.data.records);
@@ -66,10 +76,13 @@ export default function Combined() {
     }
 
 
+    // http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&created_before=${beforeYear}
+
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`
 
     axios
       .get(
-        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&created_before=${beforeYear}`
+        `${cleveland_url}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
