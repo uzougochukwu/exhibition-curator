@@ -35,6 +35,9 @@ const PaginatedItems = ({ items, currentPage, itemsPerPage, handlePageClick, tot
         return null;
     }
 
+    // Calculate the 1-based current page number for display
+    const displayCurrentPage = currentPage + 1;
+
     return (
         <section>
             <h2 className={`text-xl font-semibold ${headerColor} border-b pb-2`}>
@@ -43,7 +46,14 @@ const PaginatedItems = ({ items, currentPage, itemsPerPage, handlePageClick, tot
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-                <div className="flex justify-center my-4">
+                <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
+                    
+                    {/* 👇 MODIFICATION: Display current page and total pages */}
+                    <div className="text-sm font-medium text-gray-700">
+                        Page <span className="font-bold">{displayCurrentPage}</span> of <span className="font-bold">{totalPages}</span>
+                    </div>
+                    {/* 👆 MODIFICATION END */}
+
                     <ReactPaginate
                         breakLabel="..."
                         nextLabel="Next >"
@@ -156,7 +166,7 @@ export default function Combined() {
     }
 
     // Use &size=100 (or more) to fetch enough data for client-side pagination
-    let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`; 
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`; 
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
@@ -195,7 +205,7 @@ export default function Combined() {
     }
 
     // Use &limit=100 (or more) to fetch enough data for client-side pagination
-    let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`; 
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`; 
 
     if (cleveland_sort_value) {
         cleveland_url += `&sort=${cleveland_sort_value}`;
