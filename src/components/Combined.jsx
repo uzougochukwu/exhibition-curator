@@ -13,17 +13,23 @@ export default function Combined() {
   const [error, setError] = useState();
   // imageVisibility is kept for compatibility but currently unused in rendering logic
   const [imageVisibility, setImageVisibility] = useState({});
+  const [beforeYear, setBeforeYear] = useState("");
 
   const link = "/personalexhibition";
   const home_link = "/";
 
-  let before = ""
+  let before = "";
 
   const harvardSearch = () => {
+
+    let harvard_before_year = "-01-01";
+
+    harvard_before_year = beforeYear + harvard_before_year;
+
     // --- Harvard API Call ---
     axios
       .get(
-        `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}`
+        `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}`
       )
       .then((harvardArtworks) => {
         console.log("Harvard Results:", harvardArtworks.data.records);
@@ -59,9 +65,11 @@ export default function Combined() {
         break;
     }
 
+
+
     axios
       .get(
-        `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}`
+        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&created_before=${beforeYear}`
       )
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
@@ -82,13 +90,16 @@ export default function Combined() {
     console.log("added");
     console.log(harvardArtwork.id);
     sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
-  }
+  };
 
   const addToCollectionCleveland = (clevelandArtwork) => {
     console.log("added");
     console.log(clevelandArtwork.id);
-    sessionStorage.setItem(clevelandArtwork.id, JSON.stringify(clevelandArtwork));
-  }
+    sessionStorage.setItem(
+      clevelandArtwork.id,
+      JSON.stringify(clevelandArtwork)
+    );
+  };
 
   return (
     // Increased max-width for 5 columns
@@ -127,8 +138,6 @@ export default function Combined() {
           />
         </div>
 
-        
-
         <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
@@ -146,11 +155,11 @@ export default function Combined() {
             {/* <option value="title">Title</option> */}
             {/* <option value="newest">Newest</option>*/}
             <option value="venues">Gallery</option>
-            <option value="people">Artist</option>
+            {/* <option value="people">Artist</option> */}
           </select>
         </div>
 
-        {/* <div className="flex-grow">
+        <div className="flex-grow">
           <label
             htmlFor="before"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -160,15 +169,12 @@ export default function Combined() {
           <input
             id="before"
             type="text"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
+            value={beforeYear}
+            onChange={(e) => setBeforeYear(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., Monet, landscapes"
+            placeholder="e.g., 2020"
           />
-        </div> */}
-
-
-
+        </div>
 
         {/* <div className="w-full sm:w-1/4">
           <label
@@ -226,6 +232,8 @@ export default function Combined() {
                     src={harvardArtwork.primaryimageurl}
                     // Smaller image size for 5-across
                     className="rounded-lg object-cover w-full h-36"
+                    width="400"
+                    height="400"
                     alt={harvardArtwork.title || "Harvard Artwork"}
                   />
                 ) : (
@@ -258,7 +266,9 @@ export default function Combined() {
                       More details
                     </a>
                   </div>
-                  <button onClick={() => addToCollectionHarvard(harvardArtwork)}>
+                  <button
+                    onClick={() => addToCollectionHarvard(harvardArtwork)}
+                  >
                     Add to collection
                   </button>
                 </div>
@@ -288,6 +298,8 @@ export default function Combined() {
                     src={clevelandArtwork.images.web.url}
                     // Smaller image size for 5-across
                     className="rounded-lg object-cover w-full h-36"
+                    width="400"
+                    height="400"
                     alt={clevelandArtwork.title || "Cleveland Artwork"}
                   />
                 ) : (
@@ -321,7 +333,9 @@ export default function Combined() {
                       More details
                     </a>
                   </div>
-                  <button onClick={() => addToCollectionCleveland(clevelandArtwork)}>
+                  <button
+                    onClick={() => addToCollectionCleveland(clevelandArtwork)}
+                  >
                     Add to collection
                   </button>
                 </div>
