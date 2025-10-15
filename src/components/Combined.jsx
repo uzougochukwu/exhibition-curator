@@ -1,72 +1,188 @@
 import React, { useState } from "react";
-// FIX: Removed the failing import statement and replaced with a placeholder constant
-// to ensure the code compiles in this environment.
-import harvard_api_key from "../extra/API-KEY";
 import axios from "axios";
+import ReactPaginate from 'react-paginate';
 
+// FIX: Placeholder for API key
+import harvard_api_key from "../extra/API-KEY"
+
+// --- Helper Component for Rendering Artworks and Handling Pagination ---
+const PaginatedItems = ({ items, currentPage, itemsPerPage, handlePageClick, totalPages, title, isHarvard, addToCollection }) => {
+    
+    // Calculate items to display on the current page
+    const offset = currentPage * itemsPerPage;
+    const currentItems = items.slice(offset, offset + itemsPerPage);
+
+    const CollectionButton = isHarvard ? ({ artwork }) => (
+        <button
+            onClick={() => addToCollection(artwork)}
+            className="mt-2 w-full px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-lg hover:bg-blue-600 transition"
+        >
+            Add to collection
+        </button>
+    ) : ({ artwork }) => (
+        <button
+            onClick={() => addToCollection(artwork)}
+            className="mt-2 w-full px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-lg hover:bg-orange-600 transition"
+        >
+            Add to collection
+        </button>
+    );
+
+    const headerColor = isHarvard ? "text-blue-800" : "text-orange-800";
+    const borderColor = isHarvard ? "border-blue-200" : "border-orange-200";
+
+    if (items.length === 0) {
+        return null;
+    }
+
+    return (
+        <section>
+            <h2 className={`text-xl font-semibold ${headerColor} border-b pb-2`}>
+                {title} ({items.length} total)
+            </h2>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-center my-4">
+                    <ReactPaginate
+                        breakLabel="..."
+                        nextLabel="Next >"
+                        onPageChange={handlePageClick}
+                        pageRangeDisplayed={3}
+                        marginPagesDisplayed={2}
+                        pageCount={totalPages}
+                        previousLabel="< Previous"
+                        renderOnZeroPageCount={null}
+                        forcePage={currentPage}
+                        
+                        // Tailwind CSS classes for styling
+                        containerClassName="pagination flex space-x-2"
+                        pageLinkClassName="px-3 py-1 rounded-lg text-sm transition duration-150 border border-gray-300 hover:bg-gray-100"
+                        previousLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
+                        nextLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
+                        activeLinkClassName="bg-indigo-500 text-white border-indigo-500 hover:bg-indigo-600"
+                        disabledLinkClassName="text-gray-400 cursor-not-allowed"
+                    />
+                </div>
+            )}
+
+            {/* Responsive Grid */}
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+                {currentItems.map((artwork) => (
+                    <div
+                        key={artwork.id}
+                        className={`p-2 border ${borderColor} rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1`}
+                    >
+                        <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
+                            {artwork.title}
+                        </h3>
+                        {(isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url) ? (
+                            <img
+                                src={isHarvard ? artwork.primaryimageurl : artwork.images.web.url}
+                                className="rounded-lg object-cover w-full h-36"
+                                width="400"
+                                height="400"
+                                alt={artwork.title || "Artwork"}
+                            />
+                        ) : (
+                            <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
+                                <p className="text-gray-500 text-xs">No Image</p>
+                            </div>
+                        )}
+
+                        <div className="text-xs w-full text-left p-1 space-y-0.5">
+                            <p>
+                                <span className="font-semibold">Date:</span>{" "}
+                                {isHarvard ? artwork.begindate : artwork.creation_date || "N/A"}
+                            </p>
+                            <p>
+                                <span className="font-semibold">By:</span>{" "}
+                                {isHarvard
+                                    ? artwork.people?.[0]?.name || "N/A"
+                                    : artwork.creators?.[0]?.description || "N/A"}
+                            </p>
+                            <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                                <span className="font-semibold">Desc:</span>{" "}
+                                {artwork.description || "No description provided."}
+                            </p>
+                            <div className="pt-1 text-center">
+                                <a
+                                    href={artwork.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                                >
+                                    More details
+                                </a>
+                            </div>
+                            <CollectionButton artwork={artwork} />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+};
+
+// --- Main Component ---
 export default function Combined() {
-  const [harvardArtworks, setHarvardArtworks] = useState([]);
+  // State to hold all fetched results (for client-side pagination)
+  const [harvardFullData, setHarvardFullData] = useState([]);
+  const [clevelandFullData, setClevelandFullData] = useState([]);
+  
+  // State for search terms and filters
   const [term, setTerm] = useState("");
   const [orderby, setOrderBy] = useState("");
-  const [hasImage, setHasImage] = useState("");
-  const [clevelandArtworks, setClevelandArtworks] = useState([]);
-  const [error, setError] = useState();
-  // imageVisibility is kept for compatibility but currently unused in rendering logic
-  const [imageVisibility, setImageVisibility] = useState({});
   const [beforeYear, setBeforeYear] = useState("");
+  const [error, setError] = useState();
+
+  // Pagination State
+  const itemsPerPage = 15; // Set a reasonable number of items per page
+  const [harvardCurrentPage, setHarvardCurrentPage] = useState(0); // 0-based index
+  const [clevelandCurrentPage, setClevelandCurrentPage] = useState(0); // 0-based index
 
   const link = "/personalexhibition";
   const home_link = "/";
 
-  let before = "";
-
   const harvardSearch = () => {
+    // Reset page to 0 on a new search
+    setHarvardCurrentPage(0);
+    setClevelandCurrentPage(0);
+    setError(null);
+    
     let harvard_before_year = "";
-
-    if (beforeYear != undefined) {
-      let harvard_before_year = "-01-01";
-
-      harvard_before_year = beforeYear + harvard_before_year;
+    if (beforeYear) {
+      harvard_before_year = beforeYear + "-01-01";
     }
 
-    // http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}
+    // Use &size=100 (or more) to fetch enough data for client-side pagination
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`; 
 
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}`;
-
-    if (orderby != undefined) {
+    if (orderby) {
       harvard_url += `&orderby=${orderby}`;
     }
 
-    if (harvard_before_year != undefined) {
+    if (harvard_before_year) {
       harvard_url += `&before=${harvard_before_year}`;
     }
 
     // --- Harvard API Call ---
     axios
-      .get(`${harvard_url}`)
-      .then((harvardArtworks) => {
-        console.log("Harvard Results:", harvardArtworks.data.records);
-        setHarvardArtworks(harvardArtworks.data.records);
-        setImageVisibility({});
-        return harvardArtworks.data.records;
+      .get(harvard_url)
+      .then((response) => {
+        setHarvardFullData(response.data.records); 
       })
       .catch((err) => {
-        console.error("API error:", err);
+        console.error("Harvard API error:", err);
         setError(
-          "A network error occurred or the search query returned nothing"
+          "A network error occurred or the search query returned nothing from Harvard"
         );
+        setHarvardFullData([]); // Clear results on error
       });
 
     // --- Cleveland API Logic and Call ---
     let cleveland_sort_value = "";
-
     switch (orderby) {
-      // case "newest":
-      //   cleveland_sort_value = "recently_acquired";
-      //   break;
-      // case "title":
-      //   cleveland_sort_value = "title";
-      //   break;
       case "venues":
         cleveland_sort_value = "gallery";
         break;
@@ -78,44 +194,61 @@ export default function Combined() {
         break;
     }
 
-    // http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&created_before=${beforeYear}
+    // Use &limit=100 (or more) to fetch enough data for client-side pagination
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`; 
 
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`;
+    if (cleveland_sort_value) {
+        cleveland_url += `&sort=${cleveland_sort_value}`;
+    }
+    
+    if (beforeYear) {
+        cleveland_url += `&created_before=${beforeYear}`;
+    }
 
     axios
-      .get(`${cleveland_url}`)
-      .then((clevelandArtworks) => {
-        console.log("Cleveland Results:", clevelandArtworks.data.data);
-        setClevelandArtworks(clevelandArtworks.data.data);
-        setImageVisibility({});
-        return clevelandArtworks.data.data;
+      .get(cleveland_url)
+      .then((response) => {
+        setClevelandFullData(response.data.data);
       })
       .catch((err) => {
+        console.error("Cleveland API error:", err);
         setError(
-          "A network error occurred or the search query returned nothing"
+          "A network error occurred or the search query returned nothing from Cleveland"
         );
+        setClevelandFullData([]); // Clear results on error
       });
 
     console.log("Search button clicked. Starting API call for:", term);
   };
 
+  // --- Handle Page Change for ReactPaginate ---
+  // This updates the state when NEXT/PREVIOUS or a page number is clicked.
+  const handleHarvardPageClick = (event) => {
+    setHarvardCurrentPage(event.selected);
+  };
+
+  const handleClevelandPageClick = (event) => {
+    setClevelandCurrentPage(event.selected);
+  };
+  
   const addToCollectionHarvard = (harvardArtwork) => {
-    console.log("added");
-    console.log(harvardArtwork.id);
+    console.log("added Harvard:", harvardArtwork.id);
     sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
   };
 
   const addToCollectionCleveland = (clevelandArtwork) => {
-    console.log("added");
-    console.log(clevelandArtwork.id);
+    console.log("added Cleveland:", clevelandArtwork.id);
     sessionStorage.setItem(
       clevelandArtwork.id,
       JSON.stringify(clevelandArtwork)
     );
   };
 
+  const harvardPageCount = Math.ceil(harvardFullData.length / itemsPerPage);
+  const clevelandPageCount = Math.ceil(clevelandFullData.length / itemsPerPage);
+
+
   return (
-    // Increased max-width for 5 columns
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
@@ -165,10 +298,7 @@ export default function Combined() {
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">No sort</option>
-            {/* <option value="title">Title</option> */}
-            {/* <option value="newest">Newest</option>*/}
             <option value="venues">Gallery</option>
-            {/* <option value="people">Artist</option> */}
           </select>
         </div>
 
@@ -189,25 +319,6 @@ export default function Combined() {
           />
         </div>
 
-        {/* <div className="w-full sm:w-1/4">
-          <label
-            htmlFor="image-filter"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Do you want images?
-          </label>
-          <select
-            id="image-filter"
-            value={hasImage}
-            onChange={(e) => setHasImage(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
-          >
-            <option value="">No Filter</option>
-            <option value="1">Yes</option>
-            <option value="0">No</option>
-          </select>
-        </div> */}
-
         <button
           onClick={harvardSearch}
           className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
@@ -224,138 +335,31 @@ export default function Combined() {
 
       {/* Full-width container for all results */}
       <div className="pt-4 space-y-8">
-        {/* Harvard Results */}
-        <section>
-          <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
-            Harvard Results ({harvardArtworks.length})
-          </h2>
+        
+        {/* Harvard Results - NOW USES PAGINATED ITEMS */}
+        <PaginatedItems
+            items={harvardFullData}
+            currentPage={harvardCurrentPage}
+            itemsPerPage={itemsPerPage}
+            handlePageClick={handleHarvardPageClick}
+            totalPages={harvardPageCount}
+            title="Harvard Results"
+            isHarvard={true}
+            addToCollection={addToCollectionHarvard}
+        />
 
-          {/* Responsive Grid: 2 cols -> 5 cols */}
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {harvardArtworks.map((harvardArtwork) => (
-              <div
-                key={harvardArtwork.id}
-                className="p-2 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1"
-              >
-                <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
-                  {harvardArtwork.title}
-                </h3>
-                {harvardArtwork.primaryimageurl ? (
-                  <img
-                    src={harvardArtwork.primaryimageurl}
-                    // Smaller image size for 5-across
-                    className="rounded-lg object-cover w-full h-36"
-                    width="400"
-                    height="400"
-                    alt={harvardArtwork.title || "Harvard Artwork"}
-                  />
-                ) : (
-                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <p className="text-gray-500 text-xs">No Image</p>
-                  </div>
-                )}
-
-                <div className="text-xs w-full text-left p-1 space-y-0.5">
-                  <p>
-                    <span className="font-semibold">Date:</span>{" "}
-                    {harvardArtwork.begindate}
-                  </p>
-                  <p>
-                    <span className="font-semibold">By:</span>{" "}
-                    {harvardArtwork.people?.[0]?.name || "N/A"}
-                  </p>
-                  {/* Clamp description to 2 lines to save space */}
-                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                    <span className="font-semibold">Desc:</span>{" "}
-                    {harvardArtwork.description || "No description provided."}
-                  </p>
-                  <div className="pt-1 text-center">
-                    <a
-                      href={harvardArtwork.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                    >
-                      More details
-                    </a>
-                  </div>
-                  <button
-                    onClick={() => addToCollectionHarvard(harvardArtwork)}
-                  >
-                    Add to collection
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Cleveland Results */}
-        <section>
-          <h2 className="text-xl font-semibold text-orange-800 border-b pb-2">
-            Cleveland Results ({clevelandArtworks.length})
-          </h2>
-
-          {/* Responsive Grid: 2 cols -> 5 cols */}
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {clevelandArtworks.map((clevelandArtwork) => (
-              <div
-                key={clevelandArtwork.id}
-                className="p-2 border border-gray-100 rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1"
-              >
-                <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
-                  {clevelandArtwork.title}
-                </h3>
-                {clevelandArtwork.images?.web?.url ? (
-                  <img
-                    src={clevelandArtwork.images.web.url}
-                    // Smaller image size for 5-across
-                    className="rounded-lg object-cover w-full h-36"
-                    width="400"
-                    height="400"
-                    alt={clevelandArtwork.title || "Cleveland Artwork"}
-                  />
-                ) : (
-                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <p className="text-gray-500 text-xs">No Image</p>
-                  </div>
-                )}
-
-                <div className="text-xs w-full text-left p-1 space-y-0.5">
-                  <p>
-                    <span className="font-semibold">Date:</span>{" "}
-                    {clevelandArtwork.creation_date || "N/A"}
-                  </p>
-                  <p>
-                    {/* Using optional chaining to safely access creator description */}
-                    <span className="font-semibold">By:</span>{" "}
-                    {clevelandArtwork.creators?.[0]?.description || "N/A"}
-                  </p>
-                  {/* Clamp description to 2 lines to save space */}
-                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                    <span className="font-semibold">Desc:</span>{" "}
-                    {clevelandArtwork.description || "No description provided."}
-                  </p>
-                  <div className="pt-1 text-center">
-                    <a
-                      href={clevelandArtwork.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                    >
-                      More details
-                    </a>
-                  </div>
-                  <button
-                    onClick={() => addToCollectionCleveland(clevelandArtwork)}
-                  >
-                    Add to collection
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Cleveland Results - NOW USES PAGINATED ITEMS */}
+        <PaginatedItems
+            items={clevelandFullData}
+            currentPage={clevelandCurrentPage}
+            itemsPerPage={itemsPerPage}
+            handlePageClick={handleClevelandPageClick}
+            totalPages={clevelandPageCount}
+            title="Cleveland Results"
+            isHarvard={false}
+            addToCollection={addToCollectionCleveland}
+        />
+        
       </div>
     </div>
   );
