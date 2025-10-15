@@ -21,26 +21,29 @@ export default function Combined() {
   let before = "";
 
   const harvardSearch = () => {
+    let harvard_before_year = "";
 
-    let harvard_before_year = ""
+    if (beforeYear != undefined) {
+      let harvard_before_year = "-01-01";
 
-    if (beforeYear != undefined){
-
-    let harvard_before_year = "-01-01";
-
-    harvard_before_year = beforeYear + harvard_before_year;
+      harvard_before_year = beforeYear + harvard_before_year;
     }
 
-// http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}
+    // http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&orderby=${orderby}&before=${harvard_before_year}
 
-let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}`
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}`;
 
+    if (orderby != undefined) {
+      harvard_url += `&orderby=${orderby}`;
+    }
+
+    if (harvard_before_year != undefined) {
+      harvard_url += `&before=${harvard_before_year}`;
+    }
 
     // --- Harvard API Call ---
     axios
-      .get(
-        `${harvard_url}`
-      )
+      .get(`${harvard_url}`)
       .then((harvardArtworks) => {
         console.log("Harvard Results:", harvardArtworks.data.records);
         setHarvardArtworks(harvardArtworks.data.records);
@@ -75,15 +78,12 @@ let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?ap
         break;
     }
 
-
     // http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&orderby=${cleveland_sort_value}&created_before=${beforeYear}
 
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}`;
 
     axios
-      .get(
-        `${cleveland_url}`
-      )
+      .get(`${cleveland_url}`)
       .then((clevelandArtworks) => {
         console.log("Cleveland Results:", clevelandArtworks.data.data);
         setClevelandArtworks(clevelandArtworks.data.data);
