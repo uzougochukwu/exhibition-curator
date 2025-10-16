@@ -223,7 +223,7 @@ const PaginatedItems = ({
                       src={
                         isHarvard ? artwork.primaryimageurl : artwork.images.web.url
                       }
-                      className="rounded-lg object-cover w-full h-20" // Reduced image height due to fixed grid cell height
+                      className="rounded-lg object-cover w-full h-20"
                       width="400"
                       height="400"
                       alt={artwork.title || "Artwork"}
@@ -244,6 +244,9 @@ const PaginatedItems = ({
                 >
                   {isInfoShown ? 'Hide Info' : 'Show Info'}
                 </button>
+
+                {/* NEW POSITION: CollectionButton is now always visible */}
+                <CollectionButton artwork={artwork} /> 
 
                 {/* INFO BLOCK (CONDITIONAL RENDERING) */}
                 {isInfoShown && (
@@ -272,7 +275,7 @@ const PaginatedItems = ({
                         More details
                       </a>
                     </div>
-                    <CollectionButton artwork={artwork} />
+                    {/* The CollectionButton was removed from here */}
                   </div>
                 )}
               </div>
@@ -508,7 +511,7 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleHarvardPageClick}
           totalPages={harvardPageCount}
-          // title="Harvard Results"
+          title="Harvard Results"
           isHarvard={true}
           addToCollection={addToCollectionHarvard}
         />
@@ -519,7 +522,7 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleClevelandPageClick}
           totalPages={clevelandPageCount}
-          // title="Cleveland Results"
+          title="Cleveland Results"
           isHarvard={false}
           addToCollection={addToCollectionCleveland}
         />
