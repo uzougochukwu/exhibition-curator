@@ -88,7 +88,7 @@ const PaginatedItems = ({
   itemsPerPage,
   handlePageClick,
   totalPages,
-  title,
+  title, 
   isHarvard,
   addToCollection,
 }) => {
@@ -153,7 +153,6 @@ const PaginatedItems = ({
         </button>
       );
 
-  const headerColor = isHarvard ? "text-blue-800" : "text-orange-800";
   const borderColor = isHarvard ? "border-blue-200" : "border-orange-200";
 
   // Safe early exit is now AFTER all Hooks
@@ -166,11 +165,7 @@ const PaginatedItems = ({
 
   return (
     <section>
-      <h2 className={`text-xl font-semibold ${headerColor} border-b pb-2`}>
-        {title} ({items.length} total)
-      </h2>
-
-      {/* Pagination Controls - TOP */}
+      {/* Pagination Controls - TOP: KEPT (One control per result set at its top) */}
       {totalPages > 1 && (
         <PaginationControls
           currentPage={currentPage}
@@ -245,7 +240,7 @@ const PaginatedItems = ({
                   {isInfoShown ? 'Hide Info' : 'Show Info'}
                 </button>
 
-                {/* NEW POSITION: CollectionButton is now always visible */}
+                {/* CollectionButton is now always visible */}
                 <CollectionButton artwork={artwork} /> 
 
                 {/* INFO BLOCK (CONDITIONAL RENDERING) */}
@@ -275,7 +270,6 @@ const PaginatedItems = ({
                         More details
                       </a>
                     </div>
-                    {/* The CollectionButton was removed from here */}
                   </div>
                 )}
               </div>
@@ -283,15 +277,15 @@ const PaginatedItems = ({
         </ResponsiveReactGridLayout>
       </div>
 
-      {/* Pagination Controls - BOTTOM */}
-      {totalPages > 1 && (
+      {/* Pagination Controls - BOTTOM: REMOVED */}
+      {/* {totalPages > 1 && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
           handlePageClick={handlePageClick}
           displayCurrentPage={displayCurrentPage}
         />
-      )}
+      )} */}
     </section>
   );
 };
@@ -505,24 +499,26 @@ export default function Combined() {
 
       {/* Full-width container for all results */}
       <div className="pt-4 space-y-8">
+        {/* Harvard Results Section */}
         <PaginatedItems
           items={harvardFullData}
           currentPage={harvardCurrentPage}
           itemsPerPage={itemsPerPage}
           handlePageClick={handleHarvardPageClick}
           totalPages={harvardPageCount}
-          title="Harvard Results"
+          title="Harvard Results" 
           isHarvard={true}
           addToCollection={addToCollectionHarvard}
         />
 
+        {/* Cleveland Results Section */}
         <PaginatedItems
           items={clevelandFullData}
           currentPage={clevelandCurrentPage}
           itemsPerPage={itemsPerPage}
           handlePageClick={handleClevelandPageClick}
           totalPages={clevelandPageCount}
-          title="Cleveland Results"
+          title="Cleveland Results" 
           isHarvard={false}
           addToCollection={addToCollectionCleveland}
         />
