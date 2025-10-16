@@ -508,7 +508,7 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleHarvardPageClick}
           totalPages={harvardPageCount}
-          title="Harvard Results"
+          // title="Harvard Results"
           isHarvard={true}
           addToCollection={addToCollectionHarvard}
         />
@@ -519,7 +519,7 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleClevelandPageClick}
           totalPages={clevelandPageCount}
-          title="Cleveland Results"
+          // title="Cleveland Results"
           isHarvard={false}
           addToCollection={addToCollectionCleveland}
         />
