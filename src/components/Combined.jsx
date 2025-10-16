@@ -165,7 +165,6 @@ const PaginatedItems = ({
 
   return (
     <section>
-      {/* Pagination Controls - TOP: REMOVED from PaginatedItems */}
       
       {/* Using ResponsiveReactGridLayout */}
       <div className="mt-4">
@@ -269,7 +268,6 @@ const PaginatedItems = ({
         </ResponsiveReactGridLayout>
       </div>
 
-      {/* Pagination Controls - BOTTOM: REMOVED from PaginatedItems */}
     </section>
   );
 };
@@ -502,9 +500,10 @@ export default function Combined() {
       <div className="pt-4 space-y-8" ref={topRef}> {/* Ref marks the top */}
 
         {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-        <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
+        {/* REMOVED: Harvard Results Header */}
+        {/* <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
           Harvard Results ({harvardFullData.length} total)
-        </h2>
+        </h2> */}
         {harvardPageCount > 1 && (
           <PaginationControls
             currentPage={harvardCurrentPage}
@@ -526,10 +525,10 @@ export default function Combined() {
           addToCollection={addToCollectionHarvard}
         />
 
-        {/* Cleveland Results Header */}
-        <h2 className="text-xl font-semibold text-orange-800 border-b pb-2 pt-4">
+        {/* REMOVED: Cleveland Results Header */}
+        {/* <h2 className="text-xl font-semibold text-orange-800 border-b pb-2 pt-4">
           Cleveland Results ({clevelandFullData.length} total)
-        </h2>
+        </h2> */}
 
         {/* Cleveland Results Section */}
         <PaginatedItems
