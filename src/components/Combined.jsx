@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useMemo } from "react";
 import axios from "axios";
-import ReactPaginate from "react-paginate";
+// We no longer need to import ReactPaginate for the new UI
+// import ReactPaginate from "react-paginate"; 
+
 // NEW: Imports for React Grid Layout
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
@@ -17,34 +19,64 @@ const PaginationControls = React.memo(({
   currentPage,
   totalPages,
   handlePageClick,
-  displayCurrentPage
+  displayCurrentPage // This is currentPage + 1
 }) => {
   if (totalPages <= 1) return null;
 
+  // New handler for Previous button
+  const goToPrevious = () => {
+    if (currentPage > 0) {
+      // Calls the same function signature as ReactPaginate would have
+      handlePageClick({ selected: currentPage - 1 });
+    }
+  };
+
+  // New handler for Next button
+  const goToNext = () => {
+    if (currentPage < totalPages - 1) {
+      // Calls the same function signature as ReactPaginate would have
+      handlePageClick({ selected: currentPage + 1 });
+    }
+  };
+
+  const prevDisabled = currentPage === 0;
+  const nextDisabled = currentPage === totalPages - 1;
+
   return (
     <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
-      <div className="text-sm font-medium text-gray-700">
+      
+      {/* Previous Button */}
+      <button
+        onClick={goToPrevious}
+        disabled={prevDisabled}
+        className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
+          prevDisabled 
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+        }`}
+      >
+        &lt; Previous
+      </button>
+      
+      {/* Page X of Y Display */}
+      <div className="text-sm font-medium text-gray-700 whitespace-nowrap">
         Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
         <span className="font-bold">{totalPages}</span>
       </div>
 
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel="Next >"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={3}
-        marginPagesDisplayed={2}
-        pageCount={totalPages}
-        previousLabel="< Previous"
-        renderOnZeroPageCount={null}
-        forcePage={currentPage}
-        containerClassName="pagination flex space-x-2"
-        pageLinkClassName="px-3 py-1 rounded-lg text-sm transition duration-150 border border-gray-300 hover:bg-gray-100"
-        previousLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
-        nextLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
-        activeLinkClassName="bg-indigo-500 text-white border-indigo-500 hover:bg-indigo-600"
-        disabledLinkClassName="text-gray-400 cursor-not-allowed"
-      />
+      {/* Next Button */}
+      <button
+        onClick={goToNext}
+        disabled={nextDisabled}
+        className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
+          nextDisabled 
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+        }`}
+      >
+        Next &gt;
+      </button>
+      
     </div>
   );
 });
@@ -60,7 +92,7 @@ const PaginatedItems = ({
   isHarvard,
   addToCollection,
 }) => {
-  // 💥 HOOKS CALLED UNCONDITIONALLY AT THE TOP 💥
+  // HOOKS CALLED UNCONDITIONALLY AT THE TOP
   const [hiddenImages, setHiddenImages] = useState({});
   const [hiddenInfo, setHiddenInfo] = useState({});
 
@@ -72,7 +104,6 @@ const PaginatedItems = ({
     setHiddenInfo({});
   }, [currentPage, items]);
 
-  // FIX: This useMemo hook must be called on every render.
   const layout = useMemo(() => {
     return currentItems.map((artwork, index) => {
       // Calculate row (y) and column (x) based on a 3-column layout
