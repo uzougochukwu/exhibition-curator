@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import axios from "axios";
 // We no longer need to import ReactPaginate for the new UI
 // import ReactPaginate from "react-paginate"; 
@@ -86,7 +86,7 @@ const PaginatedItems = ({
   items,
   currentPage,
   itemsPerPage,
-  handlePageClick,
+  // handlePageClick, // No longer needed here
   totalPages,
   title, 
   isHarvard,
@@ -160,21 +160,13 @@ const PaginatedItems = ({
     return null;
   }
 
-  const displayCurrentPage = currentPage + 1;
+  // const displayCurrentPage = currentPage + 1; // Now managed in Combined component
 
 
   return (
     <section>
-      {/* Pagination Controls - TOP: KEPT (One control per result set at its top) */}
-      {totalPages > 1 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          handlePageClick={handlePageClick}
-          displayCurrentPage={displayCurrentPage}
-        />
-      )}
-
+      {/* Pagination Controls - TOP: REMOVED from PaginatedItems */}
+      
       {/* Using ResponsiveReactGridLayout */}
       <div className="mt-4">
         <ResponsiveReactGridLayout
@@ -277,21 +269,16 @@ const PaginatedItems = ({
         </ResponsiveReactGridLayout>
       </div>
 
-      {/* Pagination Controls - BOTTOM: REMOVED */}
-      {/* {totalPages > 1 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          handlePageClick={handlePageClick}
-          displayCurrentPage={displayCurrentPage}
-        />
-      )} */}
+      {/* Pagination Controls - BOTTOM: REMOVED from PaginatedItems */}
     </section>
   );
 };
 
 // --- Main Component ---
 export default function Combined() {
+  // REF: Create a ref to mark the top of the search results for scrolling
+  const topRef = useRef(null);
+
   // State to hold all fetched results (for client-side pagination)
   const [harvardFullData, setHarvardFullData] = useState([]);
   const [clevelandFullData, setClevelandFullData] = useState([]);
@@ -310,11 +297,21 @@ export default function Combined() {
   const link = "/personalexhibition";
   const home_link = "/";
 
+  // FUNCTION: Scroll to the top of the search results
+  const scrollToTop = () => {
+    topRef.current.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const harvardSearch = () => {
     // Reset page to 0 on a new search
     setHarvardCurrentPage(0);
     setClevelandCurrentPage(0);
     setError(null);
+    
+    // Scroll to the top of the results section when a new search is performed
+    if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
 
     let harvard_before_year = "";
     if (beforeYear) {
@@ -387,7 +384,7 @@ export default function Combined() {
     console.log("Search button clicked. Starting API call for:", term);
   };
 
-  // --- Handle Page Change for ReactPaginate ---
+  // --- Handle Page Change for Pagination ---
   const handleHarvardPageClick = useCallback((event) => {
     setHarvardCurrentPage(event.selected);
   }, []);
@@ -411,6 +408,9 @@ export default function Combined() {
 
   const harvardPageCount = Math.ceil(harvardFullData.length / itemsPerPage);
   const clevelandPageCount = Math.ceil(clevelandFullData.length / itemsPerPage);
+  const harvardDisplayPage = harvardCurrentPage + 1;
+  const clevelandDisplayPage = clevelandCurrentPage + 1;
+
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
@@ -430,6 +430,7 @@ export default function Combined() {
         </div>
       </header>
 
+      {/* Search/Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
           <label
@@ -498,7 +499,21 @@ export default function Combined() {
       )}
 
       {/* Full-width container for all results */}
-      <div className="pt-4 space-y-8">
+      <div className="pt-4 space-y-8" ref={topRef}> {/* Ref marks the top */}
+
+        {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
+        <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
+          Harvard Results ({harvardFullData.length} total)
+        </h2>
+        {harvardPageCount > 1 && (
+          <PaginationControls
+            currentPage={harvardCurrentPage}
+            totalPages={harvardPageCount}
+            handlePageClick={handleHarvardPageClick}
+            displayCurrentPage={harvardDisplayPage}
+          />
+        )}
+        
         {/* Harvard Results Section */}
         <PaginatedItems
           items={harvardFullData}
@@ -511,6 +526,11 @@ export default function Combined() {
           addToCollection={addToCollectionHarvard}
         />
 
+        {/* Cleveland Results Header */}
+        <h2 className="text-xl font-semibold text-orange-800 border-b pb-2 pt-4">
+          Cleveland Results ({clevelandFullData.length} total)
+        </h2>
+
         {/* Cleveland Results Section */}
         <PaginatedItems
           items={clevelandFullData}
@@ -522,6 +542,29 @@ export default function Combined() {
           isHarvard={false}
           addToCollection={addToCollectionCleveland}
         />
+
+        {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
+        {clevelandPageCount > 1 && (
+          <PaginationControls
+            currentPage={clevelandCurrentPage}
+            totalPages={clevelandPageCount}
+            handlePageClick={handleClevelandPageClick}
+            displayCurrentPage={clevelandDisplayPage}
+          />
+        )}
+
+        {/* 3. SCROLL BACK TO TOP BUTTON */}
+        {(harvardFullData.length > 0 || clevelandFullData.length > 0) && (
+            <div className="flex justify-center pt-8">
+                <button
+                    onClick={scrollToTop}
+                    className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
+                >
+                    Back to Top of Results
+                </button>
+            </div>
+        )}
+
       </div>
     </div>
   );
