@@ -1,9 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+// NEW: Imports for React Grid Layout
+import { Responsive, WidthProvider } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 
 // FIX: Placeholder for API key
 import harvard_api_key from "../extra/API-KEY";
+
+// Wrap the ResponsiveReactGridLayout with WidthProvider
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
+
+// --- STANDALONE COMPONENT: PaginationControls ---
+const PaginationControls = React.memo(({
+  currentPage,
+  totalPages,
+  handlePageClick,
+  displayCurrentPage
+}) => {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
+      <div className="text-sm font-medium text-gray-700">
+        Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
+        <span className="font-bold">{totalPages}</span>
+      </div>
+
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="Next >"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={3}
+        marginPagesDisplayed={2}
+        pageCount={totalPages}
+        previousLabel="< Previous"
+        renderOnZeroPageCount={null}
+        forcePage={currentPage}
+        containerClassName="pagination flex space-x-2"
+        pageLinkClassName="px-3 py-1 rounded-lg text-sm transition duration-150 border border-gray-300 hover:bg-gray-100"
+        previousLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
+        nextLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
+        activeLinkClassName="bg-indigo-500 text-white border-indigo-500 hover:bg-indigo-600"
+        disabledLinkClassName="text-gray-400 cursor-not-allowed"
+      />
+    </div>
+  );
+});
 
 // --- Helper Component for Rendering Artworks and Handling Pagination ---
 const PaginatedItems = ({
@@ -16,36 +60,49 @@ const PaginatedItems = ({
   isHarvard,
   addToCollection,
 }) => {
-  // 💥 MODIFIED STATE: Initialize with a structure that implies all items are hidden.
-  // We use a dummy key here, but the actual hiding logic is often tied to the
-  // ID within the currentItems map. We'll rely on the toggle state structure.
+  // 💥 HOOKS CALLED UNCONDITIONALLY AT THE TOP 💥
   const [hiddenImages, setHiddenImages] = useState({});
   const [hiddenInfo, setHiddenInfo] = useState({});
 
+  const offset = currentPage * itemsPerPage;
+  const currentItems = items.slice(offset, offset + itemsPerPage);
+
+  React.useEffect(() => {
+    setHiddenImages({});
+    setHiddenInfo({});
+  }, [currentPage, items]);
+
+  // FIX: This useMemo hook must be called on every render.
+  const layout = useMemo(() => {
+    return currentItems.map((artwork, index) => {
+      // Calculate row (y) and column (x) based on a 3-column layout
+      return {
+        i: String(artwork.id),
+        x: index % 3,
+        y: Math.floor(index / 3) * 10, // Ensure enough height for content
+        w: 1,
+        h: 10, 
+        static: true, // Prevent dragging/resizing
+      };
+    });
+  }, [currentItems]);
+  // ------------------------------------------------------------------
+
   // --- Toggle Handlers ---
   const toggleImage = (id) => {
-    // This uses a function update to ensure we check the *latest* value.
-    // By default, if an ID is not in the object, it's treated as 'false' (shown).
-    // To reverse this logic to 'hidden by default', we will need to change how we check it.
-    // However, the cleanest React way is to let the initial state be empty and
-    // update the JSX check.
-    setHiddenImages((prev) => ({
+    setHiddenImages(prev => ({
       ...prev,
-      [id]: !prev[id], // Flip the current state for this ID
+      [id]: prev[id] === false ? undefined : false 
     }));
   };
 
   const toggleInfo = (id) => {
-    setHiddenInfo((prev) => ({
+    setHiddenInfo(prev => ({
       ...prev,
-      [id]: !prev[id], // Flip the current state for this ID
+      [id]: prev[id] === false ? undefined : false
     }));
   };
   // -------------------------
-
-  // Calculate items to display on the current page
-  const offset = currentPage * itemsPerPage;
-  const currentItems = items.slice(offset, offset + itemsPerPage);
 
   const CollectionButton = isHarvard
     ? ({ artwork }) => (
@@ -68,42 +125,13 @@ const PaginatedItems = ({
   const headerColor = isHarvard ? "text-blue-800" : "text-orange-800";
   const borderColor = isHarvard ? "border-blue-200" : "border-orange-200";
 
+  // Safe early exit is now AFTER all Hooks
   if (items.length === 0) {
     return null;
   }
 
-  // Calculate the 1-based current page number for display
   const displayCurrentPage = currentPage + 1;
 
-  // --- Reusable Pagination Controls Component ---
-  const PaginationControls = () => (
-    <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
-      {/* Display current page and total pages */}
-      <div className="text-sm font-medium text-gray-700">
-        Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
-        <span className="font-bold">{totalPages}</span>
-      </div>
-
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel="Next >"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={3}
-        marginPagesDisplayed={2}
-        pageCount={totalPages}
-        previousLabel="< Previous"
-        renderOnZeroPageCount={null}
-        forcePage={currentPage}
-        // Tailwind CSS classes for styling
-        containerClassName="pagination flex space-x-2"
-        pageLinkClassName="px-3 py-1 rounded-lg text-sm transition duration-150 border border-gray-300 hover:bg-gray-100"
-        previousLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
-        nextLinkClassName="px-3 py-1 rounded-lg text-sm bg-gray-200 hover:bg-gray-300"
-        activeLinkClassName="bg-indigo-500 text-white border-indigo-500 hover:bg-indigo-600"
-        disabledLinkClassName="text-gray-400 cursor-not-allowed"
-      />
-    </div>
-  );
 
   return (
     <section>
@@ -112,119 +140,124 @@ const PaginatedItems = ({
       </h2>
 
       {/* Pagination Controls - TOP */}
-      {totalPages > 1 && <PaginationControls />}
+      {totalPages > 1 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageClick={handlePageClick}
+          displayCurrentPage={displayCurrentPage}
+        />
+      )}
 
-      {/* Responsive Grid */}
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
-        {currentItems.map((artwork) => {
-          const artworkId = String(artwork.id);
-
-          // 💥 KEY CHANGE: Check if the ID is NOT in the hidden map (meaning it is FALSE or undefined)
-          // If the ID is NOT in the map (initial state), we assume it's HIDDEN (true).
-          // If the ID is set to FALSE, it's SHOWN. If set to TRUE, it's HIDDEN.
-          // To make it hidden by default, we just need to ensure the rendering check is inverted.
-          // The cleanest way is to use the !! operator for a boolean check:
-
-          // If hiddenImages[artworkId] is undefined (default), treat as HIDDEN (true).
-          // Only show if hiddenImages[artworkId] is explicitly set to false.
-          const isImageShown = hiddenImages[artworkId] === false;
-          const isInfoShown = hiddenInfo[artworkId] === false;
-
-          return (
-            <div
-              key={artworkId}
-              className={`p-2 border ${borderColor} rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-1`}
-            >
-              <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
-                {artwork.title}
-              </h3>
-
-              {/* 💥 IMAGE TOGGLE BUTTON 💥 */}
-              <button
-                onClick={() => toggleImage(artworkId)}
-                // The button text and color now depend on whether the item is SHOWN (isImageShown)
-                className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
-                  isImageShown
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
+      {/* Using ResponsiveReactGridLayout */}
+      <div className="mt-4">
+        <ResponsiveReactGridLayout
+          layouts={{ lg: layout }} // Use the defined layout for the 'lg' breakpoint
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          cols={{ lg: 3, md: 3, sm: 3, xs: 3, xxs: 3 }} // Force 3 columns across all breakpoints
+          rowHeight={30} // Height of one grid unit in pixels
+          margin={[20, 20]} // Spacing between items
+        >
+          {currentItems.map((artwork) => {
+            const artworkId = String(artwork.id);
+            const isImageShown = hiddenImages[artworkId] === false;
+            const isInfoShown = hiddenInfo[artworkId] === false;
+            
+            return (
+              // The key must match the 'i' property in the layout definition
+              <div
+                key={artworkId}
+                // The style/positioning is handled by react-grid-layout,
+                // we keep the content styling
+                className={`p-4 border ${borderColor} rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-2 h-full w-full`}
               >
-                {isImageShown ? "Hide Image" : "Show Image"}
-              </button>
+                <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
+                  {artwork.title}
+                </h3>
 
-              {/* 💥 IMAGE BLOCK (CONDITIONAL RENDERING) 💥 */}
-              {isImageShown &&
-                ((
-                  isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
-                ) ? (
-                  <img
-                    src={
-                      isHarvard
-                        ? artwork.primaryimageurl
-                        : artwork.images.web.url
-                    }
-                    className="rounded-lg object-cover w-full h-36"
-                    width="400"
-                    height="400"
-                    alt={artwork.title || "Artwork"}
-                  />
-                ) : (
-                  <div className="w-full h-36 bg-gray-200 flex items-center justify-center rounded-lg">
-                    <p className="text-gray-500 text-xs">No Image</p>
+                {/* IMAGE TOGGLE BUTTON */}
+                <button
+                  onClick={() => toggleImage(artworkId)}
+                  className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
+                      isImageShown ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                  }`}
+                >
+                  {isImageShown ? 'Hide Image' : 'Show Image'}
+                </button>
+
+                {/* IMAGE BLOCK (CONDITIONAL RENDERING) */}
+                {isImageShown && (
+                  (isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url) ? (
+                    <img
+                      src={
+                        isHarvard ? artwork.primaryimageurl : artwork.images.web.url
+                      }
+                      className="rounded-lg object-cover w-full h-20" // Reduced image height due to fixed grid cell height
+                      width="400"
+                      height="400"
+                      alt={artwork.title || "Artwork"}
+                    />
+                  ) : (
+                    <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
+                      <p className="text-gray-500 text-xs">No Image</p>
+                    </div>
+                  )
+                )}
+
+                {/* INFO TOGGLE BUTTON */}
+                <button
+                  onClick={() => toggleInfo(artworkId)}
+                  className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
+                      isInfoShown ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                  }`}
+                >
+                  {isInfoShown ? 'Hide Info' : 'Show Info'}
+                </button>
+
+                {/* INFO BLOCK (CONDITIONAL RENDERING) */}
+                {isInfoShown && (
+                  <div className="text-xs w-full text-left p-1 space-y-0.5">
+                    <p>
+                      <span className="font-semibold">Date:</span>{" "}
+                      {isHarvard ? artwork.begindate : artwork.creation_date || "N/A"}
+                    </p>
+                    <p>
+                      <span className="font-semibold">By:</span>{" "}
+                      {isHarvard
+                        ? artwork.people?.[0]?.name || "N/A"
+                        : artwork.creators?.[0]?.description || "N/A"}
+                    </p>
+                    <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                      <span className="font-semibold">Desc:</span>{" "}
+                      {artwork.description || "No description provided."}
+                    </p>
+                    <div className="pt-1 text-center">
+                      <a
+                        href={artwork.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                      >
+                        More details
+                      </a>
+                    </div>
+                    <CollectionButton artwork={artwork} />
                   </div>
-                ))}
-
-              {/* 💥 INFO TOGGLE BUTTON 💥 */}
-              <button
-                onClick={() => toggleInfo(artworkId)}
-                className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
-                  isInfoShown
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {isInfoShown ? "Hide Info" : "Show Info"}
-              </button>
-
-              {/* 💥 INFO BLOCK (CONDITIONAL RENDERING) 💥 */}
-              {isInfoShown && (
-                <div className="text-xs w-full text-left p-1 space-y-0.5">
-                  <p>
-                    <span className="font-semibold">Date:</span>{" "}
-                    {isHarvard
-                      ? artwork.begindate
-                      : artwork.creation_date || "N/A"}
-                  </p>
-                  <p>
-                    <span className="font-semibold">By:</span>{" "}
-                    {isHarvard
-                      ? artwork.people?.[0]?.name || "N/A"
-                      : artwork.creators?.[0]?.description || "N/A"}
-                  </p>
-                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                    <span className="font-semibold">Desc:</span>{" "}
-                    {artwork.description || "No description provided."}
-                  </p>
-                  <div className="pt-1 text-center">
-                    <a
-                      href={artwork.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                    >
-                      More details
-                    </a>
-                  </div>
-                  <CollectionButton artwork={artwork} />
-                </div>
-              )}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            )})}
+        </ResponsiveReactGridLayout>
       </div>
 
       {/* Pagination Controls - BOTTOM */}
-      {totalPages > 1 && <PaginationControls />}
+      {totalPages > 1 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageClick={handlePageClick}
+          displayCurrentPage={displayCurrentPage}
+        />
+      )}
     </section>
   );
 };
@@ -327,14 +360,13 @@ export default function Combined() {
   };
 
   // --- Handle Page Change for ReactPaginate ---
-  // This updates the state when NEXT/PREVIOUS or a page number is clicked.
-  const handleHarvardPageClick = (event) => {
+  const handleHarvardPageClick = useCallback((event) => {
     setHarvardCurrentPage(event.selected);
-  };
+  }, []);
 
-  const handleClevelandPageClick = (event) => {
+  const handleClevelandPageClick = useCallback((event) => {
     setClevelandCurrentPage(event.selected);
-  };
+  }, []);
 
   const addToCollectionHarvard = (harvardArtwork) => {
     console.log("added Harvard:", harvardArtwork.id);
@@ -410,7 +442,7 @@ export default function Combined() {
           <label
             htmlFor="before"
             className="block text-sm font-medium text-gray-700 mb-1"
-          >
+            >
             Made before year:
           </label>
           <input
@@ -439,7 +471,6 @@ export default function Combined() {
 
       {/* Full-width container for all results */}
       <div className="pt-4 space-y-8">
-        {/* Harvard Results - NOW USES PAGINATED ITEMS */}
         <PaginatedItems
           items={harvardFullData}
           currentPage={harvardCurrentPage}
@@ -451,7 +482,6 @@ export default function Combined() {
           addToCollection={addToCollectionHarvard}
         />
 
-        {/* Cleveland Results - NOW USES PAGINATED ITEMS */}
         <PaginatedItems
           items={clevelandFullData}
           currentPage={clevelandCurrentPage}
