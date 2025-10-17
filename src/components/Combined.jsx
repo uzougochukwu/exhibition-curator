@@ -248,8 +248,8 @@ const PaginatedItems = ({
                         : artwork.creators?.[0]?.description || "N/A"}
                     </p>
                     <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                      <span className="font-semibold">Desc:</span>{" "}
-                      {artwork.description || "No description provided."}
+                      {/* <span className="font-semibold">Desc:</span>{" "} */}
+                      {/* {artwork.description || "No description provided."} */}
                     </p>
                     <div className="pt-1 text-center">
                       <a
