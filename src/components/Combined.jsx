@@ -274,6 +274,10 @@ const PaginatedItems = ({
 
 // --- Main Component ---
 export default function Combined() {
+  // 🚩 FEATURE FLAG DEFINITION 🚩
+  // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
+  const SHOW_CLEVELAND_PAGE_INDICATOR = false; 
+
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
 
@@ -500,10 +504,7 @@ export default function Combined() {
       <div className="pt-4 space-y-8" ref={topRef}> {/* Ref marks the top */}
 
         {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-        {/* REMOVED: Harvard Results Header */}
-        {/* <h2 className="text-xl font-semibold text-blue-800 border-b pb-2">
-          Harvard Results ({harvardFullData.length} total)
-        </h2> */}
+        {/* Harvard Results Header */}
         {harvardPageCount > 1 && (
           <PaginationControls
             currentPage={harvardCurrentPage}
@@ -525,11 +526,6 @@ export default function Combined() {
           addToCollection={addToCollectionHarvard}
         />
 
-        {/* REMOVED: Cleveland Results Header */}
-        {/* <h2 className="text-xl font-semibold text-orange-800 border-b pb-2 pt-4">
-          Cleveland Results ({clevelandFullData.length} total)
-        </h2> */}
-
         {/* Cleveland Results Section */}
         <PaginatedItems
           items={clevelandFullData}
@@ -542,8 +538,8 @@ export default function Combined() {
           addToCollection={addToCollectionCleveland}
         />
 
-        {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
-        {clevelandPageCount > 1 && (
+        {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only (Conditional on Feature Flag) */}
+        {SHOW_CLEVELAND_PAGE_INDICATOR && clevelandPageCount > 1 && (
           <PaginationControls
             currentPage={clevelandCurrentPage}
             totalPages={clevelandPageCount}
