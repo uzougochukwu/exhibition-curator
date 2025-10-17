@@ -70,6 +70,11 @@ export default function PersonalExhibition() {
         >
           <h3>{artwork.title}</h3>
           <p>{artwork.department}</p>
+          <p>
+                      <span className="font-semibold">Date:</span>{" "}
+                      { artwork.begindate|| artwork.creation_date|| "N/A"}
+                    </p>
+
           <img
             src={artwork.primaryimageurl}
             // alt={artwork.title}
