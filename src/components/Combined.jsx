@@ -424,6 +424,7 @@ export default function Combined() {
               Home
             </button>
           </a>
+          <p></p>
           <a href={link}>
             <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
               Go to Personal Exhibition
@@ -431,7 +432,7 @@ export default function Combined() {
           </a>
         </div>
       </header>
-
+<p></p>
       {/* Search/Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
@@ -450,7 +451,7 @@ export default function Combined() {
             placeholder="e.g., Monet, landscapes"
           />
         </div>
-
+<p></p>
         <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
@@ -468,6 +469,7 @@ export default function Combined() {
             <option value="venues">Gallery</option>
           </select>
         </div>
+        <p></p>
 
         <div className="flex-grow">
           <label
@@ -485,7 +487,7 @@ export default function Combined() {
             placeholder="e.g., 2020"
           />
         </div>
-
+<p></p>
         <button
           onClick={harvardSearch}
           className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
@@ -493,6 +495,7 @@ export default function Combined() {
           Search
         </button>
       </div>
+      <p></p>
 
       {error && (
         <div className="text-red-600 p-3 bg-red-100 border border-red-300 rounded-lg">

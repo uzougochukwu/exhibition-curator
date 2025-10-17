@@ -71,29 +71,34 @@ export default function PersonalExhibition() {
           <h3>{artwork.title}</h3>
           <p>{artwork.department}</p>
           <p>
-                      <span className="font-semibold">Date:</span>{" "}
-                      { artwork.begindate|| artwork.creation_date|| "N/A"}
+            <span className="font-semibold">Date:</span>{" "}
+            {artwork.begindate || artwork.creation_date || "N/A"}
+          </p>
+          <p>
+                      <span className="font-semibold">By:</span>{" "}
+                      {
+                        artwork.people?.[0]?.name || artwork.creators?.[0]?.description || "N/A"}
                     </p>
-
           <img
             src={artwork.primaryimageurl}
             // alt={artwork.title}
             style={{
               maxWidth: "200px",
-              height: "auto",
+              height: "150px",
               display: "block",
               marginBottom: "10px",
             }}
           />
-                    <img
-          src={artwork.images?.web?.url}
-          // alt={artwork.title}
-          style={{
-            maxWidth: "200px",
-            height: "auto",
-            display: "block",
-            marginBottom: "10px",
-          }}/>
+          <img
+            src={artwork.images?.web?.url}
+            // alt={artwork.title}
+            style={{
+              maxWidth: "200px",
+              height: "150px",
+              display: "block",
+              marginBottom: "10px",
+            }}
+          />
 
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>
