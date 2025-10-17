@@ -253,7 +253,8 @@ const PaginatedItems = ({
                     </p>
                     <div className="pt-1 text-center">
                       <a
-                        href={artwork.url}
+                        //href={artwork.url}
+                        href={`https://www.google.com/search?q=${artwork.title}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800 font-medium underline"

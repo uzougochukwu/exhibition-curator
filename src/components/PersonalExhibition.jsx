@@ -99,6 +99,17 @@ export default function PersonalExhibition() {
               marginBottom: "10px",
             }}
           />
+                              <div className="pt-1 text-center">
+                      <a
+                        //href={artwork.url}
+                        href={`https://www.google.com/search?q=${artwork.title}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                      >
+                        More details
+                      </a>
+                    </div>
 
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>
