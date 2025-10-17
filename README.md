@@ -2,9 +2,9 @@ Prototype museum exhibition webpage
 
 To run locally:
 
-You must first get an api key from the smithsonian
+You must first get an api key from harvard
 
-go here to sign up for one: https://api.data.gov/signup/
+go here to sign up for one: https://harvardartmuseums.org/collections/api
 
 git clone https://github.com/uzougochukwu/exhibition-curator
 
@@ -18,9 +18,9 @@ create a file called API-KEY.js and put it in extra
 
 in API-KEY.js type the following:
 
-const smithsonian_api_key = "YOUR-API-KEY"
+const harvard_api_key = "YOUR-API-KEY"
 
-export default smithsonian_api_key
+export default harvard_api_key
 
 then save that file and go back to the terminal window
 
