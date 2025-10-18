@@ -12,18 +12,24 @@ export default function SpecificCleveland() {
   const personal_exhibition = "/personalexhibition";
 
   const [individualCleveland, setParticularCleveland] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     axios
       .get(
-        `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/${parameter.artworkid}`
+        `https://openaccess-api.clevelandart.org/api/artworks/${parameter.artworkid}`
       )
       .then((individualCleveland) => {
         console.log(individualCleveland.data.data);
 
         setParticularCleveland(individualCleveland.data.data);
+        setIsLoading(false);
       });
   }, [parameter.artworkid]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   const addToCollectionCleveland = (individualCleveland) => {
     console.log("added Harvard:", individualCleveland.id);

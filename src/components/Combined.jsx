@@ -163,8 +163,12 @@ const PaginatedItems = ({
             const artworkId = String(artwork.id);
 
             // Using full API URL as requested in prior steps
-            const harvardPage = `https://api.harvardartmuseums.org/exhibition/${artwork.id}?apikey=${harvard_api_key}`;
-            const clevelandPage = `https://openaccess-api.clevelandart.org/api/artworks/${artwork.id}`;
+            // const harvardPage = `https://api.harvardartmuseums.org/exhibition/${artwork.id}?apikey=${harvard_api_key}`;
+            // const clevelandPage = `https://openaccess-api.clevelandart.org/api/artworks/${artwork.id}`;
+            const harvardPage =
+            "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+          //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+          const clevelandPage = "/artworks/" + artwork.id;
             const detailUrl = isHarvard ? harvardPage : clevelandPage;
 
             return (

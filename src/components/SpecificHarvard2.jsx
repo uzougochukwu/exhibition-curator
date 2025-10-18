@@ -14,6 +14,8 @@ export default function SpecificHarvard2() {
 
   const [individualHarvard, setParticularHarvard] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
     axios
       .get(
@@ -24,8 +26,13 @@ export default function SpecificHarvard2() {
         console.log(individualHarvard.data.venues[0].city)
 
         setParticularHarvard(individualHarvard.data);
+        setIsLoading(false)
       });
   }, [parameter.artworkid]);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }  
 
   const addToCollectionHarvard = (individualHarvard) => {
     console.log("added Harvard:", individualHarvard.id);
