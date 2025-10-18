@@ -173,8 +173,8 @@ const PaginatedItems = ({
             // MODIFIED: isImageShown is no longer needed
             const isInfoShown = hiddenInfo[artworkId] === false;
 
-            const harvardPage =
-              "/object/" + artwork.id + `?apikey=${harvard_api_key}`;
+            const harvardPage = "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+           //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
 
             return (
               // The key must match the 'i' property in the layout definition
@@ -194,17 +194,24 @@ const PaginatedItems = ({
                 {(
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
-                  <img
-                    src={
-                      isHarvard
-                        ? artwork.primaryimageurl
-                        : artwork.images.web.url
-                    }
-                    className="rounded-lg object-cover w-full h-20"
-                    width="400"
-                    height="400"
-                    alt={artwork.title || "Artwork"}
-                  />
+                  <a
+                    href={isHarvard ? harvardPage : ""}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                  >
+                    <img
+                      src={
+                        isHarvard
+                          ? artwork.primaryimageurl
+                          : artwork.images.web.url
+                      }
+                      className="rounded-lg object-cover w-full h-20"
+                      width="400"
+                      height="400"
+                      alt={artwork.title || "Artwork"}
+                    />
+                  </a>
                 ) : (
                   <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
                     <p className="text-gray-500 text-xs">No Image</p>
