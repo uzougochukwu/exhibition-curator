@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import axios from "axios";
 // We no longer need to import ReactPaginate for the new UI
-// import ReactPaginate from "react-paginate"; 
+// import ReactPaginate from "react-paginate";
 
 // NEW: Imports for React Grid Layout
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -15,71 +15,71 @@ import harvard_api_key from "../extra/API-KEY";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 // --- STANDALONE COMPONENT: PaginationControls ---
-const PaginationControls = React.memo(({
-  currentPage,
-  totalPages,
-  handlePageClick,
-  displayCurrentPage // This is currentPage + 1
-}) => {
-  if (totalPages <= 1) return null;
+const PaginationControls = React.memo(
+  ({
+    currentPage,
+    totalPages,
+    handlePageClick,
+    displayCurrentPage, // This is currentPage + 1
+  }) => {
+    if (totalPages <= 1) return null;
 
-  // New handler for Previous button
-  const goToPrevious = () => {
-    if (currentPage > 0) {
-      // Calls the same function signature as ReactPaginate would have
-      handlePageClick({ selected: currentPage - 1 });
-    }
-  };
+    // New handler for Previous button
+    const goToPrevious = () => {
+      if (currentPage > 0) {
+        // Calls the same function signature as ReactPaginate would have
+        handlePageClick({ selected: currentPage - 1 });
+      }
+    };
 
-  // New handler for Next button
-  const goToNext = () => {
-    if (currentPage < totalPages - 1) {
-      // Calls the same function signature as ReactPaginate would have
-      handlePageClick({ selected: currentPage + 1 });
-    }
-  };
+    // New handler for Next button
+    const goToNext = () => {
+      if (currentPage < totalPages - 1) {
+        // Calls the same function signature as ReactPaginate would have
+        handlePageClick({ selected: currentPage + 1 });
+      }
+    };
 
-  const prevDisabled = currentPage === 0;
-  const nextDisabled = currentPage === totalPages - 1;
+    const prevDisabled = currentPage === 0;
+    const nextDisabled = currentPage === totalPages - 1;
 
-  return (
-    <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
-      
-      {/* Previous Button */}
-      <button
-        onClick={goToPrevious}
-        disabled={prevDisabled}
-        className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
-          prevDisabled 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-        }`}
-      >
-        &lt; Previous
-      </button>
-      
-      {/* Page X of Y Display */}
-      <div className="text-sm font-medium text-gray-700 whitespace-nowrap">
-        Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
-        <span className="font-bold">{totalPages}</span>
+    return (
+      <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
+        {/* Previous Button */}
+        <button
+          onClick={goToPrevious}
+          disabled={prevDisabled}
+          className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
+            prevDisabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+          }`}
+        >
+          &lt; Previous
+        </button>
+
+        {/* Page X of Y Display */}
+        <div className="text-sm font-medium text-gray-700 whitespace-nowrap">
+          Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
+          <span className="font-bold">{totalPages}</span>
+        </div>
+
+        {/* Next Button */}
+        <button
+          onClick={goToNext}
+          disabled={nextDisabled}
+          className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
+            nextDisabled
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+          }`}
+        >
+          Next &gt;
+        </button>
       </div>
-
-      {/* Next Button */}
-      <button
-        onClick={goToNext}
-        disabled={nextDisabled}
-        className={`px-3 py-1 rounded-lg text-sm transition duration-150 ${
-          nextDisabled 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-        }`}
-      >
-        Next &gt;
-      </button>
-      
-    </div>
-  );
-});
+    );
+  }
+);
 
 // --- Helper Component for Rendering Artworks and Handling Pagination ---
 const PaginatedItems = ({
@@ -88,7 +88,7 @@ const PaginatedItems = ({
   itemsPerPage,
   // handlePageClick, // No longer needed here
   totalPages,
-  title, 
+  title,
   isHarvard,
   addToCollection,
 }) => {
@@ -112,7 +112,7 @@ const PaginatedItems = ({
         x: index % 3,
         y: Math.floor(index / 3) * 10, // Ensure enough height for content
         w: 1,
-        h: 10, 
+        h: 10,
         static: true, // Prevent dragging/resizing
       };
     });
@@ -123,9 +123,9 @@ const PaginatedItems = ({
   // MODIFIED: Removed toggleImage handler
 
   const toggleInfo = (id) => {
-    setHiddenInfo(prev => ({
+    setHiddenInfo((prev) => ({
       ...prev,
-      [id]: prev[id] === false ? undefined : false
+      [id]: prev[id] === false ? undefined : false,
     }));
   };
   // -------------------------
@@ -157,10 +157,8 @@ const PaginatedItems = ({
 
   // const displayCurrentPage = currentPage + 1; // Now managed in Combined component
 
-
   return (
     <section>
-      
       {/* Using ResponsiveReactGridLayout */}
       <div className="mt-4">
         <ResponsiveReactGridLayout
@@ -174,7 +172,10 @@ const PaginatedItems = ({
             const artworkId = String(artwork.id);
             // MODIFIED: isImageShown is no longer needed
             const isInfoShown = hiddenInfo[artworkId] === false;
-            
+
+            const harvardPage =
+              "/object/" + artwork.id + `?apikey=${harvard_api_key}`;
+
             return (
               // The key must match the 'i' property in the layout definition
               <div
@@ -188,12 +189,16 @@ const PaginatedItems = ({
                 </h3>
 
                 {/* MODIFIED: Removed IMAGE TOGGLE BUTTON */}
-                
+
                 {/* MODIFIED: IMAGE BLOCK (ALWAYS RENDERS) */}
-                {(isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url) ? (
+                {(
+                  isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
+                ) ? (
                   <img
                     src={
-                      isHarvard ? artwork.primaryimageurl : artwork.images.web.url
+                      isHarvard
+                        ? artwork.primaryimageurl
+                        : artwork.images.web.url
                     }
                     className="rounded-lg object-cover w-full h-20"
                     width="400"
@@ -210,21 +215,25 @@ const PaginatedItems = ({
                 <button
                   onClick={() => toggleInfo(artworkId)}
                   className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
-                      isInfoShown ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                    isInfoShown
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
                   }`}
                 >
-                  {isInfoShown ? 'Hide Info' : 'Show Info'}
+                  {isInfoShown ? "Hide Info" : "Show Info"}
                 </button>
 
                 {/* CollectionButton is now always visible */}
-                <CollectionButton artwork={artwork} /> 
+                <CollectionButton artwork={artwork} />
 
                 {/* INFO BLOCK (CONDITIONAL RENDERING) */}
                 {isInfoShown && (
                   <div className="text-xs w-full text-left p-1 space-y-0.5">
                     <p>
                       <span className="font-semibold">Date:</span>{" "}
-                      {isHarvard ? artwork.begindate : artwork.creation_date || "N/A"}
+                      {isHarvard
+                        ? artwork.begindate
+                        : artwork.creation_date || "N/A"}
                     </p>
                     <p>
                       <span className="font-semibold">By:</span>{" "}
@@ -239,7 +248,9 @@ const PaginatedItems = ({
                     <div className="pt-1 text-center">
                       <a
                         //href={artwork.url}
-                        href={`https://www.google.com/search?q=${artwork.title}`}
+                        //href={`https://www.google.com/search?q=${artwork.title}`}
+                        //href={`/object/${artwork.id}?apikey=${harvard_api_key}`}
+                        href={harvardPage}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800 font-medium underline"
@@ -250,10 +261,10 @@ const PaginatedItems = ({
                   </div>
                 )}
               </div>
-            )})}
+            );
+          })}
         </ResponsiveReactGridLayout>
       </div>
-
     </section>
   );
 };
@@ -262,7 +273,7 @@ const PaginatedItems = ({
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
   // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
-  const SHOW_CLEVELAND_PAGE_INDICATOR = false; 
+  const SHOW_CLEVELAND_PAGE_INDICATOR = false;
 
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
@@ -287,7 +298,7 @@ export default function Combined() {
 
   // FUNCTION: Scroll to the top of the search results
   const scrollToTop = () => {
-    topRef.current.scrollIntoView({ behavior: 'smooth' });
+    topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const harvardSearch = () => {
@@ -295,19 +306,19 @@ export default function Combined() {
     setHarvardCurrentPage(0);
     setClevelandCurrentPage(0);
     setError(null);
-    
+
     // Scroll to the top of the results section when a new search is performed
     if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'smooth' });
+      topRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
     let harvard_before_year = "";
     if (beforeYear) {
       harvard_before_year = beforeYear + "-01-01";
     }
-
+    // /localhost:8080/
     // Use &size=100 (or more) to fetch enough data for client-side pagination
-    let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`;
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`;
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
@@ -321,6 +332,8 @@ export default function Combined() {
     axios
       .get(harvard_url)
       .then((response) => {
+        console.log(response.data.records);
+
         setHarvardFullData(response.data.records);
       })
       .catch((err) => {
@@ -346,7 +359,7 @@ export default function Combined() {
     }
 
     // Use &limit=100 (or more) to fetch enough data for client-side pagination
-    let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`;
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`;
 
     if (cleveland_sort_value) {
       cleveland_url += `&sort=${cleveland_sort_value}`;
@@ -359,6 +372,8 @@ export default function Combined() {
     axios
       .get(cleveland_url)
       .then((response) => {
+        console.log(response.data.data);
+
         setClevelandFullData(response.data.data);
       })
       .catch((err) => {
@@ -399,7 +414,6 @@ export default function Combined() {
   const harvardDisplayPage = harvardCurrentPage + 1;
   const clevelandDisplayPage = clevelandCurrentPage + 1;
 
-
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
@@ -418,7 +432,7 @@ export default function Combined() {
           </a>
         </div>
       </header>
-<p></p>
+      <p></p>
       {/* Search/Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
@@ -437,7 +451,7 @@ export default function Combined() {
             placeholder="e.g., Monet, landscapes"
           />
         </div>
-<p></p>
+        <p></p>
         <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
@@ -461,7 +475,7 @@ export default function Combined() {
           <label
             htmlFor="before"
             className="block text-sm font-medium text-gray-700 mb-1"
-            >
+          >
             Made before year:
           </label>
           <input
@@ -473,7 +487,7 @@ export default function Combined() {
             placeholder="e.g., 2020"
           />
         </div>
-<p></p>
+        <p></p>
         <button
           onClick={harvardSearch}
           className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
@@ -490,8 +504,9 @@ export default function Combined() {
       )}
 
       {/* Full-width container for all results */}
-      <div className="pt-4 space-y-8" ref={topRef}> {/* Ref marks the top */}
-
+      <div className="pt-4 space-y-8" ref={topRef}>
+        {" "}
+        {/* Ref marks the top */}
         {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
         {/* Harvard Results Header */}
         {harvardPageCount > 1 && (
@@ -502,7 +517,6 @@ export default function Combined() {
             displayCurrentPage={harvardDisplayPage}
           />
         )}
-        
         {/* Harvard Results Section */}
         <PaginatedItems
           items={harvardFullData}
@@ -510,11 +524,10 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleHarvardPageClick}
           totalPages={harvardPageCount}
-          title="Harvard Results" 
+          title="Harvard Results"
           isHarvard={true}
           addToCollection={addToCollectionHarvard}
         />
-
         {/* Cleveland Results Section */}
         <PaginatedItems
           items={clevelandFullData}
@@ -522,11 +535,10 @@ export default function Combined() {
           itemsPerPage={itemsPerPage}
           handlePageClick={handleClevelandPageClick}
           totalPages={clevelandPageCount}
-          title="Cleveland Results" 
+          title="Cleveland Results"
           isHarvard={false}
           addToCollection={addToCollectionCleveland}
         />
-
         {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only (Conditional on Feature Flag) */}
         {SHOW_CLEVELAND_PAGE_INDICATOR && clevelandPageCount > 1 && (
           <PaginationControls
@@ -536,19 +548,17 @@ export default function Combined() {
             displayCurrentPage={clevelandDisplayPage}
           />
         )}
-
         {/* 3. SCROLL BACK TO TOP BUTTON */}
         {(harvardFullData.length > 0 || clevelandFullData.length > 0) && (
-            <div className="flex justify-center pt-8">
-                <button
-                    onClick={scrollToTop}
-                    className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
-                >
-                    Back to Top of Results
-                </button>
-            </div>
+          <div className="flex justify-center pt-8">
+            <button
+              onClick={scrollToTop}
+              className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
+            >
+              Back to Top of Results
+            </button>
+          </div>
         )}
-
       </div>
     </div>
   );

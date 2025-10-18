@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import harvard_api_key from "./extra/API-KEY"
 
 export default function searchMetropolitan(params) {
   return axios
@@ -30,4 +31,17 @@ function fetchSpecificMetropolitan(objectID) {
     });
 }
 
-export {fetchSpecificMetropolitan}
+function fetchSpecificHarvard(objectID) {
+  return axios
+  .get(
+    `http://localhost:8080/api.harvardartmuseums.org/object/${objectID}?apikey=${harvard_api_key}`
+  )
+  .then((response) => {
+    console.log(response);
+    
+
+    return response
+  })
+}
+
+export {fetchSpecificMetropolitan, fetchSpecificHarvard}

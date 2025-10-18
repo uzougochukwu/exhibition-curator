@@ -8,6 +8,7 @@ function Home() {
   const personal_exhibition = "/personalexhibition"
   const smithsonian_link = "/smithsonian"
   const combined = "/combined"
+  
   return (
     <div>
     <a href={personal_exhibition}>Personal Exhibition</a><p></p>

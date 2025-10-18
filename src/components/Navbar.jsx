@@ -8,6 +8,7 @@ function Navbar() {
 <a href="#">About</a>
 <a href="#">Contact</a>
     <Link to= "/" >Home</Link>
+
     <br></br>
 
  </nav>

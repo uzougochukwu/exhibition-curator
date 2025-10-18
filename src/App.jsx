@@ -9,21 +9,24 @@ import SpecificMetropolitan from "./components/SpecificMetropolitan";
 import PersonalExhibition from "./components/PersonalExhibition";
 import Metropolitan2 from "./components/Metropolitan2";
 import Combined from "./components/Combined";
+import harvard_api_key from "./extra/API-KEY";
+import SpecificHarvard from "./components/SpecificHarvard";
 
 function App() {
-  
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/cleveland" element={<Metropolitan2/>} />
-        <Route path="/smithsonian" element={<Harvard/>} />
-        <Route path="/personalexhibition" element={<PersonalExhibition/>} />
-        <Route path="/combined" element={<Combined/>}/>
+        <Route path="/" element={<Home />} />
+        <Route path="/cleveland" element={<Metropolitan2 />} />
+        <Route path="/smithsonian" element={<Harvard />} />
+        <Route path="/personalexhibition" element={<PersonalExhibition />} />
+        <Route path="/combined" element={<Combined />} />
+        <Route path="/object/:artworkid" element={<SpecificHarvard/>}/>
+
+        {/* <Route path="/object/:objectid" element={<SpecificHarvard />} /> */}
       </Routes>
     </div>
   );
 }
-
 
 export default App;
