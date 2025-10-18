@@ -25,6 +25,12 @@ export default function SpecificCleveland() {
       });
   }, [parameter.artworkid]);
 
+
+  const addToCollectionCleveland = (individualCleveland) => {
+    console.log("added Harvard:", individualCleveland.id);
+    sessionStorage.setItem(individualCleveland.id, JSON.stringify(individualCleveland));
+  };
+
   return (
     <div>
         <a href={home}>
@@ -46,6 +52,7 @@ export default function SpecificCleveland() {
       <p>Street: 11150 East Blvd</p>
       <p>City: Cleveland</p>
       <p>State: OH</p>
+      <button onClick={() => {addToCollectionCleveland(individualCleveland)}}>Add to collection</button>
     </div>
   );
 }
