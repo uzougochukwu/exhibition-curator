@@ -163,12 +163,10 @@ const PaginatedItems = ({
             const artworkId = String(artwork.id);
 
             // Using full API URL as requested in prior steps
-            // const harvardPage = `https://api.harvardartmuseums.org/exhibition/${artwork.id}?apikey=${harvard_api_key}`;
-            // const clevelandPage = `https://openaccess-api.clevelandart.org/api/artworks/${artwork.id}`;
+            // CORRECTED: Using local paths for navigation
             const harvardPage =
-            "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-          //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-          const clevelandPage = "/artworks/" + artwork.id;
+              "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+            const clevelandPage = "/artworks/" + artwork.id;
             const detailUrl = isHarvard ? harvardPage : clevelandPage;
 
             return (
@@ -276,7 +274,9 @@ export default function Combined() {
   const [term, setTerm] = useState("");
   const [orderby, setOrderBy] = useState("");
   const [beforeYear, setBeforeYear] = useState("");
-  const [error, setError] = useState();
+  const [error, setError] = useState(null); // Initialize as null for clearer check
+  // NEW STATE for loading indicator
+  const [isLoading, setIsLoading] = useState(false);
 
   // Pagination State
   const itemsPerPage = 15; // Set a reasonable number of items per page
@@ -291,13 +291,15 @@ export default function Combined() {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  const harvardSearch = () => {
-    // Reset page to 0 on a new search
+  const harvardSearch = async () => {
+    // 1. Setup: Reset states and show loading
     setHarvardCurrentPage(0);
     setClevelandCurrentPage(0);
     setError(null);
+    setHarvardFullData([]);
+    setClevelandFullData([]);
+    setIsLoading(true); // START LOADING
 
-    // Scroll to the top of the results section when a new search is performed
     if (topRef.current) {
       topRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -306,37 +308,17 @@ export default function Combined() {
     if (beforeYear) {
       harvard_before_year = beforeYear + "-01-01";
     }
-    // /localhost:8080/
-    // Use &size=100 (or more) to fetch enough data for client-side pagination
     let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
     }
-
     if (harvard_before_year) {
       harvard_url += `&before=${harvard_before_year}`;
     }
 
-    // --- Harvard API Call ---
-    axios
-      .get(harvard_url)
-      .then((response) => {
-        console.log(response.data.records);
-
-        setHarvardFullData(response.data.records);
-      })
-      .catch((err) => {
-        console.error("Harvard API error:", err);
-        setError(
-          "A network error occurred or the search query returned nothing from Harvard"
-        );
-        setHarvardFullData([]); // Clear results on error
-      });
-
-    // --- Cleveland API Logic and Call ---
+    // --- Cleveland API Logic and URL Setup ---
     let cleveland_sort_value = "";
-
     switch (orderby) {
       case "venues":
         cleveland_sort_value = "gallery";
@@ -351,31 +333,58 @@ export default function Combined() {
         break;
     }
 
-    // Use &limit=100 (or more) to fetch enough data for client-side pagination
     let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
-
     if (cleveland_sort_value) {
       cleveland_url += `&sort=${cleveland_sort_value}`;
     }
-
     if (beforeYear) {
       cleveland_url += `&created_before=${beforeYear}`;
     }
 
-    axios
-      .get(cleveland_url)
-      .then((response) => {
-        console.log(response.data.data);
+    // 2. Execute Calls (using Promise.all for parallel fetching)
+    try {
+      const [harvardResponse, clevelandResponse] = await Promise.allSettled([
+        axios.get(harvard_url),
+        axios.get(cleveland_url),
+      ]);
 
-        setClevelandFullData(response.data.data);
-      })
-      .catch((err) => {
-        console.error("Cleveland API error:", err);
-        setError(
-          "A network error occurred or the search query returned nothing from Cleveland"
-        );
-        setClevelandFullData([]); // Clear results on error
-      });
+      let errorMessages = [];
+
+      // Handle Harvard Result
+      if (harvardResponse.status === 'fulfilled') {
+        setHarvardFullData(harvardResponse.value.data.records || []);
+      } else {
+        console.error("Harvard API error:", harvardResponse.reason);
+        errorMessages.push("Harvard Museum search failed or returned no results.");
+      }
+
+      // Handle Cleveland Result
+      if (clevelandResponse.status === 'fulfilled') {
+        setClevelandFullData(clevelandResponse.value.data.data || []);
+      } else {
+        console.error("Cleveland API error:", clevelandResponse.reason);
+        errorMessages.push("Cleveland Museum search failed or returned no results.");
+      }
+
+      // Final Error Check
+      if (errorMessages.length > 0) {
+        // Only set the error state if there are actual issues
+        setError(errorMessages.join(' ')); 
+      }
+      
+      if (harvardResponse.status === 'fulfilled' && harvardResponse.value.data.records.length === 0 && 
+          clevelandResponse.status === 'fulfilled' && clevelandResponse.value.data.data.length === 0) {
+        setError("Your search returned no results from either museum.");
+      }
+
+    } catch (err) {
+      // This catch block would primarily handle system-level network errors outside of the API calls
+      console.error("System Network Error:", err);
+      setError("A critical network error occurred during the search.");
+    } finally {
+      // 3. Cleanup: Stop loading regardless of success/failure
+      setIsLoading(false); 
+    }
 
     console.log("Search button clicked. Starting API call for:", term);
   };
@@ -406,6 +415,10 @@ export default function Combined() {
   const clevelandPageCount = Math.ceil(clevelandFullData.length / itemsPerPage);
   const harvardDisplayPage = harvardCurrentPage + 1;
   const clevelandDisplayPage = clevelandCurrentPage + 1;
+
+  // --- Render Logic ---
+  const showResults = !isLoading && (harvardFullData.length > 0 || clevelandFullData.length > 0);
+  const showNoResultsMessage = !isLoading && !error && harvardFullData.length === 0 && clevelandFullData.length === 0;
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
@@ -442,6 +455,7 @@ export default function Combined() {
             onChange={(e) => setTerm(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="e.g., Monet, landscapes"
+            disabled={isLoading} // Disable input while searching
           />
         </div>
         <p></p>
@@ -457,6 +471,7 @@ export default function Combined() {
             value={orderby}
             onChange={(e) => setOrderBy(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading} // Disable input while searching
           >
             <option value="">No sort</option>
             <option value="artists">artists</option>
@@ -479,81 +494,104 @@ export default function Combined() {
             onChange={(e) => setBeforeYear(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="e.g., 2020"
+            disabled={isLoading} // Disable input while searching
           />
         </div>
         <p></p>
         <button
           onClick={harvardSearch}
-          className="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-150 transform hover:scale-105"
+          disabled={isLoading} // Disable button while searching
+          className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg transition duration-150 transform ${
+            isLoading
+              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+              : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
+          }`}
         >
-          Search
+          {isLoading ? "Searching..." : "Search"}
         </button>
       </div>
       <p></p>
 
+      {/* ERROR MESSAGE DISPLAY */}
       {error && (
-        <div className="text-red-600 p-3 bg-red-100 border border-red-300 rounded-lg">
+        <div className="text-red-700 p-3 bg-red-100 border border-red-300 rounded-lg font-medium">
           Error: {error}
         </div>
       )}
 
-      {/* Full-width container for all results */}
-      <div className="pt-4 space-y-8" ref={topRef}>
-        {" "}
-        {/* Ref marks the top */}
-        {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-        {/* Harvard Results Header */}
-        {harvardPageCount > 1 && (
-          <PaginationControls
+      {/* LOADING INDICATOR */}
+      {isLoading && (
+        <div className="flex justify-center items-center py-10 text-xl font-semibold text-gray-600">
+          Searching... please wait.
+        </div>
+      )}
+
+      {/* NO RESULTS MESSAGE */}
+      {showNoResultsMessage && (
+        <div className="flex justify-center items-center py-10 text-xl font-medium text-gray-500">
+          No artworks found matching your criteria. Try a different search term.
+        </div>
+      )}
+
+      {/* RESULTS SECTION (Only visible if not loading AND we have data) */}
+      {showResults && (
+        <div className="pt-4 space-y-8" ref={topRef}>
+          {" "}
+          {/* Ref marks the top */}
+          {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
+          {/* Harvard Results Header */}
+          {harvardPageCount > 1 && (
+            <PaginationControls
+              currentPage={harvardCurrentPage}
+              totalPages={harvardPageCount}
+              handlePageClick={handleHarvardPageClick}
+              displayCurrentPage={harvardDisplayPage}
+            />
+          )}
+          {/* Harvard Results Section */}
+          <PaginatedItems
+            items={harvardFullData}
             currentPage={harvardCurrentPage}
-            totalPages={harvardPageCount}
+            itemsPerPage={itemsPerPage}
             handlePageClick={handleHarvardPageClick}
-            displayCurrentPage={harvardDisplayPage}
+            totalPages={harvardPageCount}
+            title="Harvard Results"
+            isHarvard={true}
+            addToCollection={addToCollectionHarvard}
           />
-        )}
-        {/* Harvard Results Section */}
-        <PaginatedItems
-          items={harvardFullData}
-          currentPage={harvardCurrentPage}
-          itemsPerPage={itemsPerPage}
-          handlePageClick={handleHarvardPageClick}
-          totalPages={harvardPageCount}
-          title="Harvard Results"
-          isHarvard={true}
-          addToCollection={addToCollectionHarvard}
-        />
-        {/* Cleveland Results Section */}
-        <PaginatedItems
-          items={clevelandFullData}
-          currentPage={clevelandCurrentPage}
-          itemsPerPage={itemsPerPage}
-          handlePageClick={handleClevelandPageClick}
-          totalPages={clevelandPageCount}
-          title="Cleveland Results"
-          isHarvard={false}
-          addToCollection={addToCollectionCleveland}
-        />
-        {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only (Conditional on Feature Flag) */}
-        {SHOW_CLEVELAND_PAGE_INDICATOR && clevelandPageCount > 1 && (
-          <PaginationControls
+          {/* Cleveland Results Section */}
+          <PaginatedItems
+            items={clevelandFullData}
             currentPage={clevelandCurrentPage}
-            totalPages={clevelandPageCount}
+            itemsPerPage={itemsPerPage}
             handlePageClick={handleClevelandPageClick}
-            displayCurrentPage={clevelandDisplayPage}
+            totalPages={clevelandPageCount}
+            title="Cleveland Results"
+            isHarvard={false}
+            addToCollection={addToCollectionCleveland}
           />
-        )}
-        {/* 3. SCROLL BACK TO TOP BUTTON */}
-        {(harvardFullData.length > 0 || clevelandFullData.length > 0) && (
-          <div className="flex justify-center pt-8">
-            <button
-              onClick={scrollToTop}
-              className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
-            >
-              Back to Top of Results
-            </button>
-          </div>
-        )}
-      </div>
+          {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only (Conditional on Feature Flag) */}
+          {SHOW_CLEVELAND_PAGE_INDICATOR && clevelandPageCount > 1 && (
+            <PaginationControls
+              currentPage={clevelandCurrentPage}
+              totalPages={clevelandPageCount}
+              handlePageClick={handleClevelandPageClick}
+              displayCurrentPage={clevelandDisplayPage}
+            />
+          )}
+          {/* 3. SCROLL BACK TO TOP BUTTON */}
+          {(harvardFullData.length > 0 || clevelandFullData.length > 0) && (
+            <div className="flex justify-center pt-8">
+              <button
+                onClick={scrollToTop}
+                className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 transition duration-150"
+              >
+                Back to Top of Results
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
