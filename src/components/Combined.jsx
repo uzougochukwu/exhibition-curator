@@ -93,15 +93,13 @@ const PaginatedItems = ({
   addToCollection,
 }) => {
   // HOOKS CALLED UNCONDITIONALLY AT THE TOP
-  // MODIFIED: Removed useState for hiddenImages
-  const [hiddenInfo, setHiddenInfo] = useState({});
+  // REMOVED: const [hiddenInfo, setHiddenInfo] = useState({});
 
   const offset = currentPage * itemsPerPage;
   const currentItems = items.slice(offset, offset + itemsPerPage);
 
   React.useEffect(() => {
-    // MODIFIED: Removed setHiddenImages({});
-    setHiddenInfo({});
+    // REMOVED: setHiddenInfo({});
   }, [currentPage, items]);
 
   const layout = useMemo(() => {
@@ -110,9 +108,9 @@ const PaginatedItems = ({
       return {
         i: String(artwork.id),
         x: index % 3,
-        y: Math.floor(index / 3) * 10, // Ensure enough height for content
+        y: Math.floor(index / 3) * 12, // Increased height slightly since info is now always visible
         w: 1,
-        h: 10,
+        h: 12,
         static: true, // Prevent dragging/resizing
       };
     });
@@ -120,14 +118,7 @@ const PaginatedItems = ({
   // ------------------------------------------------------------------
 
   // --- Toggle Handlers ---
-  // MODIFIED: Removed toggleImage handler
-
-  const toggleInfo = (id) => {
-    setHiddenInfo((prev) => ({
-      ...prev,
-      [id]: prev[id] === false ? undefined : false,
-    }));
-  };
+  // REMOVED: const toggleInfo = (id) => { ... }
   // -------------------------
 
   const CollectionButton = isHarvard
@@ -170,13 +161,11 @@ const PaginatedItems = ({
         >
           {currentItems.map((artwork) => {
             const artworkId = String(artwork.id);
-            // MODIFIED: isImageShown is no longer needed
-            const isInfoShown = hiddenInfo[artworkId] === false;
 
-            const harvardPage =
-              "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-            //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-            const clevelandPage = "/artworks/" + artwork.id;
+            // Using full API URL as requested in prior steps
+            const harvardPage = `https://api.harvardartmuseums.org/exhibition/${artwork.id}?apikey=${harvard_api_key}`;
+            const clevelandPage = `https://openaccess-api.clevelandart.org/api/artworks/${artwork.id}`;
+            const detailUrl = isHarvard ? harvardPage : clevelandPage;
 
             return (
               // The key must match the 'i' property in the layout definition
@@ -190,53 +179,47 @@ const PaginatedItems = ({
                   {artwork.title}
                 </h3>
 
-                {/* MODIFIED: Removed IMAGE TOGGLE BUTTON */}
-
-                {/* MODIFIED: IMAGE BLOCK (ALWAYS RENDERS) */}
+                {/* IMAGE BLOCK (ALWAYS RENDERS) */}
                 {(
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
-                  // <a
-                  //   href={isHarvard ? harvardPage : clevelandPage}
-                  //   target="_blank"
-                  //   rel="noopener noreferrer"
-                  //   className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                  // ></a>
+                  // Wrap in a relative div to allow the link to cover the image
+                  <div className="relative w-full h-20"> 
+                    {/* The <a> tag uses absolute positioning to cover the image */}
+                    <a
+                      href={detailUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-10 block" // z-10 makes it clickable over the image
+                      title={`View details for ${artwork.title}`}
+                    >
+                      {/* Empty anchor tag to make the area clickable */}
+                    </a> 
                     <img
                       src={
                         isHarvard
                           ? artwork.primaryimageurl
-                          : artwork.images.web.url}
+                          : artwork.images.web.url
+                      }
                       className="rounded-lg object-cover w-full h-20"
                       width="200"
                       height="200"
                       alt={artwork.title || "Artwork"}
                     />
-                  
+                  </div>
                 ) : (
                   <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
                     <p className="text-gray-500 text-xs">No Image</p>
                   </div>
                 )}
 
-                {/* INFO TOGGLE BUTTON */}
-                <button
-                  onClick={() => toggleInfo(artworkId)}
-                  className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
-                    isInfoShown
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
-                  }`}
-                >
-                  {isInfoShown ? "Hide Info" : "Show Info"}
-                </button>
+                {/* REMOVED: INFO TOGGLE BUTTON */}
 
                 {/* CollectionButton is now always visible */}
                 <CollectionButton artwork={artwork} />
 
-                {/* INFO BLOCK (CONDITIONAL RENDERING) */}
-                {isInfoShown && (
-                  <div className="text-xs w-full text-left p-1 space-y-0.5">
+                {/* INFO BLOCK (NOW ALWAYS RENDERS) */}
+                <div className="text-xs w-full text-left p-1 space-y-0.5">
                     <p>
                       <span className="font-semibold">Date:</span>{" "}
                       {isHarvard
@@ -250,15 +233,11 @@ const PaginatedItems = ({
                         : artwork.creators?.[0]?.description || "N/A"}
                     </p>
                     <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                      {/* <span className="font-semibold">Desc:</span>{" "} */}
                       {/* {artwork.description || "No description provided."} */}
                     </p>
                     <div className="pt-1 text-center">
                       <a
-                        //href={artwork.url}
-                        //href={`https://www.google.com/search?q=${artwork.title}`}
-                        //href={`/object/${artwork.id}?apikey=${harvard_api_key}`}
-                        href={isHarvard ? harvardPage : clevelandPage }
+                        href={detailUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800 font-medium underline"
@@ -267,7 +246,6 @@ const PaginatedItems = ({
                       </a>
                     </div>
                   </div>
-                )}
               </div>
             );
           })}

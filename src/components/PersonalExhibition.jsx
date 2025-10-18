@@ -65,7 +65,8 @@ export default function PersonalExhibition() {
           style={{
             border: "1px solid #ccc",
             padding: "10px",
-            margin: "10px 0",
+            margin: "10px auto", // Centering the entire record container
+            maxWidth: "600px", 
           }}
         >
           <h3>{artwork.title}</h3>
@@ -80,37 +81,43 @@ export default function PersonalExhibition() {
               artwork.creators?.[0]?.description ||
               "N/A"}
           </p>
-          <img
-            src={artwork.primaryimageurl}
-            // alt={artwork.title}
-            style={{
-              maxWidth: "200px",
-              height: "150px",
-              display: "block",
-              marginBottom: "10px",
-            }}
-          />
-          <img
-            src={artwork.images?.web?.url}
-            // alt={artwork.title}
-            style={{
-              maxWidth: "200px",
-              height: "150px",
-              display: "block",
-              marginBottom: "10px",
-            }}
-          />
+
+          {/* Image Container for Centering */}
+          <div style={{ textAlign: "center", margin: "10px 0" }}>
+            {/* Harvard Image (using primaryimageurl) */}
+            {artwork.primaryimageurl && (
+              <img
+                src={artwork.primaryimageurl}
+                alt={artwork.title || "Harvard Artwork"}
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  maxHeight: "300px",
+                  display: "inline-block", // Required for center alignment
+                  marginBottom: "10px",
+                }}
+              />
+            )}
+            
+            {/* Cleveland Image (using images.web.url) */}
+            {artwork.images?.web?.url && (
+              <img
+                src={artwork.images.web.url}
+                alt={artwork.title || "Cleveland Artwork"}
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  maxHeight: "300px",
+                  display: "inline-block", // Required for center alignment
+                  marginBottom: "10px",
+                }}
+              />
+            )}
+          </div>
+          {/* End Image Container */}
+
           <div className="pt-1 text-center">
-            {/* <a
-                        //href={artwork.url}
-                        // href={`https://www.google.com/search?q=${artwork.title}`}
-                        href={artwork}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                      >
-                        More details
-                      </a> */}
+            {/* More details link placeholder */}
           </div>
 
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
