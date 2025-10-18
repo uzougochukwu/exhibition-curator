@@ -11,11 +11,11 @@ export default function SpecificHarvard() {
   useEffect(() => {
     fetchSpecificHarvard(parameter.artworkid)
       .then((individualHarvard) => {
-        console.log(parameter.objectID);
+        console.log(parameter.artworkid);
         
-        console.log(individualHarvard);
+        console.log(individualHarvard.data);
         
-        setParticularHarvard(individualHarvard);
+        setParticularHarvard(individualHarvard.data);
       })
       .catch(console.log);
   }, []);
