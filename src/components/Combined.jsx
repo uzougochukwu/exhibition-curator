@@ -222,6 +222,12 @@ const PaginatedItems = ({
 
                 {/* INFO BLOCK (NOW ALWAYS RENDERS) */}
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
+                <p>
+                    <span className="font-semibold">From:</span>{" "}
+                    {isHarvard
+                      ? "Harvard"
+                      : "Cleveland"}
+                  </p>
                   <p>
                     <span className="font-semibold">Date:</span>{" "}
                     {isHarvard
