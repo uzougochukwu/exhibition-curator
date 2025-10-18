@@ -15,6 +15,7 @@ export default function SpecificHarvard2() {
       )
       .then((individualHarvard) => {
         console.log(individualHarvard.data);
+        console.log(individualHarvard.data.venues[0].city)
 
         setParticularHarvard(individualHarvard.data);
       });
@@ -23,6 +24,13 @@ export default function SpecificHarvard2() {
   return (
     <div>
       <p>Title: {individualHarvard.title}</p>
+      <p>Desc: {individualHarvard.description}</p>
+      <img
+      src={individualHarvard.primaryimageurl}></img>
+      <p>Location:</p>
+      <p>Street: {individualHarvard.venues[0].address1}</p>
+      <p>City: {individualHarvard.venues[0].city}</p>
+      <p>State: {individualHarvard.venues[0].state}</p>
     </div>
   );
 }
