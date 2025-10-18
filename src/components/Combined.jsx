@@ -93,14 +93,14 @@ const PaginatedItems = ({
   addToCollection,
 }) => {
   // HOOKS CALLED UNCONDITIONALLY AT THE TOP
-  const [hiddenImages, setHiddenImages] = useState({});
+  // MODIFIED: Removed useState for hiddenImages
   const [hiddenInfo, setHiddenInfo] = useState({});
 
   const offset = currentPage * itemsPerPage;
   const currentItems = items.slice(offset, offset + itemsPerPage);
 
   React.useEffect(() => {
-    setHiddenImages({});
+    // MODIFIED: Removed setHiddenImages({});
     setHiddenInfo({});
   }, [currentPage, items]);
 
@@ -120,12 +120,7 @@ const PaginatedItems = ({
   // ------------------------------------------------------------------
 
   // --- Toggle Handlers ---
-  const toggleImage = (id) => {
-    setHiddenImages(prev => ({
-      ...prev,
-      [id]: prev[id] === false ? undefined : false 
-    }));
-  };
+  // MODIFIED: Removed toggleImage handler
 
   const toggleInfo = (id) => {
     setHiddenInfo(prev => ({
@@ -177,7 +172,7 @@ const PaginatedItems = ({
         >
           {currentItems.map((artwork) => {
             const artworkId = String(artwork.id);
-            const isImageShown = hiddenImages[artworkId] === false;
+            // MODIFIED: isImageShown is no longer needed
             const isInfoShown = hiddenInfo[artworkId] === false;
             
             return (
@@ -192,33 +187,23 @@ const PaginatedItems = ({
                   {artwork.title}
                 </h3>
 
-                {/* IMAGE TOGGLE BUTTON */}
-                <button
-                  onClick={() => toggleImage(artworkId)}
-                  className={`w-full py-1 text-xs font-semibold rounded-lg transition ${
-                      isImageShown ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                  }`}
-                >
-                  {isImageShown ? 'Hide Image' : 'Show Image'}
-                </button>
-
-                {/* IMAGE BLOCK (CONDITIONAL RENDERING) */}
-                {isImageShown && (
-                  (isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url) ? (
-                    <img
-                      src={
-                        isHarvard ? artwork.primaryimageurl : artwork.images.web.url
-                      }
-                      className="rounded-lg object-cover w-full h-20"
-                      width="400"
-                      height="400"
-                      alt={artwork.title || "Artwork"}
-                    />
-                  ) : (
-                    <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
-                      <p className="text-gray-500 text-xs">No Image</p>
-                    </div>
-                  )
+                {/* MODIFIED: Removed IMAGE TOGGLE BUTTON */}
+                
+                {/* MODIFIED: IMAGE BLOCK (ALWAYS RENDERS) */}
+                {(isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url) ? (
+                  <img
+                    src={
+                      isHarvard ? artwork.primaryimageurl : artwork.images.web.url
+                    }
+                    className="rounded-lg object-cover w-full h-20"
+                    width="400"
+                    height="400"
+                    alt={artwork.title || "Artwork"}
+                  />
+                ) : (
+                  <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
+                    <p className="text-gray-500 text-xs">No Image</p>
+                  </div>
                 )}
 
                 {/* INFO TOGGLE BUTTON */}
