@@ -206,9 +206,7 @@ const PaginatedItems = ({
                       src={
                         isHarvard
                           ? artwork.primaryimageurl
-                          : artwork.images.web.url
-                      }
-                      
+                          : artwork.images.web.url}
                       className="rounded-lg object-cover w-full h-20"
                       width="200"
                       height="200"
@@ -328,7 +326,7 @@ export default function Combined() {
     }
     // /localhost:8080/
     // Use &size=100 (or more) to fetch enough data for client-side pagination
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100`;
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
@@ -356,6 +354,7 @@ export default function Combined() {
 
     // --- Cleveland API Logic and Call ---
     let cleveland_sort_value = "";
+
     switch (orderby) {
       case "venues":
         cleveland_sort_value = "gallery";
@@ -363,13 +362,15 @@ export default function Combined() {
       case "people":
         cleveland_sort_value = "artists";
         break;
+      case "title":
+        cleveland_sort_value = "title";
       default:
         cleveland_sort_value = "";
         break;
     }
 
     // Use &limit=100 (or more) to fetch enough data for client-side pagination
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100`;
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
 
     if (cleveland_sort_value) {
       cleveland_url += `&sort=${cleveland_sort_value}`;
@@ -476,7 +477,8 @@ export default function Combined() {
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">No sort</option>
-            <option value="venues">Gallery</option>
+            <option value="artists">artists</option>
+            <option value="title">title</option>
           </select>
         </div>
         <p></p>
