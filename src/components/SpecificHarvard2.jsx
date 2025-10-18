@@ -14,7 +14,7 @@ export default function SpecificHarvard2() {
         `https://api.harvardartmuseums.org/exhibition/${parameter.artworkid}?apikey=${harvard_api_key}`
       )
       .then((individualHarvard) => {
-        console.log(individualHarvard);
+        console.log(individualHarvard.data);
 
         setParticularHarvard(individualHarvard.data);
       });

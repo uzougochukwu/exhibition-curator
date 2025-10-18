@@ -175,6 +175,7 @@ const PaginatedItems = ({
 
             const harvardPage = "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
            //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+           const clevelandPage = "/artworks/" + artwork.id 
 
             return (
               // The key must match the 'i' property in the layout definition
@@ -195,7 +196,7 @@ const PaginatedItems = ({
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
                   <a
-                    href={isHarvard ? harvardPage : ""}
+                    href={isHarvard ? harvardPage : clevelandPage}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-indigo-600 hover:text-indigo-800 font-medium underline"

@@ -11,6 +11,7 @@ import Metropolitan2 from "./components/Metropolitan2";
 import Combined from "./components/Combined";
 import harvard_api_key from "./extra/API-KEY";
 import SpecificHarvard2 from "./components/SpecificHarvard2";
+import SpecificCleveland from "./components/SpecificCleveland";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/personalexhibition" element={<PersonalExhibition />} />
         <Route path="/combined" element={<Combined />} />
         <Route path="/exhibition/:artworkid" element={<SpecificHarvard2 />} />
+        <Route path="/artworks/:artworkid" element={<SpecificCleveland/>} />
         {/* <Route path="/exhibition/:artworkid" element={<SpecificHarvard />} /> */}
         {/* <Route path="/object/:objectid" element={<SpecificHarvard />} /> */}
       </Routes>
