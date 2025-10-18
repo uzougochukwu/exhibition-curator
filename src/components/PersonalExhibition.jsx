@@ -75,10 +75,11 @@ export default function PersonalExhibition() {
             {artwork.begindate || artwork.creation_date || "N/A"}
           </p>
           <p>
-                      <span className="font-semibold">By:</span>{" "}
-                      {
-                        artwork.people?.[0]?.name || artwork.creators?.[0]?.description || "N/A"}
-                    </p>
+            <span className="font-semibold">By:</span>{" "}
+            {artwork.people?.[0]?.name ||
+              artwork.creators?.[0]?.description ||
+              "N/A"}
+          </p>
           <img
             src={artwork.primaryimageurl}
             // alt={artwork.title}
@@ -99,17 +100,18 @@ export default function PersonalExhibition() {
               marginBottom: "10px",
             }}
           />
-                              <div className="pt-1 text-center">
-                      <a
+          <div className="pt-1 text-center">
+            {/* <a
                         //href={artwork.url}
-                        href={`https://www.google.com/search?q=${artwork.title}`}
+                        // href={`https://www.google.com/search?q=${artwork.title}`}
+                        href={artwork}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800 font-medium underline"
                       >
                         More details
-                      </a>
-                    </div>
+                      </a> */}
+          </div>
 
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>
