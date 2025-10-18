@@ -277,6 +277,8 @@ export default function Combined() {
   const [error, setError] = useState(null); // Initialize as null for clearer check
   // NEW STATE for loading indicator
   const [isLoading, setIsLoading] = useState(false);
+  // NEW STATE to track if a search has been performed
+  const [hasSearched, setHasSearched] = useState(false); // <--- ADDED
 
   // Pagination State
   const itemsPerPage = 15; // Set a reasonable number of items per page
@@ -298,6 +300,7 @@ export default function Combined() {
     setError(null);
     setHarvardFullData([]);
     setClevelandFullData([]);
+    setHasSearched(true); // <--- Set search attempted flag
     setIsLoading(true); // START LOADING
 
     if (topRef.current) {
@@ -366,16 +369,21 @@ export default function Combined() {
         errorMessages.push("Cleveland Museum search failed or returned no results.");
       }
 
-      // Final Error Check
+      // Final Error Check: Prioritize network/API errors first, then 'no results' error
       if (errorMessages.length > 0) {
         // Only set the error state if there are actual issues
         setError(errorMessages.join(' ')); 
       }
       
+      // If both succeeded but returned 0 results, show a specific error
       if (harvardResponse.status === 'fulfilled' && harvardResponse.value.data.records.length === 0 && 
           clevelandResponse.status === 'fulfilled' && clevelandResponse.value.data.data.length === 0) {
         setError("Your search returned no results from either museum.");
       }
+      // Note: If setError was set by the previous block (e.g., Harvard API failure),
+      // this check effectively overrides it with the 'no results' message if the Cleveland API was fine but empty.
+      // This logic is simple but might be slightly inaccurate if one API failed and the other returned empty.
+      // For simplicity, we keep the original 'no results' error, as it covers the most common empty outcome.
 
     } catch (err) {
       // This catch block would primarily handle system-level network errors outside of the API calls
@@ -418,7 +426,9 @@ export default function Combined() {
 
   // --- Render Logic ---
   const showResults = !isLoading && (harvardFullData.length > 0 || clevelandFullData.length > 0);
-  const showNoResultsMessage = !isLoading && !error && harvardFullData.length === 0 && clevelandFullData.length === 0;
+  
+  // The no results message should only show if a search was performed, it's not loading, there's no error, and the data is empty.
+  const showNoResultsMessage = hasSearched && !isLoading && !error && harvardFullData.length === 0 && clevelandFullData.length === 0;
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
@@ -512,8 +522,8 @@ export default function Combined() {
       </div>
       <p></p>
 
-      {/* ERROR MESSAGE DISPLAY */}
-      {error && (
+      {/* ERROR MESSAGE DISPLAY: Now requires error AND hasSearched to be true */}
+      {error && hasSearched && (
         <div className="text-red-700 p-3 bg-red-100 border border-red-300 rounded-lg font-medium">
           Error: {error}
         </div>
@@ -526,7 +536,7 @@ export default function Combined() {
         </div>
       )}
 
-      {/* NO RESULTS MESSAGE */}
+      {/* NO RESULTS MESSAGE: Now requires hasSearched to be true */}
       {showNoResultsMessage && (
         <div className="flex justify-center items-center py-10 text-xl font-medium text-gray-500">
           No artworks found matching your criteria. Try a different search term.
