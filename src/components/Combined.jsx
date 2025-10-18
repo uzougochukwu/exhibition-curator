@@ -196,24 +196,25 @@ const PaginatedItems = ({
                 {(
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
-                  <a
-                    href={isHarvard ? harvardPage : clevelandPage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                  >
+                  // <a
+                  //   href={isHarvard ? harvardPage : clevelandPage}
+                  //   target="_blank"
+                  //   rel="noopener noreferrer"
+                  //   className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                  // ></a>
                     <img
                       src={
                         isHarvard
                           ? artwork.primaryimageurl
                           : artwork.images.web.url
                       }
+                      
                       className="rounded-lg object-cover w-full h-20"
-                      width="400"
-                      height="400"
+                      width="200"
+                      height="200"
                       alt={artwork.title || "Artwork"}
                     />
-                  </a>
+                  
                 ) : (
                   <div className="w-full h-20 bg-gray-200 flex items-center justify-center rounded-lg">
                     <p className="text-gray-500 text-xs">No Image</p>
@@ -259,7 +260,7 @@ const PaginatedItems = ({
                         //href={artwork.url}
                         //href={`https://www.google.com/search?q=${artwork.title}`}
                         //href={`/object/${artwork.id}?apikey=${harvard_api_key}`}
-                        href={harvardPage}
+                        href={isHarvard ? harvardPage : clevelandPage }
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-600 hover:text-indigo-800 font-medium underline"
