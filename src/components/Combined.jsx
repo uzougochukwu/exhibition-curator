@@ -190,8 +190,8 @@ const PaginatedItems = ({
                     {/* The <a> tag uses absolute positioning to cover the image */}
                     <a
                       href={detailUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      // target="_blank"
+                      // rel="noopener noreferrer"
                       className="absolute inset-0 z-10 block" // z-10 makes it clickable over the image
                       title={`View details for ${artwork.title}`}
                     >
@@ -240,8 +240,8 @@ const PaginatedItems = ({
                   <div className="pt-1 text-center">
                     <a
                       href={detailUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      // target="_blank"
+                      // rel="noopener noreferrer"
                       className="text-indigo-600 hover:text-indigo-800 font-medium underline"
                     >
                       More details

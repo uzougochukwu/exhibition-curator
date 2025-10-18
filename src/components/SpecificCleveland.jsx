@@ -34,7 +34,7 @@ export default function SpecificCleveland() {
   }
 
   const addToCollectionCleveland = (individualCleveland) => {
-    console.log("added Harvard:", individualCleveland.id);
+    console.log("added Cleveland:", individualCleveland.id);
     sessionStorage.setItem(
       individualCleveland.id,
       JSON.stringify(individualCleveland)

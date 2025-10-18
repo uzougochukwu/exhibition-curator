@@ -48,6 +48,9 @@ export default function PersonalExhibition() {
     return (
       <div>
         <h2>Personal Exhibition</h2>
+        <a href={link}>
+        <button> Go to the Home page</button>
+      </a>
         <p>Your personal exhibition is empty. Add some artworks!</p>
       </div>
     );
