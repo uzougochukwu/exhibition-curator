@@ -173,9 +173,10 @@ const PaginatedItems = ({
             // MODIFIED: isImageShown is no longer needed
             const isInfoShown = hiddenInfo[artworkId] === false;
 
-            const harvardPage = "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-           //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
-           const clevelandPage = "/artworks/" + artwork.id 
+            const harvardPage =
+              "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+            //const harvardPage = "https://api.harvardartmuseums.org/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
+            const clevelandPage = "/artworks/" + artwork.id;
 
             return (
               // The key must match the 'i' property in the layout definition
