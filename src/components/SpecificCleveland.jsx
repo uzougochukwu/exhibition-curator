@@ -14,6 +14,8 @@ export default function SpecificCleveland() {
   const [individualCleveland, setParticularCleveland] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/${parameter.artworkid}`
+
   useEffect(() => {
     axios
       .get(

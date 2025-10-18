@@ -186,7 +186,7 @@ const PaginatedItems = ({
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
                   // Wrap in a relative div to allow the link to cover the image
-                  <div className="relative w-full h-20"> 
+                  <div className="relative w-full h-20">
                     {/* The <a> tag uses absolute positioning to cover the image */}
                     <a
                       href={detailUrl}
@@ -196,7 +196,7 @@ const PaginatedItems = ({
                       title={`View details for ${artwork.title}`}
                     >
                       {/* Empty anchor tag to make the area clickable */}
-                    </a> 
+                    </a>
                     <img
                       src={
                         isHarvard
@@ -222,32 +222,32 @@ const PaginatedItems = ({
 
                 {/* INFO BLOCK (NOW ALWAYS RENDERS) */}
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
-                    <p>
-                      <span className="font-semibold">Date:</span>{" "}
-                      {isHarvard
-                        ? artwork.begindate
-                        : artwork.creation_date || "N/A"}
-                    </p>
-                    <p>
-                      <span className="font-semibold">By:</span>{" "}
-                      {isHarvard
-                        ? artwork.people?.[0]?.name || "N/A"
-                        : artwork.creators?.[0]?.description || "N/A"}
-                    </p>
-                    <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                      {/* {artwork.description || "No description provided."} */}
-                    </p>
-                    <div className="pt-1 text-center">
-                      <a
-                        href={detailUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                      >
-                        More details
-                      </a>
-                    </div>
+                  <p>
+                    <span className="font-semibold">Date:</span>{" "}
+                    {isHarvard
+                      ? artwork.begindate
+                      : artwork.creation_date || "N/A"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">By:</span>{" "}
+                    {isHarvard
+                      ? artwork.people?.[0]?.name || "N/A"
+                      : artwork.creators?.[0]?.description || "N/A"}
+                  </p>
+                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                    {/* {artwork.description || "No description provided."} */}
+                  </p>
+                  <div className="pt-1 text-center">
+                    <a
+                      href={detailUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-800 font-medium underline"
+                    >
+                      More details
+                    </a>
                   </div>
+                </div>
               </div>
             );
           })}
@@ -310,8 +310,8 @@ export default function Combined() {
     let harvard_before_year = "";
     if (beforeYear) {
       harvard_before_year = beforeYear + "-01-01";
-    }
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
+    } // localhost:8080
+    let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
 
     if (orderby) {
       harvard_url += `&orderby=${orderby}`;
@@ -335,8 +335,8 @@ export default function Combined() {
         cleveland_sort_value = "";
         break;
     }
-
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
+    // localhost:8080
+    let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
     if (cleveland_sort_value) {
       cleveland_url += `&sort=${cleveland_sort_value}`;
     }
@@ -354,44 +354,51 @@ export default function Combined() {
       let errorMessages = [];
 
       // Handle Harvard Result
-      if (harvardResponse.status === 'fulfilled') {
+      if (harvardResponse.status === "fulfilled") {
         setHarvardFullData(harvardResponse.value.data.records || []);
       } else {
         console.error("Harvard API error:", harvardResponse.reason);
-        errorMessages.push("Harvard Museum search failed or returned no results.");
+        errorMessages.push(
+          "Harvard Museum search failed or returned no results."
+        );
       }
 
       // Handle Cleveland Result
-      if (clevelandResponse.status === 'fulfilled') {
+      if (clevelandResponse.status === "fulfilled") {
         setClevelandFullData(clevelandResponse.value.data.data || []);
       } else {
         console.error("Cleveland API error:", clevelandResponse.reason);
-        errorMessages.push("Cleveland Museum search failed or returned no results.");
+        errorMessages.push(
+          "Cleveland Museum search failed or returned no results."
+        );
       }
 
       // Final Error Check: Prioritize network/API errors first, then 'no results' error
       if (errorMessages.length > 0) {
         // Only set the error state if there are actual issues
-        setError(errorMessages.join(' ')); 
+        setError(errorMessages.join(" "));
       }
-      
+
       // If both succeeded but returned 0 results, show a specific error
-      if (harvardResponse.status === 'fulfilled' && harvardResponse.value.data.records.length === 0 && 
-          clevelandResponse.status === 'fulfilled' && clevelandResponse.value.data.data.length === 0) {
+      if (
+        harvardResponse.status === "fulfilled" &&
+        harvardResponse.value.data.records.length === 0 &&
+        clevelandResponse.status === "fulfilled" &&
+        clevelandResponse.value.data.data.length === 0
+      ) {
         setError("Your search returned no results from either museum.");
       }
       // Note: If setError was set by the previous block (e.g., Harvard API failure),
       // this check effectively overrides it with the 'no results' message if the Cleveland API was fine but empty.
       // This logic is simple but might be slightly inaccurate if one API failed and the other returned empty.
       // For simplicity, we keep the original 'no results' error, as it covers the most common empty outcome.
-
     } catch (err) {
       // This catch block would primarily handle system-level network errors outside of the API calls
       console.error("System Network Error:", err);
       setError("A critical network error occurred during the search.");
     } finally {
       // 3. Cleanup: Stop loading regardless of success/failure
-      setIsLoading(false); 
+      setIsLoading(false);
     }
 
     console.log("Search button clicked. Starting API call for:", term);
@@ -425,10 +432,16 @@ export default function Combined() {
   const clevelandDisplayPage = clevelandCurrentPage + 1;
 
   // --- Render Logic ---
-  const showResults = !isLoading && (harvardFullData.length > 0 || clevelandFullData.length > 0);
-  
+  const showResults =
+    !isLoading && (harvardFullData.length > 0 || clevelandFullData.length > 0);
+
   // The no results message should only show if a search was performed, it's not loading, there's no error, and the data is empty.
-  const showNoResultsMessage = hasSearched && !isLoading && !error && harvardFullData.length === 0 && clevelandFullData.length === 0;
+  const showNoResultsMessage =
+    hasSearched &&
+    !isLoading &&
+    !error &&
+    harvardFullData.length === 0 &&
+    clevelandFullData.length === 0;
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
