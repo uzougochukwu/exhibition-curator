@@ -341,6 +341,8 @@ export default function Combined() {
         cleveland_sort_value = "";
         break;
     }
+
+
     // localhost:8080
     let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
     if (cleveland_sort_value) {
@@ -503,7 +505,7 @@ export default function Combined() {
             disabled={isLoading} // Disable input while searching
           >
             <option value="">No sort</option>
-            <option value="artists">artists</option>
+            <option value="people">artists</option>
             <option value="title">title</option>
           </select>
         </div>
