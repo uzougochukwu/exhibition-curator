@@ -50,9 +50,12 @@ export default function SpecificHarvard2() {
       <img
       src={individualHarvard.primaryimageurl}></img>
       <p>Location:</p>
-      <p>Street: {individualHarvard.venues[0].address1}</p>
+      {/* <p>Street: {individualHarvard.venues[0].address1}</p>
       <p>City: {individualHarvard.venues[0].city}</p>
-      <p>State: {individualHarvard.venues[0].state}</p>
+      <p>State: {individualHarvard.venues[0].state}</p> */}
+            <p>Street: 32 Quincy Street</p>
+      <p>City: Cambridge</p>
+      <p>State: MA</p>
     <button onClick={()=> {addToCollectionHarvard(individualHarvard)}}>Add to collection</button>
 
     </div>
