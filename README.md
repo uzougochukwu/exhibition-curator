@@ -34,6 +34,6 @@ npm i
 
 npm install cors-anywhere
 
-cd node_modules
+cd exhibition-creator/node_modules
 
 node cors-anywhere/server.js
