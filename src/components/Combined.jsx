@@ -15,7 +15,6 @@ import harvard_api_key from "../extra/API-KEY";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 // --- STANDALONE COMPONENT: PaginationControls (UNCHANGED) ---
-// ... (Keep the PaginationControls component as it was) ...
 const PaginationControls = React.memo(
   ({
     currentPage,
@@ -82,27 +81,48 @@ const PaginationControls = React.memo(
   }
 );
 
-// --- Helper Component for Rendering Artworks and Handling Pagination (UNCHANGED) ---
-// Note: This component now receives pre-filtered data.
+// --- Helper Component for Rendering Artworks and Handling Pagination (MODIFIED) ---
 const PaginatedItems = ({
   items,
   currentPage,
   itemsPerPage,
-  // handlePageClick, // No longer needed here
   totalPages,
   title,
   isHarvard,
-  addToCollection,
+  addToCollection, // The base function to save the item
 }) => {
-  // HOOKS CALLED UNCONDITIONALLY AT THE TOP
-  // REMOVED: const [hiddenInfo, setHiddenInfo] = useState({});
+  // NEW STATE: Tracks the IDs of items that were recently added (for visual feedback)
+  const [addedState, setAddedState] = useState({});
 
   const offset = currentPage * itemsPerPage;
   const currentItems = items.slice(offset, offset + itemsPerPage);
 
+  // Clear the addedState when the page changes
   React.useEffect(() => {
-    // REMOVED: setHiddenInfo({});
+    setAddedState({});
   }, [currentPage, items]);
+
+  // NEW: Handler that calls the parent function and sets the "Added!" state
+  const handleAddToCollection = useCallback((artwork) => {
+    // 1. Save the item via the parent function
+    addToCollection(artwork);
+
+    // 2. Set the "Added!" status for this item ID
+    const artworkId = String(artwork.id);
+    setAddedState(prev => ({
+      ...prev,
+      [artworkId]: true,
+    }));
+
+    // 3. Clear the status after 2 seconds
+    setTimeout(() => {
+      setAddedState(prev => ({
+        ...prev,
+        [artworkId]: false, // Set back to false or remove key
+      }));
+    }, 2000);
+  }, [addToCollection]);
+
 
   // 1. MODIFIED useMemo to create a responsive layout object
   const layouts = useMemo(() => {
@@ -152,27 +172,44 @@ const PaginatedItems = ({
   }, [currentItems]);
   // ------------------------------------------------------------------
 
-  // --- Toggle Handlers ---
-  // REMOVED: const toggleInfo = (id) => { ... }
-  // -------------------------
-
+  // MODIFIED CollectionButton to use addedState
   const CollectionButton = isHarvard
-    ? ({ artwork }) => (
-        <button
-          onClick={() => addToCollection(artwork)}
-          className="mt-2 w-full px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-lg hover:bg-blue-600 transition"
-        >
-          Add to collection
-        </button>
-      )
-    : ({ artwork }) => (
-        <button
-          onClick={() => addToCollection(artwork)}
-          className="mt-2 w-full px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-lg hover:bg-orange-600 transition"
-        >
-          Add to collection
-        </button>
-      );
+    ? ({ artwork }) => {
+        const artworkId = String(artwork.id);
+        const isAdded = addedState[artworkId];
+
+        return (
+          <button
+            onClick={() => handleAddToCollection(artwork)}
+            className={`mt-2 w-full px-3 py-1 text-white text-xs font-semibold rounded-lg transition duration-150 ${
+              isAdded
+                ? "bg-green-500 hover:bg-green-600" // Green for success
+                : "bg-blue-500 hover:bg-blue-600" // Blue for default
+            }`}
+            disabled={isAdded} // Disable button while showing confirmation
+          >
+            {isAdded ? "Added! 🎉" : "Add to collection"}
+          </button>
+        );
+      }
+    : ({ artwork }) => {
+        const artworkId = String(artwork.id);
+        const isAdded = addedState[artworkId];
+
+        return (
+          <button
+            onClick={() => handleAddToCollection(artwork)}
+            className={`mt-2 w-full px-3 py-1 text-white text-xs font-semibold rounded-lg transition duration-150 ${
+              isAdded
+                ? "bg-green-500 hover:bg-green-600" // Green for success
+                : "bg-orange-500 hover:bg-orange-600" // Orange for default
+            }`}
+            disabled={isAdded} // Disable button while showing confirmation
+          >
+            {isAdded ? "Added! 🎉" : "Add to collection"}
+          </button>
+        );
+      };
 
   const borderColor = isHarvard ? "border-blue-200" : "border-orange-200";
 
@@ -180,8 +217,6 @@ const PaginatedItems = ({
   if (items.length === 0) {
     return null;
   }
-
-  // const displayCurrentPage = currentPage + 1; // Now managed in Combined component
 
   return (
     <section>
@@ -346,13 +381,13 @@ export default function Combined() {
   // Use useMemo to filter the data whenever the raw data changes.
   const filteredHarvardData = useMemo(() => {
     // Reset page on new data
-    setHarvardCurrentPage(0);
+    // setHarvardCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(harvardFullData);
   }, [harvardFullData]);
 
   const filteredClevelandData = useMemo(() => {
     // Reset page on new data
-    setClevelandCurrentPage(0);
+    // setClevelandCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(clevelandFullData);
   }, [clevelandFullData]);
   // -----------------------------
@@ -508,18 +543,20 @@ export default function Combined() {
     setClevelandCurrentPage(event.selected);
   }, []);
 
-  const addToCollectionHarvard = (harvardArtwork) => {
-    console.log("added Harvard:", harvardArtwork.id);
+  // MODIFIED: Simplified parent functions - they just save the data.
+  const addToCollectionHarvard = useCallback((harvardArtwork) => {
+    console.log("saving Harvard:", harvardArtwork.id);
     sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
-  };
+  }, []);
 
-  const addToCollectionCleveland = (clevelandArtwork) => {
-    console.log("added Cleveland:", clevelandArtwork.id);
+  const addToCollectionCleveland = useCallback((clevelandArtwork) => {
+    console.log("saving Cleveland:", clevelandArtwork.id);
     sessionStorage.setItem(
       clevelandArtwork.id,
       JSON.stringify(clevelandArtwork)
     );
-  };
+  }, []);
+  // END MODIFIED
 
   // Use filtered data for page calculations
   const harvardPageCount = Math.ceil(filteredHarvardData.length / itemsPerPage);
