@@ -422,6 +422,9 @@ export default function Combined() {
       let harvardRecords = [];
       if (harvardResponse.status === "fulfilled") {
         harvardRecords = harvardResponse.value.data.records || [];
+        if (orderby == "title") {
+          harvardRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
+        }
         setHarvardFullData(harvardRecords);
       } else {
         console.error("Harvard API error:", harvardResponse.reason);
@@ -434,6 +437,9 @@ export default function Combined() {
       let clevelandRecords = [];
       if (clevelandResponse.status === "fulfilled") {
         clevelandRecords = clevelandResponse.value.data.data || [];
+        if (orderby == "title") {
+          clevelandRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
+        }
         setClevelandFullData(clevelandRecords);
       } else {
         console.error("Cleveland API error:", clevelandResponse.reason);
@@ -570,8 +576,8 @@ export default function Combined() {
             disabled={isLoading} // Disable input while searching
           >
             <option value="">No sort</option>
-            <option value="people">artists</option>
-            <option value="title">title</option>
+            <option value="people">Artist</option>
+            <option value="title">Title</option>
           </select>
         </div>
         <p></p>
