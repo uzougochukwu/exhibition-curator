@@ -554,6 +554,7 @@ export default function Combined() {
           />
         </div>
         <p></p>
+        <p></p>
         <div className="w-full sm:w-1/4">
           <label
             htmlFor="sort-order"
@@ -573,6 +574,7 @@ export default function Combined() {
             <option value="title">title</option>
           </select>
         </div>
+        <p></p>
         <p></p>
 
         <div className="flex-grow">
