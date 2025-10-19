@@ -37,10 +37,7 @@ export default function SpecificCleveland() {
 
     // 1. Save the item to sessionStorage
     console.log("added Cleveland:", artwork.id);
-    sessionStorage.setItem(
-      artwork.id,
-      JSON.stringify(artwork)
-    );
+    sessionStorage.setItem(artwork.id, JSON.stringify(artwork));
 
     // 2. Show the confirmation message
     setIsAdded(true);
@@ -60,7 +57,9 @@ export default function SpecificCleveland() {
     return (
       <div>
         <p>Artwork not found or an error occurred.</p>
-        <a href={search}><button>Go to Search</button></a>
+        <a href={search}>
+          <button>Go to Search</button>
+        </a>
       </div>
     );
   }
@@ -83,13 +82,19 @@ export default function SpecificCleveland() {
       <p>Title: {individualCleveland.title}</p>
       <p>Desc: {individualCleveland.description}</p>
       {individualCleveland.images?.web?.url && (
-        <img src={individualCleveland.images.web.url} alt={individualCleveland.title || "Artwork image"} />
+        <img
+          src={individualCleveland.images.web.url}
+          alt={individualCleveland.title || "Artwork image"}
+        />
       )}
       <p>Location: </p>
       <p>Street: 11150 East Blvd</p>
       <p>City: Cleveland</p>
       <p>State: OH</p>
-      
+      <a href={individualCleveland.url}>
+        <p>Cleveland Website</p>
+      </a>
+
       {/* MODIFIED BUTTON SECTION */}
       <button
         onClick={() => {

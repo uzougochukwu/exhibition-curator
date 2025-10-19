@@ -6,22 +6,23 @@ import axios from "axios";
 export default function SpecificHarvard2() {
   const parameter = useParams();
 
-  const home = "/"
-  const search = "/combined"
-  const personal_exhibition = "/personalexhibition"
+  const home = "/";
+  const search = "/combined";
+  const personal_exhibition = "/personalexhibition";
 
   const [individualHarvard, setParticularHarvard] = useState(null); // Changed to null for better loading checks
-  const [isLoading, setIsLoading] = useState(true)
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   // NEW STATE: To control the confirmation message
-  const [isAdded, setIsAdded] = useState(false); 
+  const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     axios
       .get(
         `https://api.harvardartmuseums.org/exhibition/${parameter.artworkid}?apikey=${harvard_api_key}`
       )
-      .then((response) => { // Use response for clarity
+      .then((response) => {
+        // Use response for clarity
         console.log(response.data);
         // Note: Accessing venues[0].city might fail if venues is empty.
         // It's safer to check the actual data structure or handle it in the return block.
@@ -37,14 +38,16 @@ export default function SpecificHarvard2() {
 
   if (isLoading) {
     return <p>Loading...</p>;
-  }  
-  
+  }
+
   // Handle case where data might not be found or fetch failed
   if (!individualHarvard) {
     return (
       <div>
         <p>Artwork not found or an error occurred.</p>
-        <a href={search}><button>Go to Search</button></a>
+        <a href={search}>
+          <button>Go to Search</button>
+        </a>
       </div>
     );
   }
@@ -63,27 +66,35 @@ export default function SpecificHarvard2() {
     // 3. Hide the confirmation message after 2 seconds (2000ms)
     setTimeout(() => {
       setIsAdded(false);
-    }, 2000); 
+    }, 2000);
   };
 
   return (
     <div>
       <a href={home}>
         <button>Home</button>
-      </a><p></p>
+      </a>
+      <p></p>
       <a href={search}>
         <button>Search</button>
       </a>
-      <p><a href={personal_exhibition}><button>Personal Exhibition</button></a></p>
-      
+      <p>
+        <a href={personal_exhibition}>
+          <button>Personal Exhibition</button>
+        </a>
+      </p>
+
       {/* Artwork Details */}
       <p>Title: {individualHarvard.title}</p>
       <p>Desc: {individualHarvard.description}</p>
-      
+
       {individualHarvard.primaryimageurl && (
-          <img src={individualHarvard.primaryimageurl} alt={individualHarvard.title || "Artwork image"}></img>
+        <img
+          src={individualHarvard.primaryimageurl}
+          alt={individualHarvard.title || "Artwork image"}
+        ></img>
       )}
-      
+
       <p>Location:</p>
       {/* <p>Street: {individualHarvard.venues?.[0]?.address1}</p>
       <p>City: {individualHarvard.venues?.[0]?.city}</p>
@@ -91,13 +102,18 @@ export default function SpecificHarvard2() {
       <p>Street: 32 Quincy Street</p>
       <p>City: Cambridge</p>
       <p>State: MA</p>
-      
+      <a href={individualHarvard.url}>
+        <p>Harvard Website</p>
+      </a>
+
       {/* MODIFIED BUTTON SECTION */}
-      <button 
-        onClick={()=> {handleAddToCollection(individualHarvard)}}
+      <button
+        onClick={() => {
+          handleAddToCollection(individualHarvard);
+        }}
         disabled={isAdded} // Disable while showing "Added!"
         // Optional inline styling for a green confirmation look
-        // style={{ 
+        // style={{
         //     padding: '8px 16px',
         //     borderRadius: '4px',
         //     backgroundColor: isAdded ? '#4CAF50' : '#4f46e5', // Green for added, Indigo for default
@@ -109,7 +125,6 @@ export default function SpecificHarvard2() {
         {/* Conditional text display */}
         {isAdded ? "Added! 🎉" : "Add to collection"}
       </button>
-
     </div>
   );
 }
