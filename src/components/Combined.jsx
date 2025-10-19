@@ -14,7 +14,7 @@ import harvard_api_key from "../extra/API-KEY";
 // Wrap the ResponsiveReactGridLayout with WidthProvider
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-// --- STANDALONE COMPONENT: PaginationControls ---
+// --- STANDALONE COMPONENT: PaginationControls (UNCHANGED) ---
 const PaginationControls = React.memo(
   ({
     currentPage,
@@ -102,9 +102,10 @@ const PaginatedItems = ({
     // REMOVED: setHiddenInfo({});
   }, [currentPage, items]);
 
-  const layout = useMemo(() => {
-    return currentItems.map((artwork, index) => {
-      // Calculate row (y) and column (x) based on a 3-column layout
+  // 1. MODIFIED useMemo to create a responsive layout object
+  const layouts = useMemo(() => {
+    const lgLayout = currentItems.map((artwork, index) => {
+      // 3-column layout for 'lg' and 'md'
       return {
         i: String(artwork.id),
         x: index % 3,
@@ -114,6 +115,38 @@ const PaginatedItems = ({
         static: true, // Prevent dragging/resizing
       };
     });
+
+    const smLayout = currentItems.map((artwork, index) => {
+      // 2-column layout for 'sm'
+      return {
+        i: String(artwork.id),
+        x: index % 2,
+        y: Math.floor(index / 2) * 12, 
+        w: 1,
+        h: 12,
+        static: true, 
+      };
+    });
+
+    const xsLayout = currentItems.map((artwork, index) => {
+      // 1-column layout for 'xs' and 'xxs' (mobile)
+      return {
+        i: String(artwork.id),
+        x: 0, // Always column 0
+        y: index * 12, // Stack vertically
+        w: 1,
+        h: 12,
+        static: true,
+      };
+    });
+
+    return {
+      lg: lgLayout, // Large (default)
+      md: lgLayout, // Medium
+      sm: smLayout, // Small (tablet)
+      xs: xsLayout, // Extra small (mobile)
+      xxs: xsLayout, // Tiny
+    };
   }, [currentItems]);
   // ------------------------------------------------------------------
 
@@ -153,9 +186,10 @@ const PaginatedItems = ({
       {/* Using ResponsiveReactGridLayout */}
       <div className="mt-4">
         <ResponsiveReactGridLayout
-          layouts={{ lg: layout }} // Use the defined layout for the 'lg' breakpoint
+          layouts={layouts} // 2. Use the new responsive 'layouts' object
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-          cols={{ lg: 3, md: 3, sm: 3, xs: 3, xxs: 3 }} // Force 3 columns across all breakpoints
+          // 3. Define the column count for each breakpoint
+          cols={{ lg: 3, md: 3, sm: 2, xs: 1, xxs: 1 }} // 1 column on 'xs' and 'xxs'
           rowHeight={30} // Height of one grid unit in pixels
           margin={[20, 20]} // Spacing between items
         >
@@ -261,7 +295,7 @@ const PaginatedItems = ({
   );
 };
 
-// --- Main Component ---
+// --- Main Component (UNCHANGED) ---
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
   // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
