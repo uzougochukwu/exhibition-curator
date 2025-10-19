@@ -34,6 +34,11 @@ npm i
 
 npm install cors-anywhere
 
+cd ..
 cd exhibition-creator/node_modules
 
 node cors-anywhere/server.js
+
+go back to the terminal window where you ran npm run dev
+
+hold down the Ctrl key and click the localhost link in the terminal
