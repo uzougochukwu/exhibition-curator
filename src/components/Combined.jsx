@@ -305,7 +305,7 @@ const PaginatedItems = ({
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
   // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
-  const SHOW_CLEVELAND_PAGE_INDICATOR = false;
+  const SHOW_CLEVELAND_PAGE_INDICATOR = true;
 
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
@@ -377,34 +377,34 @@ export default function Combined() {
     } // localhost:8080
     let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
 
-    if (orderby) {
-      harvard_url += `&orderby=${orderby}`;
-    }
+    // if (orderby) {
+    //   harvard_url += `&orderby=${orderby}`;
+    // }
     if (harvard_before_year) {
       harvard_url += `&before=${harvard_before_year}`;
     }
 
     // --- Cleveland API Logic and URL Setup ---
-    let cleveland_sort_value = "";
-    switch (orderby) {
-      case "venues":
-        cleveland_sort_value = "gallery";
-        break;
-      case "people":
-        cleveland_sort_value = "artists";
-        break;
-      case "title":
-        cleveland_sort_value = "title";
-      default:
-        cleveland_sort_value = "";
-        break;
-    }
+    // let cleveland_sort_value = "";
+    // switch (orderby) {
+    //   case "venues":
+    //     cleveland_sort_value = "gallery";
+    //     break;
+    //   case "people":
+    //     cleveland_sort_value = "artists";
+    //     break;
+    //   case "title":
+    //     cleveland_sort_value = "title";
+    //   default:
+    //     cleveland_sort_value = "";
+    //     break;
+    // }
 
     // localhost:8080
     let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
-    if (cleveland_sort_value) {
-      cleveland_url += `&sort=${cleveland_sort_value}`;
-    }
+    // if (cleveland_sort_value) {
+    //   cleveland_url += `&sort=${cleveland_sort_value}`;
+    // }
     if (beforeYear) {
       cleveland_url += `&created_before=${beforeYear}`;
     }
@@ -422,12 +422,18 @@ export default function Combined() {
       let harvardRecords = [];
       if (harvardResponse.status === "fulfilled") {
         harvardRecords = harvardResponse.value.data.records || [];
-        if (orderby == "title") {
+        if (orderby == "title-A-first") {
           harvardRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
         }
+        if (orderby == "title-Z-first") {
+          harvardRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
+        }
 
-        if (orderby == "people") {
+        if (orderby == "begindate-oldest") {
           harvardRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
+        }
+        if (orderby == "begindate-newest") {
+          harvardRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
         }
 
         setHarvardFullData(harvardRecords);
@@ -442,9 +448,20 @@ export default function Combined() {
       let clevelandRecords = [];
       if (clevelandResponse.status === "fulfilled") {
         clevelandRecords = clevelandResponse.value.data.data || [];
-        if (orderby == "title") {
+        if (orderby == "title-A-first") {
           clevelandRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
         }
+        if (orderby == "title-Z-first") {
+          clevelandRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
+        }
+
+        if (orderby == "begindate-oldest") {
+          clevelandRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
+        }
+        if (orderby == "begindate-newest") {
+          clevelandRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
+        }
+
         setClevelandFullData(clevelandRecords);
       } else {
         console.error("Cleveland API error:", clevelandResponse.reason);
@@ -581,8 +598,14 @@ export default function Combined() {
             disabled={isLoading} // Disable input while searching
           >
             <option value="">No sort</option>
-            <option value="begindate">Date Created - oldest to newest</option>
-            <option value="title">Title A - Z</option>
+            <option value="begindate-oldest">
+              Date Created - oldest to newest
+            </option>
+            <option value="begindate-newest">
+              Date Created - newest to oldest
+            </option>
+            <option value="title-A-first">Title A - Z</option>
+            <option value="title-Z-first">Title Z - A</option>
           </select>
         </div>
         <p></p>
