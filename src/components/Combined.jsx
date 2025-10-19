@@ -425,6 +425,11 @@ export default function Combined() {
         if (orderby == "title") {
           harvardRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
         }
+
+        if (orderby == "people") {
+          harvardRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
+        }
+
         setHarvardFullData(harvardRecords);
       } else {
         console.error("Harvard API error:", harvardResponse.reason);
@@ -576,8 +581,8 @@ export default function Combined() {
             disabled={isLoading} // Disable input while searching
           >
             <option value="">No sort</option>
-            <option value="people">Artist</option>
-            <option value="title">Title</option>
+            <option value="begindate">Date Created - oldest to newest</option>
+            <option value="title">Title A - Z</option>
           </select>
         </div>
         <p></p>
