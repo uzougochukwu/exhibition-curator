@@ -23,9 +23,7 @@ function App() {
         <Route path="/personalexhibition" element={<PersonalExhibition />} />
         <Route path="/combined" element={<Combined />} />
         <Route path="/exhibition/:artworkid" element={<SpecificHarvard2 />} />
-        <Route path="/artworks/:artworkid" element={<SpecificCleveland/>} />
-        {/* <Route path="/exhibition/:artworkid" element={<SpecificHarvard />} /> */}
-        {/* <Route path="/object/:objectid" element={<SpecificHarvard />} /> */}
+        <Route path="/artworks/:artworkid" element={<SpecificCleveland />} />
       </Routes>
     </div>
   );

@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback } from "react";
 export default function PersonalExhibition() {
   const link = "/";
 
+  const search = "/combined";
+
   const [collection, setCollection] = useState([]);
 
   // function to load the collection from sessionStorage
@@ -49,8 +51,12 @@ export default function PersonalExhibition() {
       <div>
         <h2>Personal Exhibition</h2>
         <a href={link}>
-        <button> Go to the Home page</button>
-      </a>
+          <button> Go to the Home page</button>
+        </a>
+
+        <a href={search}>
+          <button> Search</button>
+        </a>
         <p>Your personal exhibition is empty. Add some artworks!</p>
       </div>
     );
@@ -65,12 +71,12 @@ export default function PersonalExhibition() {
       {collection.map((artwork) => (
         <div
           key={artwork.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            margin: "10px auto", // Centering the entire record container
-            maxWidth: "600px", 
-          }}
+          // style={{
+          //   border: "1px solid #ccc",
+          //   padding: "10px",
+          //   margin: "10px auto", // Centering the entire record container
+          //   maxWidth: "600px",
+          // }}
         >
           <h3>{artwork.title}</h3>
           <p>{artwork.department}</p>
@@ -78,55 +84,55 @@ export default function PersonalExhibition() {
             <span className="font-semibold">Date:</span>{" "}
             {artwork.begindate || artwork.creation_date || "N/A"}
           </p>
-
           <p>
             <span className="font-semibold">By:</span>{" "}
             {artwork.people?.[0]?.name ||
               artwork.creators?.[0]?.description ||
               "N/A"}
           </p>
-          <p>Desc: </p>
-<p>{artwork.description}</p>
-          
-
           {/* Image Container for Centering */}
-          <div style={{ textAlign: "center", margin: "10px 0" }}>
+          {/* style={{ textAlign: "center", margin: "10px 0" }} */}
+          <div>
             {/* Harvard Image (using primaryimageurl) */}
             {artwork.primaryimageurl && (
               <img
                 src={artwork.primaryimageurl}
                 alt={artwork.title || "Harvard Artwork"}
                 style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                  maxHeight: "300px",
+                  // maxWidth: "100%",
+                  // height: "auto",
+                  // maxHeight: "300px",
+                  width: "100",
+                  height: "100",
                   display: "inline-block", // Required for center alignment
                   marginBottom: "10px",
                 }}
               />
             )}
-            
+
             {/* Cleveland Image (using images.web.url) */}
             {artwork.images?.web?.url && (
               <img
                 src={artwork.images.web.url}
                 alt={artwork.title || "Cleveland Artwork"}
                 style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                  maxHeight: "300px",
+                  // maxWidth: "100%",
+                  // height: "auto",
+                  // maxHeight: "300px",
+                  width: "100",
+                  height: "100",
                   display: "inline-block", // Required for center alignment
                   marginBottom: "10px",
                 }}
               />
             )}
-          </div>
+          </div>{" "}
           {/* End Image Container */}
-
+          <p>Desc: </p>
+          <p>{artwork.description}</p>
           <div className="pt-1 text-center">
             {/* More details link placeholder */}
           </div>
-
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>
             Delete from Collection

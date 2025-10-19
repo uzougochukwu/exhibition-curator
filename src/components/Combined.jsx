@@ -15,6 +15,7 @@ import harvard_api_key from "../extra/API-KEY";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 // --- STANDALONE COMPONENT: PaginationControls (UNCHANGED) ---
+// ... (Keep the PaginationControls component as it was) ...
 const PaginationControls = React.memo(
   ({
     currentPage,
@@ -81,7 +82,8 @@ const PaginationControls = React.memo(
   }
 );
 
-// --- Helper Component for Rendering Artworks and Handling Pagination ---
+// --- Helper Component for Rendering Artworks and Handling Pagination (UNCHANGED) ---
+// Note: This component now receives pre-filtered data.
 const PaginatedItems = ({
   items,
   currentPage,
@@ -121,10 +123,10 @@ const PaginatedItems = ({
       return {
         i: String(artwork.id),
         x: index % 2,
-        y: Math.floor(index / 2) * 12, 
+        y: Math.floor(index / 2) * 12,
         w: 1,
         h: 12,
-        static: true, 
+        static: true,
       };
     });
 
@@ -272,9 +274,13 @@ const PaginatedItems = ({
                       ? artwork.people?.[0]?.name || "N/A"
                       : artwork.creators?.[0]?.description || "N/A"}
                   </p>
-                  <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
-                    {/* {artwork.description || "No description provided."} */}
-                  </p>
+                  {/* MODIFIED SECTION START: Conditionally render description */}
+                  {artwork.description && (
+                    <p className="line-clamp-2 text-gray-600 min-h-[1.5rem]">
+                      {/* {artwork.description} */}
+                    </p>
+                  )}
+                  {/* MODIFIED SECTION END */}
                   <div className="pt-1 text-center">
                     <a
                       href={detailUrl}
@@ -295,7 +301,7 @@ const PaginatedItems = ({
   );
 };
 
-// --- Main Component (UNCHANGED) ---
+// --- Main Component (MODIFIED) ---
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
   // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
@@ -331,14 +337,34 @@ export default function Combined() {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  // NEW HELPER FUNCTION to filter data by description
+  const filterData = (data) => {
+    return data.filter((item) => item.description);
+  };
+
+  // --- DERIVED/FILTERED DATA ---
+  // Use useMemo to filter the data whenever the raw data changes.
+  const filteredHarvardData = useMemo(() => {
+    // Reset page on new data
+    setHarvardCurrentPage(0);
+    return filterData(harvardFullData);
+  }, [harvardFullData]);
+
+  const filteredClevelandData = useMemo(() => {
+    // Reset page on new data
+    setClevelandCurrentPage(0);
+    return filterData(clevelandFullData);
+  }, [clevelandFullData]);
+  // -----------------------------
+
   const harvardSearch = async () => {
     // 1. Setup: Reset states and show loading
     setHarvardCurrentPage(0);
     setClevelandCurrentPage(0);
     setError(null);
-    setHarvardFullData([]);
-    setClevelandFullData([]);
-    setHasSearched(true); // <--- Set search attempted flag
+    setHarvardFullData([]); // Raw data cleared
+    setClevelandFullData([]); // Raw data cleared
+    setHasSearched(true);
     setIsLoading(true); // START LOADING
 
     if (topRef.current) {
@@ -393,8 +419,10 @@ export default function Combined() {
       let errorMessages = [];
 
       // Handle Harvard Result
+      let harvardRecords = [];
       if (harvardResponse.status === "fulfilled") {
-        setHarvardFullData(harvardResponse.value.data.records || []);
+        harvardRecords = harvardResponse.value.data.records || [];
+        setHarvardFullData(harvardRecords);
       } else {
         console.error("Harvard API error:", harvardResponse.reason);
         errorMessages.push(
@@ -403,8 +431,10 @@ export default function Combined() {
       }
 
       // Handle Cleveland Result
+      let clevelandRecords = [];
       if (clevelandResponse.status === "fulfilled") {
-        setClevelandFullData(clevelandResponse.value.data.data || []);
+        clevelandRecords = clevelandResponse.value.data.data || [];
+        setClevelandFullData(clevelandRecords);
       } else {
         console.error("Cleveland API error:", clevelandResponse.reason);
         errorMessages.push(
@@ -412,25 +442,23 @@ export default function Combined() {
         );
       }
 
-      // Final Error Check: Prioritize network/API errors first, then 'no results' error
-      if (errorMessages.length > 0) {
-        // Only set the error state if there are actual issues
-        setError(errorMessages.join(" "));
-      }
-
-      // If both succeeded but returned 0 results, show a specific error
-      if (
-        harvardResponse.status === "fulfilled" &&
-        harvardResponse.value.data.records.length === 0 &&
-        clevelandResponse.status === "fulfilled" &&
-        clevelandResponse.value.data.data.length === 0
-      ) {
+      // Final Error Check: Check the raw data lengths to determine if the user needs a 'no results' message
+      if (harvardRecords.length === 0 && clevelandRecords.length === 0) {
         setError("Your search returned no results from either museum.");
+      } else if (errorMessages.length > 0) {
+        // If there were API failures AND we have some data, show the API error
+        setError(errorMessages.join(" "));
+      } else {
+        // Check if filtering removed everything
+        const allDataFilteredOut =
+          filterData(harvardRecords).length === 0 &&
+          filterData(clevelandRecords).length === 0;
+        if (allDataFilteredOut) {
+          setError(
+            "We found some artworks, but none of them had a complete description, so they couldn't be displayed."
+          );
+        }
       }
-      // Note: If setError was set by the previous block (e.g., Harvard API failure),
-      // this check effectively overrides it with the 'no results' message if the Cleveland API was fine but empty.
-      // This logic is simple but might be slightly inaccurate if one API failed and the other returned empty.
-      // For simplicity, we keep the original 'no results' error, as it covers the most common empty outcome.
     } catch (err) {
       // This catch block would primarily handle system-level network errors outside of the API calls
       console.error("System Network Error:", err);
@@ -465,22 +493,27 @@ export default function Combined() {
     );
   };
 
-  const harvardPageCount = Math.ceil(harvardFullData.length / itemsPerPage);
-  const clevelandPageCount = Math.ceil(clevelandFullData.length / itemsPerPage);
+  // Use filtered data for page calculations
+  const harvardPageCount = Math.ceil(filteredHarvardData.length / itemsPerPage);
+  const clevelandPageCount = Math.ceil(
+    filteredClevelandData.length / itemsPerPage
+  );
   const harvardDisplayPage = harvardCurrentPage + 1;
   const clevelandDisplayPage = clevelandCurrentPage + 1;
 
   // --- Render Logic ---
   const showResults =
-    !isLoading && (harvardFullData.length > 0 || clevelandFullData.length > 0);
+    !isLoading &&
+    (filteredHarvardData.length > 0 || filteredClevelandData.length > 0);
 
-  // The no results message should only show if a search was performed, it's not loading, there's no error, and the data is empty.
+  // The no results message should only show if a search was performed, it's not loading, there's no error, and the filtered data is empty.
+  // Note: The error state is now used to distinguish between API failure and successful filtering-out.
   const showNoResultsMessage =
     hasSearched &&
     !isLoading &&
     !error &&
-    harvardFullData.length === 0 &&
-    clevelandFullData.length === 0;
+    filteredHarvardData.length === 0 &&
+    filteredClevelandData.length === 0;
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
@@ -612,10 +645,10 @@ export default function Combined() {
           )}
           {/* Harvard Results Section */}
           <PaginatedItems
-            items={harvardFullData}
+            items={filteredHarvardData} // *** MODIFIED TO USE FILTERED DATA ***
             currentPage={harvardCurrentPage}
             itemsPerPage={itemsPerPage}
-            handlePageClick={handleHarvardPageClick}
+            // handlePageClick={handleHarvardPageClick} // Handled by separate controls
             totalPages={harvardPageCount}
             title="Harvard Results"
             isHarvard={true}
@@ -623,10 +656,10 @@ export default function Combined() {
           />
           {/* Cleveland Results Section */}
           <PaginatedItems
-            items={clevelandFullData}
+            items={filteredClevelandData} // *** MODIFIED TO USE FILTERED DATA ***
             currentPage={clevelandCurrentPage}
             itemsPerPage={itemsPerPage}
-            handlePageClick={handleClevelandPageClick}
+            // handlePageClick={handleClevelandPageClick} // Handled by separate controls
             totalPages={clevelandPageCount}
             title="Cleveland Results"
             isHarvard={false}
@@ -642,7 +675,8 @@ export default function Combined() {
             />
           )}
           {/* 3. SCROLL BACK TO TOP BUTTON */}
-          {(harvardFullData.length > 0 || clevelandFullData.length > 0) && (
+          {(filteredHarvardData.length > 0 ||
+            filteredClevelandData.length > 0) && (
             <div className="flex justify-center pt-8">
               <button
                 onClick={scrollToTop}
