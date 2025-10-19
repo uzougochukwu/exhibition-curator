@@ -222,11 +222,9 @@ const PaginatedItems = ({
 
                 {/* INFO BLOCK (NOW ALWAYS RENDERS) */}
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
-                <p>
+                  <p>
                     <span className="font-semibold">From:</span>{" "}
-                    {isHarvard
-                      ? "Harvard"
-                      : "Cleveland"}
+                    {isHarvard ? "Harvard" : "Cleveland"}
                   </p>
                   <p>
                     <span className="font-semibold">Date:</span>{" "}
@@ -341,7 +339,6 @@ export default function Combined() {
         cleveland_sort_value = "";
         break;
     }
-
 
     // localhost:8080
     let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
@@ -477,7 +474,7 @@ export default function Combined() {
             htmlFor="search-term"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Search Term
+            Search Term &nbsp;
           </label>
           <input
             id="search-term"
@@ -495,7 +492,7 @@ export default function Combined() {
             htmlFor="sort-order"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Sort By
+            Sort By &nbsp;
           </label>
           <select
             id="sort-order"
@@ -516,7 +513,7 @@ export default function Combined() {
             htmlFor="before"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Made before year:
+            Made before year: &nbsp;
           </label>
           <input
             id="before"

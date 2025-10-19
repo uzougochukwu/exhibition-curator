@@ -78,12 +78,16 @@ export default function PersonalExhibition() {
             <span className="font-semibold">Date:</span>{" "}
             {artwork.begindate || artwork.creation_date || "N/A"}
           </p>
+
           <p>
             <span className="font-semibold">By:</span>{" "}
             {artwork.people?.[0]?.name ||
               artwork.creators?.[0]?.description ||
               "N/A"}
           </p>
+          <p>Desc: </p>
+<p>{artwork.description}</p>
+          
 
           {/* Image Container for Centering */}
           <div style={{ textAlign: "center", margin: "10px 0" }}>

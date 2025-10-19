@@ -1,5 +1,7 @@
 Prototype museum exhibition webpage
 
+Public url: https://my-exhibition.netlify.app/
+
 To run locally:
 
 You must first get an api key from harvard
