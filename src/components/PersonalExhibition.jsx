@@ -98,12 +98,12 @@ export default function PersonalExhibition() {
               <img
                 src={artwork.primaryimageurl}
                 alt={artwork.title || "Harvard Artwork"}
+                width="200"
+                height="200"
                 style={{
                   // maxWidth: "100%",
                   // height: "auto",
                   // maxHeight: "300px",
-                  width: "100",
-                  height: "100",
                   display: "inline-block", // Required for center alignment
                   marginBottom: "10px",
                 }}
@@ -115,12 +115,13 @@ export default function PersonalExhibition() {
               <img
                 src={artwork.images.web.url}
                 alt={artwork.title || "Cleveland Artwork"}
+                width="200"
+                height="200"
                 style={{
                   // maxWidth: "100%",
                   // height: "auto",
                   // maxHeight: "300px",
-                  width: "100",
-                  height: "100",
+
                   display: "inline-block", // Required for center alignment
                   marginBottom: "10px",
                 }}
@@ -133,6 +134,7 @@ export default function PersonalExhibition() {
           <div className="pt-1 text-center">
             {/* More details link placeholder */}
           </div>
+          <a href={artwork.url}><p>External Website </p></a>
           {/* 3. Add the Delete button and bind it to removeFromCollection */}
           <button onClick={() => removeFromCollection(artwork.id)}>
             Delete from Collection

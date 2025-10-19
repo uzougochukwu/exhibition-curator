@@ -14,8 +14,8 @@ import harvard_api_key from "../extra/API-KEY";
 // Wrap the ResponsiveReactGridLayout with WidthProvider
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-// --- STANDALONE COMPONENT: PaginationControls (UNCHANGED) ---
-const PaginationControls = React.memo(
+// --- MODIFIED STANDALONE COMPONENT: PaginationControls (Renamed and Wrapped) ---
+const BasePaginationControls = React.memo(
   ({
     currentPage,
     totalPages,
@@ -24,18 +24,14 @@ const PaginationControls = React.memo(
   }) => {
     if (totalPages <= 1) return null;
 
-    // New handler for Previous button
     const goToPrevious = () => {
       if (currentPage > 0) {
-        // Calls the same function signature as ReactPaginate would have
         handlePageClick({ selected: currentPage - 1 });
       }
     };
 
-    // New handler for Next button
     const goToNext = () => {
       if (currentPage < totalPages - 1) {
-        // Calls the same function signature as ReactPaginate would have
         handlePageClick({ selected: currentPage + 1 });
       }
     };
@@ -81,7 +77,25 @@ const PaginationControls = React.memo(
   }
 );
 
-// --- Helper Component for Rendering Artworks and Handling Pagination (MODIFIED) ---
+// --- NEW COMPONENT: LabeledPaginationControls ---
+// This component wraps the base controls with a label and a visual divider.
+const LabeledPaginationControls = ({ label, ...props }) => {
+    if (props.totalPages <= 1) return null;
+
+    // Determine the border color based on the label for visual grouping
+    const borderColor = label.includes('Harvard') ? 'border-blue-400' : 'border-orange-400';
+
+    return (
+        <div className={`pt-4 border-t-2 ${borderColor} mt-8`}>
+            <p className="text-lg font-semibold text-center mb-2">
+                {label} Page Selector
+            </p>
+            <BasePaginationControls {...props} />
+        </div>
+    );
+};
+
+// --- Helper Component for Rendering Artworks and Handling Pagination (SLIGHTLY MODIFIED) ---
 const PaginatedItems = ({
   items,
   currentPage,
@@ -339,8 +353,6 @@ const PaginatedItems = ({
 // --- Main Component (MODIFIED) ---
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
-  // Setting this flag to true is NOT necessary if we are only showing Cleveland's controls at the bottom,
-  // but I'll keep it for continuity with the original code block it was modifying.
   const SHOW_CLEVELAND_PAGE_INDICATOR = true; 
 
   // REF: Create a ref to mark the top of the search results for scrolling
@@ -709,9 +721,9 @@ export default function Combined() {
           {/* Ref marks the top */}
           
           {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-          {/* Harvard Results Header (Now the ONLY place for Harvard controls) */}
           {harvardPageCount > 1 && (
-            <PaginationControls
+            <LabeledPaginationControls
+              label="Harvard Art Museums"
               currentPage={harvardCurrentPage}
               totalPages={harvardPageCount}
               handlePageClick={handleHarvardPageClick}
@@ -721,10 +733,9 @@ export default function Combined() {
 
           {/* Harvard Results Section */}
           <PaginatedItems
-            items={filteredHarvardData} // *** MODIFIED TO USE FILTERED DATA ***
+            items={filteredHarvardData} 
             currentPage={harvardCurrentPage}
             itemsPerPage={itemsPerPage}
-            // handlePageClick={handleHarvardPageClick} // Handled by separate controls
             totalPages={harvardPageCount}
             title="Harvard Results"
             isHarvard={true}
@@ -733,10 +744,9 @@ export default function Combined() {
           
           {/* Cleveland Results Section */}
           <PaginatedItems
-            items={filteredClevelandData} // *** MODIFIED TO USE FILTERED DATA ***
+            items={filteredClevelandData} 
             currentPage={clevelandCurrentPage}
             itemsPerPage={itemsPerPage}
-            // handlePageClick={handleClevelandPageClick} // Handled by separate controls
             totalPages={clevelandPageCount}
             title="Cleveland Results"
             isHarvard={false}
@@ -744,10 +754,9 @@ export default function Combined() {
           />
           
           {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
-          {/* Note: The SHOW_CLEVELAND_PAGE_INDICATOR flag is functionally irrelevant here if we remove the Harvard controls, 
-                 but keeping it for backward compatibility if it's used elsewhere. */}
           {clevelandPageCount > 1 && (
-            <PaginationControls
+            <LabeledPaginationControls
+              label="Cleveland Museum of Art"
               currentPage={clevelandCurrentPage}
               totalPages={clevelandPageCount}
               handlePageClick={handleClevelandPageClick}
