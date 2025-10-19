@@ -339,8 +339,9 @@ const PaginatedItems = ({
 // --- Main Component (MODIFIED) ---
 export default function Combined() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
-  // Set this to 'true' to show the Cleveland page number indicator, 'false' to hide it.
-  const SHOW_CLEVELAND_PAGE_INDICATOR = true;
+  // Setting this flag to true is NOT necessary if we are only showing Cleveland's controls at the bottom,
+  // but I'll keep it for continuity with the original code block it was modifying.
+  const SHOW_CLEVELAND_PAGE_INDICATOR = true; 
 
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
@@ -706,8 +707,9 @@ export default function Combined() {
         <div className="pt-4 space-y-8" ref={topRef}>
           {" "}
           {/* Ref marks the top */}
+          
           {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-          {/* Harvard Results Header */}
+          {/* Harvard Results Header (Now the ONLY place for Harvard controls) */}
           {harvardPageCount > 1 && (
             <PaginationControls
               currentPage={harvardCurrentPage}
@@ -716,6 +718,7 @@ export default function Combined() {
               displayCurrentPage={harvardDisplayPage}
             />
           )}
+
           {/* Harvard Results Section */}
           <PaginatedItems
             items={filteredHarvardData} // *** MODIFIED TO USE FILTERED DATA ***
@@ -727,6 +730,7 @@ export default function Combined() {
             isHarvard={true}
             addToCollection={addToCollectionHarvard}
           />
+          
           {/* Cleveland Results Section */}
           <PaginatedItems
             items={filteredClevelandData} // *** MODIFIED TO USE FILTERED DATA ***
@@ -738,8 +742,11 @@ export default function Combined() {
             isHarvard={false}
             addToCollection={addToCollectionCleveland}
           />
-          {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only (Conditional on Feature Flag) */}
-          {SHOW_CLEVELAND_PAGE_INDICATOR && clevelandPageCount > 1 && (
+          
+          {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
+          {/* Note: The SHOW_CLEVELAND_PAGE_INDICATOR flag is functionally irrelevant here if we remove the Harvard controls, 
+                 but keeping it for backward compatibility if it's used elsewhere. */}
+          {clevelandPageCount > 1 && (
             <PaginationControls
               currentPage={clevelandCurrentPage}
               totalPages={clevelandPageCount}
@@ -747,6 +754,7 @@ export default function Combined() {
               displayCurrentPage={clevelandDisplayPage}
             />
           )}
+
           {/* 3. SCROLL BACK TO TOP BUTTON */}
           {(filteredHarvardData.length > 0 ||
             filteredClevelandData.length > 0) && (
