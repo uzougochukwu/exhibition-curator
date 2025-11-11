@@ -119,7 +119,9 @@ export default function SpecificCleveland() {
       {individualCleveland.images?.web?.url && (
         <img
           src={individualCleveland.images.web.url}
-          alt={individualCleveland.title || "Artwork image"}
+          alt={individualCleveland.title || "Artwork image"}         
+          width="200"
+          height="200"
         />
       )}
       <p>Location: </p>

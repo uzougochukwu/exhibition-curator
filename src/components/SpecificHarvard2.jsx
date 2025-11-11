@@ -122,6 +122,8 @@ export default function SpecificHarvard2() {
         <img
           src={individualHarvard.primaryimageurl}
           alt={individualHarvard.title || "Artwork image"}
+          width="200"
+          height="200"
         ></img>
       )}
 

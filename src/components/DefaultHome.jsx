@@ -200,7 +200,7 @@ const PaginatedItems = ({
             }`}
             disabled={isAdded} // Disable button if permanently added
           >
-            {isAdded ? "Added Permanently! ✅" : "Add to collection"}
+            {isAdded ? "Added! ✅" : "Add to collection"}
           </button>
         );
       };
