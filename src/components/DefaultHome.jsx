@@ -329,6 +329,10 @@ export default function DefaultHome() {
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
 
+  const personal_exhibition = "/personalexhibition";
+
+  const combined = "/combined";
+
   // State to hold all fetched results (for client-side pagination)
   const [harvardFullData, setHarvardFullData] = useState([]);
   const [clevelandFullData, setClevelandFullData] = useState([]);
@@ -543,6 +547,14 @@ export default function DefaultHome() {
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-700">Artworks Collection</h1>
         <div className="space-x-2">
+        <h1>My Exhibition</h1>
+      <p>Welcome to your own personal exhibition</p>
+      <p>
+        If you click on the search link, you can search the Harvard and
+        Cleveland Museums for artworks
+      </p>
+      <p>If you like an artwork, save it by clicking 'Add to Collection'</p>
+      <p>To view your saved artworks, go to your personal exhibition</p>
           <a href={home_link}>
             <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-150">
               Home
@@ -552,6 +564,9 @@ export default function DefaultHome() {
             <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
               Go to Personal Exhibition
             </button>
+          </a>
+          <a href={combined}>
+            <button>Go to search</button>
           </a>
         </div>
       </header>
