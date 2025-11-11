@@ -7,6 +7,7 @@ function Home() {
   const personal_exhibition = "/personalexhibition";
   const smithsonian_link = "/smithsonian";
   const combined = "/combined";
+  const defaulthome = "/defaulthome"
 
   return (
     <div>
@@ -22,7 +23,9 @@ function Home() {
       <p></p>
       {/* <a href={cleveland_link}>Cleveland</a><p></p>
     <a href={smithsonian_link}>Smithsonian</a><p></p> */}
-      <a href={combined}>Search</a>
+      <a href={combined}>Search</a><p></p>
+      <a href={defaulthome}>Default</a>
+
 
       <p>
         <img

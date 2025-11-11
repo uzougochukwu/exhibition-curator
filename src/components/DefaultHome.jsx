@@ -1,7 +1,5 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import axios from "axios";
-// We no longer need to import ReactPaginate for the new UI
-// import ReactPaginate from "react-paginate";
 
 // NEW: Imports for React Grid Layout
 import { Responsive, WidthProvider } from "react-grid-layout";
@@ -78,7 +76,6 @@ const BasePaginationControls = React.memo(
 );
 
 // --- NEW COMPONENT: LabeledPaginationControls ---
-// This component wraps the base controls with a label and a visual divider.
 const LabeledPaginationControls = ({ label, ...props }) => {
     if (props.totalPages <= 1) return null;
 
@@ -95,7 +92,7 @@ const LabeledPaginationControls = ({ label, ...props }) => {
     );
 };
 
-// --- Helper Component for Rendering Artworks and Handling Pagination (SLIGHTLY MODIFIED) ---
+// --- Helper Component for Rendering Artworks and Handling Pagination (MODIFIED) ---
 const PaginatedItems = ({
   items,
   currentPage,
@@ -104,38 +101,21 @@ const PaginatedItems = ({
   title,
   isHarvard,
   addToCollection, // The base function to save the item
+  onArtworkAdded, // NEW PROP: Callback to trigger parent re-render
 }) => {
-  // NEW STATE: Tracks the IDs of items that were recently added (for visual feedback)
-  const [addedState, setAddedState] = useState({});
+  // Removed temporary addedState
 
   const offset = currentPage * itemsPerPage;
   const currentItems = items.slice(offset, offset + itemsPerPage);
-
-  // Clear the addedState when the page changes
-  React.useEffect(() => {
-    setAddedState({});
-  }, [currentPage, items]);
 
   // NEW: Handler that calls the parent function and sets the "Added!" state
   const handleAddToCollection = useCallback((artwork) => {
     // 1. Save the item via the parent function
     addToCollection(artwork);
 
-    // 2. Set the "Added!" status for this item ID
-    const artworkId = String(artwork.id);
-    setAddedState(prev => ({
-      ...prev,
-      [artworkId]: true,
-    }));
-
-    // 3. Clear the status after 2 seconds
-    setTimeout(() => {
-      setAddedState(prev => ({
-        ...prev,
-        [artworkId]: false, // Set back to false or remove key
-      }));
-    }, 2000);
-  }, [addToCollection]);
+    // 2. Call the parent callback to force a re-render and update the button's state immediately
+    onArtworkAdded();
+  }, [addToCollection, onArtworkAdded]);
 
 
   // 1. MODIFIED useMemo to create a responsive layout object
@@ -186,41 +166,41 @@ const PaginatedItems = ({
   }, [currentItems]);
   // ------------------------------------------------------------------
 
-  // MODIFIED CollectionButton to use addedState
+  // MODIFIED CollectionButton to check sessionStorage permanently
   const CollectionButton = isHarvard
     ? ({ artwork }) => {
         const artworkId = String(artwork.id);
-        const isAdded = addedState[artworkId];
+        const isAdded = !!sessionStorage.getItem(artworkId);
 
         return (
           <button
             onClick={() => handleAddToCollection(artwork)}
             className={`mt-2 w-full px-3 py-1 text-white text-xs font-semibold rounded-lg transition duration-150 ${
               isAdded
-                ? "bg-green-500 hover:bg-green-600" // Green for success
+                ? "bg-green-500 hover:bg-green-600" // Green for permanent success
                 : "bg-blue-500 hover:bg-blue-600" // Blue for default
             }`}
-            disabled={isAdded} // Disable button while showing confirmation
+            disabled={isAdded} // Disable button if permanently added
           >
-            {isAdded ? "Added! 🎉" : "Add to collection"}
+            {isAdded ? "Added! ✅" : "Add to collection"}
           </button>
         );
       }
     : ({ artwork }) => {
         const artworkId = String(artwork.id);
-        const isAdded = addedState[artworkId];
+        const isAdded = !!sessionStorage.getItem(artworkId);
 
         return (
           <button
             onClick={() => handleAddToCollection(artwork)}
             className={`mt-2 w-full px-3 py-1 text-white text-xs font-semibold rounded-lg transition duration-150 ${
               isAdded
-                ? "bg-green-500 hover:bg-green-600" // Green for success
+                ? "bg-green-500 hover:bg-green-600" // Green for permanent success
                 : "bg-orange-500 hover:bg-orange-600" // Orange for default
             }`}
-            disabled={isAdded} // Disable button while showing confirmation
+            disabled={isAdded} // Disable button if permanently added
           >
-            {isAdded ? "Added! 🎉" : "Add to collection"}
+            {isAdded ? "Added Permanently! ✅" : "Add to collection"}
           </button>
         );
       };
@@ -247,7 +227,6 @@ const PaginatedItems = ({
           {currentItems.map((artwork) => {
             const artworkId = String(artwork.id);
 
-            // Using full API URL as requested in prior steps
             // CORRECTED: Using local paths for navigation
             const harvardPage =
               "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
@@ -258,15 +237,13 @@ const PaginatedItems = ({
               // The key must match the 'i' property in the layout definition
               <div
                 key={artworkId}
-                // The style/positioning is handled by react-grid-layout,
-                // we keep the content styling
                 className={`p-4 border ${borderColor} rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-2 h-full w-full`}
               >
                 <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
                   {artwork.title}
                 </h3>
 
-                {/* IMAGE BLOCK (ALWAYS RENDERS) */}
+                {/* IMAGE BLOCK */}
                 {(
                   isHarvard ? artwork.primaryimageurl : artwork.images?.web?.url
                 ) ? (
@@ -275,8 +252,6 @@ const PaginatedItems = ({
                     {/* The <a> tag uses absolute positioning to cover the image */}
                     <a
                       href={detailUrl}
-                      // target="_blank"
-                      // rel="noopener noreferrer"
                       className="absolute inset-0 z-10 block" // z-10 makes it clickable over the image
                       title={`View details for ${artwork.title}`}
                     >
@@ -299,8 +274,6 @@ const PaginatedItems = ({
                     <p className="text-gray-500 text-xs">No Image</p>
                   </div>
                 )}
-
-                {/* REMOVED: INFO TOGGLE BUTTON */}
 
                 {/* CollectionButton is now always visible */}
                 <CollectionButton artwork={artwork} />
@@ -333,8 +306,6 @@ const PaginatedItems = ({
                   <div className="pt-1 text-center">
                     <a
                       href={detailUrl}
-                      // target="_blank"
-                      // rel="noopener noreferrer"
                       className="text-indigo-600 hover:text-indigo-800 font-medium underline"
                     >
                       More details
@@ -351,7 +322,7 @@ const PaginatedItems = ({
 };
 
 // --- Main Component (MODIFIED) ---
-export default function Combined() {
+export default function DefaultHome() {
   // 🚩 FEATURE FLAG DEFINITION 🚩
   const SHOW_CLEVELAND_PAGE_INDICATOR = true; 
 
@@ -362,15 +333,18 @@ export default function Combined() {
   const [harvardFullData, setHarvardFullData] = useState([]);
   const [clevelandFullData, setClevelandFullData] = useState([]);
 
-  // State for search terms and filters
-  const [term, setTerm] = useState("");
+  // NEW STATE: Used solely to trigger a re-render when an item is added to the exhibition.
+  const [exhibitionUpdateTrigger, setExhibitionUpdateTrigger] = useState(0);
+
+  // State for filters (retained for search URL building, even if controls are hidden)
   const [orderby, setOrderBy] = useState("");
-  const [beforeYear, setBeforeYear] = useState("");
-  const [error, setError] = useState(null); // Initialize as null for clearer check
+  const [beforeYear, setBeforeYear] = useState(""); 
+  const [error, setError] = useState(null); 
+  
   // NEW STATE for loading indicator
   const [isLoading, setIsLoading] = useState(false);
   // NEW STATE to track if a search has been performed
-  const [hasSearched, setHasSearched] = useState(false); // <--- ADDED
+  const [hasSearched, setHasSearched] = useState(false); 
 
   // Pagination State
   const itemsPerPage = 15; // Set a reasonable number of items per page
@@ -391,16 +365,11 @@ export default function Combined() {
   };
 
   // --- DERIVED/FILTERED DATA ---
-  // Use useMemo to filter the data whenever the raw data changes.
   const filteredHarvardData = useMemo(() => {
-    // Reset page on new data
-    // setHarvardCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(harvardFullData);
   }, [harvardFullData]);
 
   const filteredClevelandData = useMemo(() => {
-    // Reset page on new data
-    // setClevelandCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(clevelandFullData);
   }, [clevelandFullData]);
   // -----------------------------
@@ -422,37 +391,17 @@ export default function Combined() {
     let harvard_before_year = "";
     if (beforeYear) {
       harvard_before_year = beforeYear + "-01-01";
-    } // localhost:8080
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
-    //
-    // if (orderby) {
-    //   harvard_url += `&orderby=${orderby}`;
-    // }
+    }
+
+    // Harvard API URL
+    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&size=100&hasimage=1`;
     if (harvard_before_year) {
       harvard_url += `&before=${harvard_before_year}`;
     }
 
-    // --- Cleveland API Logic and URL Setup ---
-    // let cleveland_sort_value = "";
-    // switch (orderby) {
-    //   case "venues":
-    //     cleveland_sort_value = "gallery";
-    //     break;
-    //   case "people":
-    //     cleveland_sort_value = "artists";
-    //     break;
-    //   case "title":
-    //     cleveland_sort_value = "title";
-    //   default:
-    //     cleveland_sort_value = "";
-    //     break;
-    // }
-
-    // localhost:8080
-    let cleveland_url = `https://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
-    // if (cleveland_sort_value) {
-    //   cleveland_url += `&sort=${cleveland_sort_value}`;
-    // }
+    // Cleveland API URL
+    // CORRECTED: Ensure client uses localhost:8080 proxy for Cleveland as well.
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?limit=100&has_image=1`;
     if (beforeYear) {
       cleveland_url += `&created_before=${beforeYear}`;
     }
@@ -470,17 +419,14 @@ export default function Combined() {
       let harvardRecords = [];
       if (harvardResponse.status === "fulfilled") {
         harvardRecords = harvardResponse.value.data.records || [];
-        if (orderby == "title-A-first") {
+        // Apply sorting based on retained 'orderby' state
+        if (orderby === "title-A-first") {
           harvardRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
-        }
-        if (orderby == "title-Z-first") {
+        } else if (orderby === "title-Z-first") {
           harvardRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
-        }
-
-        if (orderby == "begindate-oldest") {
+        } else if (orderby === "begindate-oldest") {
           harvardRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
-        }
-        if (orderby == "begindate-newest") {
+        } else if (orderby === "begindate-newest") {
           harvardRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
         }
 
@@ -488,7 +434,7 @@ export default function Combined() {
       } else {
         console.error("Harvard API error:", harvardResponse.reason);
         errorMessages.push(
-          "Harvard Museum search failed or returned no results."
+          "Harvard Museum data failed to load."
         );
       }
 
@@ -496,36 +442,31 @@ export default function Combined() {
       let clevelandRecords = [];
       if (clevelandResponse.status === "fulfilled") {
         clevelandRecords = clevelandResponse.value.data.data || [];
-        if (orderby == "title-A-first") {
+        // Apply sorting based on retained 'orderby' state
+        if (orderby === "title-A-first") {
           clevelandRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
-        }
-        if (orderby == "title-Z-first") {
+        } else if (orderby === "title-Z-first") {
           clevelandRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
-        }
-
-        if (orderby == "begindate-oldest") {
-          clevelandRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
-        }
-        if (orderby == "begindate-newest") {
-          clevelandRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
+        } else if (orderby === "begindate-oldest") {
+          clevelandRecords.sort((a, b) => (a.creation_date > b.creation_date ? 1 : -1));
+        } else if (orderby === "begindate-newest") {
+          clevelandRecords.sort((a, b) => (a.creation_date < b.creation_date ? 1 : -1));
         }
 
         setClevelandFullData(clevelandRecords);
       } else {
         console.error("Cleveland API error:", clevelandResponse.reason);
         errorMessages.push(
-          "Cleveland Museum search failed or returned no results."
+          "Cleveland Museum data failed to load."
         );
       }
 
-      // Final Error Check: Check the raw data lengths to determine if the user needs a 'no results' message
+      // Final Error Check: Check the raw data lengths
       if (harvardRecords.length === 0 && clevelandRecords.length === 0) {
-        setError("Your search returned no results from either museum.");
+        setError("The initial data fetch returned no artworks from either museum.");
       } else if (errorMessages.length > 0) {
-        // If there were API failures AND we have some data, show the API error
         setError(errorMessages.join(" "));
       } else {
-        // Check if filtering removed everything
         const allDataFilteredOut =
           filterData(harvardRecords).length === 0 &&
           filterData(clevelandRecords).length === 0;
@@ -536,16 +477,24 @@ export default function Combined() {
         }
       }
     } catch (err) {
-      // This catch block would primarily handle system-level network errors outside of the API calls
       console.error("System Network Error:", err);
-      setError("A critical network error occurred during the search.");
+      setError("A critical network error occurred during the initial data fetch.");
     } finally {
       // 3. Cleanup: Stop loading regardless of success/failure
       setIsLoading(false);
     }
-
-    console.log("Search button clicked. Starting API call for:", term);
   };
+  
+  // 🚀 Call harvardSearch immediately when the component mounts
+  useEffect(() => {
+      harvardSearch();
+  }, []); 
+
+  // NEW: Callback function used by PaginatedItems to signal an addition
+  const handleArtworkAdded = useCallback(() => {
+    // Increment the state to force a re-render of components that depend on it
+    setExhibitionUpdateTrigger(prev => prev + 1);
+  }, []);
 
   // --- Handle Page Change for Pagination ---
   const handleHarvardPageClick = useCallback((event) => {
@@ -556,14 +505,12 @@ export default function Combined() {
     setClevelandCurrentPage(event.selected);
   }, []);
 
-  // MODIFIED: Simplified parent functions - they just save the data.
+  // MODIFIED: Parent functions to save data to sessionStorage.
   const addToCollectionHarvard = useCallback((harvardArtwork) => {
-    console.log("saving Harvard:", harvardArtwork.id);
     sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
   }, []);
 
   const addToCollectionCleveland = useCallback((clevelandArtwork) => {
-    console.log("saving Cleveland:", clevelandArtwork.id);
     sessionStorage.setItem(
       clevelandArtwork.id,
       JSON.stringify(clevelandArtwork)
@@ -584,8 +531,6 @@ export default function Combined() {
     !isLoading &&
     (filteredHarvardData.length > 0 || filteredClevelandData.length > 0);
 
-  // The no results message should only show if a search was performed, it's not loading, there's no error, and the filtered data is empty.
-  // Note: The error state is now used to distinguish between API failure and successful filtering-out.
   const showNoResultsMessage =
     hasSearched &&
     !isLoading &&
@@ -596,14 +541,13 @@ export default function Combined() {
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
+        <h1 className="text-2xl font-bold text-indigo-700">Artworks Collection</h1>
         <div className="space-x-2">
           <a href={home_link}>
             <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-150">
               Home
             </button>
           </a>
-          <p></p>
           <a href={link}>
             <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
               Go to Personal Exhibition
@@ -611,89 +555,10 @@ export default function Combined() {
           </a>
         </div>
       </header>
-      <p></p>
-      {/* Search/Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
-        <div className="flex-grow">
-          <label
-            htmlFor="search-term"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Search Term &nbsp;
-          </label>
-          <input
-            id="search-term"
-            type="text"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., Monet, landscapes"
-            disabled={isLoading} // Disable input while searching
-          />
-        </div>
-        <p></p>
-        <p></p>
-        <div className="w-full sm:w-1/4">
-          <label
-            htmlFor="sort-order"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Sort By &nbsp;
-          </label>
-          <select
-            id="sort-order"
-            value={orderby}
-            onChange={(e) => setOrderBy(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={isLoading} // Disable input while searching
-          >
-            <option value="">No sort</option>
-            <option value="begindate-oldest">
-              Date Created - oldest to newest
-            </option>
-            <option value="begindate-newest">
-              Date Created - newest to oldest
-            </option>
-            <option value="title-A-first">Title A - Z</option>
-            <option value="title-Z-first">Title Z - A</option>
-          </select>
-        </div>
-        <p></p>
-        <p></p>
+      
+      {/* Search/Filter Controls REMOVED */}
 
-        <div className="flex-grow">
-          <label
-            htmlFor="before"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Made before year: &nbsp;
-          </label>
-          <input
-            id="before"
-            type="text"
-            value={beforeYear}
-            onChange={(e) => setBeforeYear(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., 2020"
-            disabled={isLoading} // Disable input while searching
-          />
-        </div>
-        <p></p>
-        <button
-          onClick={harvardSearch}
-          disabled={isLoading} // Disable button while searching
-          className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg transition duration-150 transform ${
-            isLoading
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
-          }`}
-        >
-          {isLoading ? "Searching..." : "Search"}
-        </button>
-      </div>
-      <p></p>
-
-      {/* ERROR MESSAGE DISPLAY: Now requires error AND hasSearched to be true */}
+      {/* ERROR MESSAGE DISPLAY */}
       {error && hasSearched && (
         <div className="text-red-700 p-3 bg-red-100 border border-red-300 rounded-lg font-medium">
           Error: {error}
@@ -703,24 +568,23 @@ export default function Combined() {
       {/* LOADING INDICATOR */}
       {isLoading && (
         <div className="flex justify-center items-center py-10 text-xl font-semibold text-gray-600">
-          Searching... please wait.
+          Loading artworks... please wait.
         </div>
       )}
 
-      {/* NO RESULTS MESSAGE: Now requires hasSearched to be true */}
+      {/* NO RESULTS MESSAGE */}
       {showNoResultsMessage && (
         <div className="flex justify-center items-center py-10 text-xl font-medium text-gray-500">
-          No artworks found matching your criteria. Try a different search term.
+          No artworks found in the initial data fetch.
         </div>
       )}
 
-      {/* RESULTS SECTION (Only visible if not loading AND we have data) */}
+      {/* RESULTS SECTION */}
       {showResults && (
         <div className="pt-4 space-y-8" ref={topRef}>
           {" "}
-          {/* Ref marks the top */}
           
-          {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
+          {/* 1. TOP PAGE SELECTION: Harvard Only */}
           {harvardPageCount > 1 && (
             <LabeledPaginationControls
               label="Harvard Art Museums"
@@ -731,8 +595,9 @@ export default function Combined() {
             />
           )}
 
-          {/* Harvard Results Section */}
+          {/* Harvard Results Section - Uses key to force re-render on addition */}
           <PaginatedItems
+            key={`harvard-${exhibitionUpdateTrigger}`} 
             items={filteredHarvardData} 
             currentPage={harvardCurrentPage}
             itemsPerPage={itemsPerPage}
@@ -740,10 +605,12 @@ export default function Combined() {
             title="Harvard Results"
             isHarvard={true}
             addToCollection={addToCollectionHarvard}
+            onArtworkAdded={handleArtworkAdded}
           />
           
-          {/* Cleveland Results Section */}
+          {/* Cleveland Results Section - Uses key to force re-render on addition */}
           <PaginatedItems
+            key={`cleveland-${exhibitionUpdateTrigger}`} 
             items={filteredClevelandData} 
             currentPage={clevelandCurrentPage}
             itemsPerPage={itemsPerPage}
@@ -751,9 +618,10 @@ export default function Combined() {
             title="Cleveland Results"
             isHarvard={false}
             addToCollection={addToCollectionCleveland}
+            onArtworkAdded={handleArtworkAdded}
           />
           
-          {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
+          {/* 2. BOTTOM PAGE SELECTION: Cleveland Only */}
           {clevelandPageCount > 1 && (
             <LabeledPaginationControls
               label="Cleveland Museum of Art"

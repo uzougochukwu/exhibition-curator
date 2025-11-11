@@ -12,6 +12,7 @@ import Combined from "./components/Combined";
 import harvard_api_key from "./extra/API-KEY";
 import SpecificHarvard2 from "./components/SpecificHarvard2";
 import SpecificCleveland from "./components/SpecificCleveland";
+import DefaultHome from "./components/DefaultHome";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/combined" element={<Combined />} />
         <Route path="/exhibition/:artworkid" element={<SpecificHarvard2 />} />
         <Route path="/artworks/:artworkid" element={<SpecificCleveland />} />
+        <Route path="/defaulthome" element={<DefaultHome/>}/>
       </Routes>
     </div>
   );
