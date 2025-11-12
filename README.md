@@ -1,18 +1,22 @@
-Prototype museum exhibition webpage
+#Exhibition Curator
+
+Create your own personal exhibition, using artworks from the Cleveland Museum of Art and the Harvard Art Museum.
+
+Search for the artworks that match a particular interest (e.g. wildlife) and sort them alphabetically or by the year they were created.
 
 Public url: https://my-exhibition.netlify.app/
 
-To run locally:
+##To run locally:
 
 You must first get an api key from harvard
 
 go here to sign up for one: https://harvardartmuseums.org/collections/api
 
-git clone https://github.com/uzougochukwu/exhibition-curator
-
-cd exhibition-curator
-
-cd src
+> git clone https://github.com/uzougochukwu/exhibition-curator
+>
+> cd exhibition-curator
+> 
+> cd src
 
 create a folder caller 'extra'
 
@@ -26,18 +30,18 @@ export default harvard_api_key
 
 then save that file and go back to the terminal window
 
-npm run dev
+> npm run dev
 
 open a new terminal window
 
-npm i
+> npm i
 
-npm install cors-anywhere
+> npm install cors-anywhere
 
-cd ..
-cd exhibition-creator/node_modules
+> cd ..
+> cd exhibition-creator/node_modules
 
-node cors-anywhere/server.js
+> node cors-anywhere/server.js
 
 go back to the terminal window where you ran npm run dev
 
