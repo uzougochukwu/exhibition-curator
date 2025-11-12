@@ -13,6 +13,7 @@ import harvard_api_key from "./extra/API-KEY";
 import SpecificHarvard2 from "./components/SpecificHarvard2";
 import SpecificCleveland from "./components/SpecificCleveland";
 import DefaultHome from "./components/DefaultHome";
+import MountainExamples from "./components/MountainExamples";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/exhibition/:artworkid" element={<SpecificHarvard2 />} />
         <Route path="/artworks/:artworkid" element={<SpecificCleveland />} />
         <Route path="/defaulthome" element={<DefaultHome/>}/>
+        <Route path = "/mountainexamples" element={<MountainExamples/>}/>
       </Routes>
     </div>
   );
