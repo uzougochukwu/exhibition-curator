@@ -17,7 +17,9 @@ Open up a terminal:
 > git clone https://github.com/uzougochukwu/exhibition-curator
 >
 > cd exhibition-curator
+>
 > npm i
+>
 > npm install cors-anywhere
 > 
 > cd src
@@ -46,7 +48,9 @@ Save that file and go back to the terminal window.
 Open a separate terminal window
 
 > cd ..
+>
 > cd exhibition-creator/node_modules
+>
 > node cors-anywhere/server.js
 
 In your brower url box, type in "http://localhost:5173" and press enter.
