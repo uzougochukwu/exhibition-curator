@@ -379,6 +379,7 @@ export default function Home() {
 
   const link = "/personalexhibition";
   const home_link = "/";
+  const combined = "/combined"
 
   // FUNCTION: Scroll to the top of the search results
   const scrollToTop = () => {
@@ -611,16 +612,19 @@ export default function Home() {
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
         <div className="space-x-2">
-          <a href={home_link}>
+          {/* <a href={home_link}>
             <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-150">
               Home
             </button>
-          </a>
+          </a> */}
           <p></p>
           <a href={link}>
             <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
               Go to Personal Exhibition
             </button>
+          </a>
+          <a href={combined}>
+            <button>Search Page</button>
           </a>
         </div>
       </header>
@@ -628,7 +632,7 @@ export default function Home() {
       {/* Search/Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
-          <label
+          {/* <label
             htmlFor="search-term"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
@@ -642,12 +646,12 @@ export default function Home() {
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="e.g., Monet, landscapes"
             disabled={isLoading} // Disable input while searching
-          />
+          /> */}
         </div>
         <p></p>
         <p></p>
         <div className="w-full sm:w-1/4">
-          <label
+          {/* <label
             htmlFor="sort-order"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
@@ -669,13 +673,13 @@ export default function Home() {
             </option>
             <option value="title-A-first">Title A - Z</option>
             <option value="title-Z-first">Title Z - A</option>
-          </select>
+          </select> */}
         </div>
         <p></p>
         <p></p>
 
         <div className="flex-grow">
-          <label
+          {/* <label
             htmlFor="before"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
@@ -689,7 +693,7 @@ export default function Home() {
             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
             placeholder="e.g., 2020"
             disabled={isLoading} // Disable input while searching
-          />
+          /> */}
         </div>
         <p></p>
         <button
