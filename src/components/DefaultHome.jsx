@@ -334,6 +334,7 @@ export default function DefaultHome() {
   const combined = "/combined";
 
   const mountainexamples = "/mountainexamples"
+  const flowerexamples = "/flowerexamples"
 
   // State to hold all fetched results (for client-side pagination)
   const [harvardFullData, setHarvardFullData] = useState([]);
@@ -572,7 +573,8 @@ export default function DefaultHome() {
           </a>
           <p></p>
           <p>Examples of Personal Exhibitions:</p>
-          <a href={mountainexamples}> Mountains</a>
+          <a href={mountainexamples}> Mountains</a><p></p>
+          <a href={flowerexamples}> Flowers</a>
         </div>
       </header>
       

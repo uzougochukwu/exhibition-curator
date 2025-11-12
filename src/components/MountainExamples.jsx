@@ -40,10 +40,7 @@ function MountainExamples() {
         <p>City: Cleveland</p>
         <p>State: OH</p>
         <p><a href="https://clevelandart.org/art/1941.594">Cleveland Website</a></p>
-
-
-
-    </div>
+        </div>
   )
 }
 
