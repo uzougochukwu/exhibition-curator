@@ -35,7 +35,7 @@ The layout of your file should match the image below.
 Replace YOUR-API-KEY with the actual Harvard API key.
 
 The file should look something like this: 
-![FilePic](./fileimage.png)
+![FilePic](./fileimage.jpg)
 
 Save that file and go back to the terminal window.
 
