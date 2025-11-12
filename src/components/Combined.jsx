@@ -449,7 +449,7 @@ export default function Combined() {
     // }
 
     // localhost:8080
-    let cleveland_url = `https://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
+    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
     // if (cleveland_sort_value) {
     //   cleveland_url += `&sort=${cleveland_sort_value}`;
     // }
