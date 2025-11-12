@@ -428,7 +428,8 @@ export default function Home() {
       harvard_before_year = beforeYear + "-01-01";
     } // localhost:8080
     // Use search_term in the URL
-    let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${search_term}&size=100&hasimage=1`;
+    // let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${search_term}&size=100&hasimage=1`;
+    let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${search_term}&size=100&hasimage=1`;
     //
     // if (orderby) {
     //   harvard_url += `&orderby=${orderby}`;
@@ -455,7 +456,8 @@ export default function Home() {
 
     // localhost:8080
     // Use search_term in the URL
-    let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${search_term}&limit=100&has_image=1`;
+    // let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${search_term}&limit=100&has_image=1`;
+    let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${search_term}&limit=100&has_image=1`;
     // if (cleveland_sort_value) {
     //   cleveland_url += `&sort=${cleveland_sort_value}`;
     // }
