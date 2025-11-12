@@ -30,11 +30,7 @@ Create a folder caller 'extra'.
 
 In this folder create a file called API-KEY.js 
 
-Type the following:
-
-const harvard_api_key = "YOUR-API-KEY"
-
-export default harvard_api_key
+The layout of your file should match the image below.
 
 Replace YOUR-API-KEY with the actual Harvard API key.
 
