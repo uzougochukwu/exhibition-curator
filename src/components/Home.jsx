@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from "react"; // <-- MODIFIED
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import axios from "axios";
 // We no longer need to import ReactPaginate for the new UI
 // import ReactPaginate from "react-paginate";
@@ -406,7 +406,7 @@ export default function Home() {
   }, [clevelandFullData]);
   // -----------------------------
 
-  const harvardSearch = useCallback(async (currentTerm) => { // <-- MODIFIED: Wrapped in useCallback and accepts term
+  const harvardSearch = useCallback(async (currentTerm) => { // <-- Wrapped in useCallback and accepts term
     // Use the term passed to the function, falling back to state 'term' if needed
     const search_term = currentTerm || term; 
 
@@ -696,17 +696,28 @@ export default function Home() {
           /> */}
         </div>
         <p></p>
-        <button
-          onClick={() => harvardSearch(term)} // <-- MODIFIED: Use term from state on click
-          disabled={isLoading} // Disable button while searching
-          className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg transition duration-150 transform ${
-            isLoading
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
-          }`}
-        >
-          {isLoading ? "Searching..." : "Search"}
-        </button>
+        {/* MODIFIED: Separate Loading Indicator from Button */}
+        {isLoading ? (
+          <div
+            className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg bg-gray-400 text-gray-700 text-center transition duration-150 transform`}
+          >
+            Searching...
+          </div>
+        ) : (
+          // <button
+          //   onClick={() => harvardSearch(term)}
+          //   disabled={isLoading} 
+          //   className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg transition duration-150 transform ${
+          //     isLoading
+          //       ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+          //       : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
+          //   }`}
+          // >
+          //   Search
+          // </button>
+          // <p>isLoading ? <div>Searching</div>: <div>""</div></p>
+          <p></p>
+        )}
       </div>
       <p></p>
 
