@@ -1,10 +1,28 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Apply full height and a soft gradient background to mimic Calm's style */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* Fallback font to Inter, assuming Tailwind loads it */
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
 }
 
+/* Modify #root to allow content to span the screen and be centered within the view */
+#root {
+  max-width: none; /* Allow full width, removing the 1280px limit */
+  min-height: 100vh; /* Ensure it covers the full viewport height */
+  margin: 0;
+  padding: 0; /* Tailwind classes inside Home component handle content padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  /* Add a subtle, calming background gradient from soft blue to light blue */
+  background: linear-gradient(180deg, #a0c4ff 0%, #b0c4de 100%); 
+}
+
+/* Existing styles below (kept for completeness, though they are likely overridden by Tailwind) */
 .logo {
   height: 6em;
   padding: 1.5em;
