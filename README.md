@@ -1,4 +1,4 @@
-#Exhibition Curator
+# Exhibition Curator
 
 Create your own personal exhibition, using artworks from the Cleveland Museum of Art and the Harvard Art Museum.
 
@@ -6,7 +6,7 @@ Search for the artworks that match a particular interest (e.g. wildlife) and sor
 
 Public url: https://my-exhibition.netlify.app/
 
-##To run locally:
+## To run locally:
 
 You must first get an api key from harvard
 
