@@ -350,11 +350,8 @@ const PaginatedItems = ({
   );
 };
 
-// --- Main Component (MODIFIED) ---
+// --- Main Component: Home (MODIFIED TO REMOVE SEARCH CONTROLS) ---
 export default function Home() {
-  // 🚩 FEATURE FLAG DEFINITION 🚩
-  const SHOW_CLEVELAND_PAGE_INDICATOR = true; 
-
   // REF: Create a ref to mark the top of the search results for scrolling
   const topRef = useRef(null);
 
@@ -363,23 +360,24 @@ export default function Home() {
   const [clevelandFullData, setClevelandFullData] = useState([]);
 
   // State for search terms and filters
-  const [term, setTerm] = useState("everything"); // <-- MODIFIED: Set default search term
+  // Search is defaulted to "tree" and is not modifiable by the user anymore.
+  const [term, setTerm] = useState("tree"); 
   const [orderby, setOrderBy] = useState("");
   const [beforeYear, setBeforeYear] = useState("");
-  const [error, setError] = useState(null); // Initialize as null for clearer check
-  // NEW STATE for loading indicator
+  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // NEW STATE to track if a search has been performed
   const [hasSearched, setHasSearched] = useState(false); 
 
   // Pagination State
-  const itemsPerPage = 15; // Set a reasonable number of items per page
-  const [harvardCurrentPage, setHarvardCurrentPage] = useState(0); // 0-based index
-  const [clevelandCurrentPage, setClevelandCurrentPage] = useState(0); // 0-based index
+  const itemsPerPage = 15;
+  const [harvardCurrentPage, setHarvardCurrentPage] = useState(0);
+  const [clevelandCurrentPage, setClevelandCurrentPage] = useState(0);
 
   const link = "/personalexhibition";
   const home_link = "/";
   const combined = "/combined"
+  const flowers = "/flowerexamples"
+  const mountains = "/mountainexamples"
 
   // FUNCTION: Scroll to the top of the search results
   const scrollToTop = () => {
@@ -388,36 +386,32 @@ export default function Home() {
 
   // NEW HELPER FUNCTION to filter data by description
   const filterData = (data) => {
-    return data.filter((item) => item.description);
+    return data.filter((item) => item.description); 
   };
 
   // --- DERIVED/FILTERED DATA ---
-  // Use useMemo to filter the data whenever the raw data changes.
   const filteredHarvardData = useMemo(() => {
-    // Reset page on new data
-    // setHarvardCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(harvardFullData);
   }, [harvardFullData]);
 
   const filteredClevelandData = useMemo(() => {
-    // Reset page on new data
-    // setClevelandCurrentPage(0); // Removing this reset here to allow smooth filtering
     return filterData(clevelandFullData);
   }, [clevelandFullData]);
   // -----------------------------
 
-  const harvardSearch = useCallback(async (currentTerm) => { // <-- Wrapped in useCallback and accepts term
-    // Use the term passed to the function, falling back to state 'term' if needed
+  // Search function remains, but it relies on the internal 'term', 'orderby', and 'beforeYear' states,
+  // which are fixed/uncontrollable by the user in the UI now.
+  const harvardSearch = useCallback(async (currentTerm) => { 
     const search_term = currentTerm || term; 
 
     // 1. Setup: Reset states and show loading
     setHarvardCurrentPage(0);
     setClevelandCurrentPage(0);
     setError(null);
-    setHarvardFullData([]); // Raw data cleared
-    setClevelandFullData([]); // Raw data cleared
+    setHarvardFullData([]);
+    setClevelandFullData([]);
     setHasSearched(true);
-    setIsLoading(true); // START LOADING
+    setIsLoading(true);
 
     if (topRef.current) {
       topRef.current.scrollIntoView({ behavior: "smooth" });
@@ -426,45 +420,22 @@ export default function Home() {
     let harvard_before_year = "";
     if (beforeYear) {
       harvard_before_year = beforeYear + "-01-01";
-    } // localhost:8080
+    } 
+    
     // Use search_term in the URL
-    // let harvard_url = `http://localhost:8080/api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${search_term}&size=100&hasimage=1`;
     let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${search_term}&size=100&hasimage=1`;
-    //
-    // if (orderby) {
-    //   harvard_url += `&orderby=${orderby}`;
-    // }
+    
     if (harvard_before_year) {
       harvard_url += `&before=${harvard_before_year}`;
     }
 
-    // --- Cleveland API Logic and URL Setup ---
-    // let cleveland_sort_value = "";
-    // switch (orderby) {
-    //   case "venues":
-    //     cleveland_sort_value = "gallery";
-    //     break;
-    //   case "people":
-    //     cleveland_sort_value = "artists";
-    //     break;
-    //   case "title":
-    //     cleveland_sort_value = "title";
-    //   default:
-    //     cleveland_sort_value = "";
-    //     break;
-    // }
-
-    // localhost:8080
     // Use search_term in the URL
-    // let cleveland_url = `http://localhost:8080/openaccess-api.clevelandart.org/api/artworks/?q=${search_term}&limit=100&has_image=1`;
     let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${search_term}&limit=100&has_image=1`;
-    // if (cleveland_sort_value) {
-    //   cleveland_url += `&sort=${cleveland_sort_value}`;
-    // }
+    
     if (beforeYear) {
       cleveland_url += `&created_before=${beforeYear}`;
     }
-
+    
     // 2. Execute Calls (using Promise.all for parallel fetching)
     try {
       const [harvardResponse, clevelandResponse] = await Promise.allSettled([
@@ -478,17 +449,14 @@ export default function Home() {
       let harvardRecords = [];
       if (harvardResponse.status === "fulfilled") {
         harvardRecords = harvardResponse.value.data.records || [];
-        if (orderby == "title-A-first") {
+        // Sorting logic kept intact
+        if (orderby === "title-A-first") {
           harvardRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
-        }
-        if (orderby == "title-Z-first") {
+        } else if (orderby === "title-Z-first") {
           harvardRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
-        }
-
-        if (orderby == "begindate-oldest") {
+        } else if (orderby === "begindate-oldest") {
           harvardRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
-        }
-        if (orderby == "begindate-newest") {
+        } else if (orderby === "begindate-newest") {
           harvardRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
         }
 
@@ -504,17 +472,14 @@ export default function Home() {
       let clevelandRecords = [];
       if (clevelandResponse.status === "fulfilled") {
         clevelandRecords = clevelandResponse.value.data.data || [];
-        if (orderby == "title-A-first") {
+        // Sorting logic kept intact
+        if (orderby === "title-A-first") {
           clevelandRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
-        }
-        if (orderby == "title-Z-first") {
+        } else if (orderby === "title-Z-first") {
           clevelandRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
-        }
-
-        if (orderby == "begindate-oldest") {
+        } else if (orderby === "begindate-oldest") {
           clevelandRecords.sort((a, b) => (a.begindate > b.begindate ? 1 : -1));
-        }
-        if (orderby == "begindate-newest") {
+        } else if (orderby === "begindate-newest") {
           clevelandRecords.sort((a, b) => (a.begindate < b.begindate ? 1 : -1));
         }
 
@@ -526,14 +491,12 @@ export default function Home() {
         );
       }
 
-      // Final Error Check: Check the raw data lengths to determine if the user needs a 'no results' message
+      // Final Error Check
       if (harvardRecords.length === 0 && clevelandRecords.length === 0) {
         setError(`Your search for '${search_term}' returned no results from either museum.`);
       } else if (errorMessages.length > 0) {
-        // If there were API failures AND we have some data, show the API error
         setError(errorMessages.join(" "));
       } else {
-        // Check if filtering removed everything
         const allDataFilteredOut =
           filterData(harvardRecords).length === 0 &&
           filterData(clevelandRecords).length === 0;
@@ -544,7 +507,6 @@ export default function Home() {
         }
       }
     } catch (err) {
-      // This catch block would primarily handle system-level network errors outside of the API calls
       console.error("System Network Error:", err);
       setError("A critical network error occurred during the search.");
     } finally {
@@ -553,14 +515,14 @@ export default function Home() {
     }
 
     console.log("Search button clicked. Starting API call for:", search_term);
-  }, [term, beforeYear, orderby]); // <-- DEPENDENCIES ADDED
+  }, [term, beforeYear, orderby, harvard_api_key]);
 
-  // --- NEW: useEffect for initial search on load ---
+
+  // useEffect for initial search on load
   useEffect(() => {
-    // We pass the default term 'everything' to the search function
-    harvardSearch("everything");
-  }, [harvardSearch]); // Dependency array includes harvardSearch, which is wrapped in useCallback
-  // -------------------------------------------------
+    // Trigger the search with the default term "tree" when the component mounts
+    harvardSearch("tree"); 
+  }, [harvardSearch]); 
 
 
   // --- Handle Page Change for Pagination ---
@@ -572,7 +534,7 @@ export default function Home() {
     setClevelandCurrentPage(event.selected);
   }, []);
 
-  // MODIFIED: Simplified parent functions - they just save the data.
+  // Collection functions for saving data
   const addToCollectionHarvard = useCallback((harvardArtwork) => {
     console.log("saving Harvard:", harvardArtwork.id);
     sessionStorage.setItem(harvardArtwork.id, JSON.stringify(harvardArtwork));
@@ -600,8 +562,6 @@ export default function Home() {
     !isLoading &&
     (filteredHarvardData.length > 0 || filteredClevelandData.length > 0);
 
-  // The no results message should only show if a search was performed, it's not loading, there's no error, and the filtered data is empty.
-  // Note: The error state is now used to distinguish between API failure and successful filtering-out.
   const showNoResultsMessage =
     hasSearched &&
     !isLoading &&
@@ -628,102 +588,26 @@ export default function Home() {
           <a href={combined}>
             <button>Search Page</button>
           </a>
+          <p>Examples of Personal Exhibitions:</p>
+          <p></p>
+          <a href={flowers}>Flowers</a>
+          <p></p>
+          <a href={mountains}>Mountains</a>
         </div>
       </header>
-      <p></p>
-      {/* Search/Filter Controls */}
+      
+      {/* Search/Filter Controls (MODIFIED: CONTENT REMOVED) */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
-        <div className="flex-grow">
-          {/* <label
-            htmlFor="search-term"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Search Term &nbsp;
-          </label>
-          <input
-            id="search-term"
-            type="text"
-            value={term}
-            onChange={(e) => setTerm(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., Monet, landscapes"
-            disabled={isLoading} // Disable input while searching
-          /> */}
-        </div>
-        <p></p>
-        <p></p>
-        <div className="w-full sm:w-1/4">
-          {/* <label
-            htmlFor="sort-order"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Sort By &nbsp;
-          </label>
-          <select
-            id="sort-order"
-            value={orderby}
-            onChange={(e) => setOrderBy(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={isLoading} // Disable input while searching
-          >
-            <option value="">No sort</option>
-            <option value="begindate-oldest">
-              Date Created - oldest to newest
-            </option>
-            <option value="begindate-newest">
-              Date Created - newest to oldest
-            </option>
-            <option value="title-A-first">Title A - Z</option>
-            <option value="title-Z-first">Title Z - A</option>
-          </select> */}
-        </div>
-        <p></p>
-        <p></p>
-
-        <div className="flex-grow">
-          {/* <label
-            htmlFor="before"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Made before year: &nbsp;
-          </label>
-          <input
-            id="before"
-            type="text"
-            value={beforeYear}
-            onChange={(e) => setBeforeYear(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., 2020"
-            disabled={isLoading} // Disable input while searching
-          /> */}
-        </div>
-        <p></p>
-        {/* MODIFIED: Separate Loading Indicator from Button */}
-        {isLoading ? (
-          <div
-            className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg bg-gray-400 text-gray-700 text-center transition duration-150 transform`}
-          >
-            Searching...
-          </div>
-        ) : (
-          // <button
-          //   onClick={() => harvardSearch(term)}
-          //   disabled={isLoading} 
-          //   className={`w-full sm:w-auto px-6 py-2 font-semibold rounded-lg shadow-lg transition duration-150 transform ${
-          //     isLoading
-          //       ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-          //       : "bg-green-500 text-white hover:bg-green-600 hover:scale-105"
-          //   }`}
-          // >
-          //   Search
-          // </button>
-          // <p>isLoading ? <div>Searching</div>: <div>""</div></p>
-          <p></p>
-        )}
+        {/* All inputs and the search button are removed from the UI */}
+        {/* Placeholder for the now-empty search area */}
+        {/* <p className="text-sm font-medium text-gray-700">
+            Current search term: **tree** (Automatic search on load)
+        </p> */}
       </div>
+      
       <p></p>
 
-      {/* ERROR MESSAGE DISPLAY: Now requires error AND hasSearched to be true */}
+      {/* ERROR MESSAGE DISPLAY */}
       {error && hasSearched && (
         <div className="text-red-700 p-3 bg-red-100 border border-red-300 rounded-lg font-medium">
           Error: {error}
@@ -737,18 +621,17 @@ export default function Home() {
         </div>
       )}
 
-      {/* NO RESULTS MESSAGE: Now requires hasSearched to be true */}
+      {/* NO RESULTS MESSAGE */}
       {showNoResultsMessage && (
         <div className="flex justify-center items-center py-10 text-xl font-medium text-gray-500">
-          No artworks found matching your criteria. Try a different search term.
+          No artworks found matching your criteria.
         </div>
       )}
 
-      {/* RESULTS SECTION (Only visible if not loading AND we have data) */}
+      {/* RESULTS SECTION */}
       {showResults && (
         <div className="pt-4 space-y-8" ref={topRef}>
           {" "}
-          {/* Ref marks the top */}
           
           {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
           {harvardPageCount > 1 && (
