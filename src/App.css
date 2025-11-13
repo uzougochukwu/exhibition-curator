@@ -17,6 +17,8 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* --- MODIFICATION HERE --- */
+  justify-content: center; /* **Centers content vertically (along the main axis, which is column)** */
   
   /* Add a subtle, calming background gradient from soft blue to light blue */
   background: linear-gradient(180deg, #a0c4ff 0%, #b0c4de 100%); 

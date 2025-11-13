@@ -31,6 +31,9 @@ export default function SpecificHarvard2() {
     }
 
     // 2. Fetch the artwork details
+    // NOTE: This URL looks like it's fetching an *exhibition*, not a specific artwork (object).
+    // I am keeping the original URL for functional consistency, but for single artwork details,
+    // the endpoint is usually: `https://api.harvardartmuseums.org/object/${artworkId}?apikey=...`
     axios
       .get(
         `https://api.harvardartmuseums.org/exhibition/${artworkId}?apikey=${harvard_api_key}`
@@ -74,7 +77,7 @@ export default function SpecificHarvard2() {
   // Handle case where data might not be found or fetch failed
   if (!individualHarvard) {
     return (
-      <div>
+      <div style={{ textAlign: 'center' }}> {/* Added centering style here as well */}
         <p>Artwork not found or an error occurred.</p>
         <a href={search}>
           <button>Go to Search</button>
@@ -98,9 +101,17 @@ export default function SpecificHarvard2() {
     buttonColor = '#4CAF50'; // Green
   }
 
-
+  // --- MODIFICATION HERE: Added style prop to the outermost div ---
   return (
-    <div>
+    <div 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', // Centers children horizontally
+        width: '100%', // Ensures the container spans full width
+        padding: '20px'
+      }}
+    >
       <a href={home}>
         <button>Home</button>
       </a>
@@ -114,7 +125,7 @@ export default function SpecificHarvard2() {
         </a>
       </p>
 
-      {/* Artwork Details */}
+      {/* Artwork Details - Text content will be centered by 'alignItems: center' on the p tags */}
       <p>Title: {individualHarvard.title}</p>
       <p>Desc: {individualHarvard.description}</p>
 

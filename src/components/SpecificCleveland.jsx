@@ -69,13 +69,14 @@ export default function SpecificCleveland() {
   // --- Render Logic ---
   
   if (isLoading) {
-    return <p>Loading...</p>;
+    // Applied simple centering style for consistency
+    return <p style={{ textAlign: 'center' }}>Loading...</p>;
   }
 
   // Handle case where data might not be found or fetch failed
   if (!individualCleveland) {
     return (
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <p>Artwork not found or an error occurred.</p>
         <a href={search}>
           <button>Go to Search</button>
@@ -99,7 +100,16 @@ export default function SpecificCleveland() {
 
 
   return (
-    <div>
+    // --- MODIFICATION: Added inline style for centering ---
+    <div 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', // Centers children horizontally
+        width: '100%',
+        padding: '20px'
+      }}
+    >
       <a href={home}>
         <button>Home</button>
       </a>
