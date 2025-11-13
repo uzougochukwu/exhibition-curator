@@ -572,7 +572,7 @@ export default function Home() {
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
       <header className="flex justify-between items-center pb-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1>
+        {/* <h1 className="text-2xl font-bold text-indigo-700">Artworks Search</h1> */}
         <div className="space-x-2">
           {/* <a href={home_link}>
             <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-150">
@@ -580,13 +580,42 @@ export default function Home() {
             </button>
           </a> */}
           <p></p>
-          <a href={link}>
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
-              Go to Personal Exhibition
-            </button>
-          </a>
+          <h1>My Exhibition</h1>
+      <p>Welcome to your own personal exhibition</p>
+      <p>
+        If you click on the search button below, you can search the Harvard and
+        Cleveland Museums for artworks
+      </p>
+      <p>If you like an artwork, save it by clicking 'Add to Collection'</p>
+      <p>To view your saved artworks, go to your personal exhibition</p>
+      <a href={link}>Personal Exhibition</a>
+      <p></p>
+      {/* <a href={cleveland_link}>Cleveland</a><p></p>
+    <a href={smithsonian_link}>Smithsonian</a><p></p> */}
+      {/* <a href={combined}>Search</a> */}
+
+      <p>
+        <img
+          src={
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Logo_Cleveland_Museum_of_Art.svg/1200px-Logo_Cleveland_Museum_of_Art.svg.png"
+          }
+          width="300"
+          height="300"
+        ></img>
+      </p>
+
+      <p>
+        <img
+          src={
+            "https://www.harvardsquare.com/wp-content/uploads/2019/07/harvard-art-museums-logo.jpg"
+          }
+          width="300"
+          height="300"
+        ></img>
+      </p>
+          
           <a href={combined}>
-            <button>Search Page</button>
+            <button>Search</button>
           </a>
           <p>Examples of Personal Exhibitions:</p>
           <p></p>
