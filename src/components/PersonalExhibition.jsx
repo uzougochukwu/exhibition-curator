@@ -4,6 +4,8 @@ export default function PersonalExhibition() {
   const link = "/";
 
   const search = "/combined";
+    const flowers = "/flowerexamples"
+  const mountains = "/mountainexamples"
 
   const [collection, setCollection] = useState([]);
 
@@ -57,6 +59,9 @@ export default function PersonalExhibition() {
         <a href={search}>
           <button> Search</button>
         </a>
+        <p>Example Exhibitions</p>
+        <a href={flowers}>Flowers</a><p></p>
+        <a href={mountains}>Mountains</a>
         <p>Your personal exhibition is empty. Add some artworks!</p>
       </div>
     );
@@ -68,6 +73,11 @@ export default function PersonalExhibition() {
       <a href={link}>
         <button> Go to the Home page</button>
       </a>
+      <p>Example Exhibitions</p>
+        <a href={flowers}>Flowers</a><p></p>
+        <a href={mountains}>Mountains</a>
+        <p>Your personal exhibition is empty. Add some artworks!</p>
+      
       {collection.map((artwork) => (
         <div
           key={artwork.id}
@@ -82,7 +92,7 @@ export default function PersonalExhibition() {
           <p>{artwork.department}</p>
           <p>
             <span className="font-semibold">Date:</span>{" "}
-            {artwork.begindate || artwork.creation_date || "N/A"}
+            {artwork.begindate || artwork.creation_date || "Unknown"}
           </p>
           <p>
             <span className="font-semibold">By:</span>{" "}

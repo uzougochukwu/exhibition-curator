@@ -127,7 +127,7 @@ export default function SpecificHarvard2() {
 
       {/* Artwork Details - Text content will be centered by 'alignItems: center' on the p tags */}
       <p>Title: {individualHarvard.title}</p>
-      <p>Desc: {individualHarvard.description}</p>
+
 
       {individualHarvard.primaryimageurl && (
         <img
@@ -137,7 +137,7 @@ export default function SpecificHarvard2() {
           height="200"
         ></img>
       )}
-
+      <p>Desc: {individualHarvard.description}</p>
       <p>Location:</p>
       <p>Street: 32 Quincy Street</p>
       <p>City: Cambridge</p>

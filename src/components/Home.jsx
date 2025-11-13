@@ -315,13 +315,13 @@ const PaginatedItems = ({
                     <span className="font-semibold">Date:</span>{" "}
                     {isHarvard
                       ? artwork.begindate
-                      : artwork.creation_date || "N/A"}
+                      : artwork.creation_date || "Unknown"}
                   </p>
                   <p>
                     <span className="font-semibold">By:</span>{" "}
                     {isHarvard
-                      ? artwork.people?.[0]?.name || "N/A"
-                      : artwork.creators?.[0]?.description || "N/A"}
+                      ? artwork.people?.[0]?.name || "Unknown"
+                      : artwork.creators?.[0]?.description || "Unknown"}
                   </p>
                   {/* MODIFIED SECTION START: Conditionally render description */}
                   {artwork.description && (
@@ -606,9 +606,10 @@ export default function Home() {
 
       <p>
         <img
-          src={
-            "https://www.harvardsquare.com/wp-content/uploads/2019/07/harvard-art-museums-logo.jpg"
-          }
+          // src={
+          //   "https://www.harvardsquare.com/wp-content/uploads/2019/07/harvard-art-museums-logo.jpg"
+          // }
+          src={"https://imgs.search.brave.com/2hutW0ThvTvlJcvtC_h2vqjN68ISR9tRsRLQw1dd7F4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mdW5k/aXQuZnIvc2l0ZXMv/ZGVmYXVsdC9maWxl/cy9zdHlsZXMvbWF4/XzY1MHg2NTAvcHVi/bGljL2FjdG9ycy8y/Mjc2LWhhcnZhcmQt/YXJ0LW11c2V1bXMu/cG5nP2l0b2s9ZXBN/NWtnLWw"}
           width="300"
           height="300"
         ></img>
@@ -617,11 +618,11 @@ export default function Home() {
           <a href={combined}>
             <button>Search</button>
           </a>
-          <p>Examples of Personal Exhibitions:</p>
+          {/* <p>Examples of Personal Exhibitions:</p>
           <p></p>
           <a href={flowers}>Flowers</a>
           <p></p>
-          <a href={mountains}>Mountains</a>
+          <a href={mountains}>Mountains</a> */}
         </div>
       </header>
       

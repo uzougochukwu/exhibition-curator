@@ -125,7 +125,7 @@ export default function SpecificCleveland() {
       
       {/* Artwork Details */}
       <p>Title: {individualCleveland.title}</p>
-      <p>Desc: {individualCleveland.description}</p>
+
       {individualCleveland.images?.web?.url && (
         <img
           src={individualCleveland.images.web.url}
@@ -134,6 +134,7 @@ export default function SpecificCleveland() {
           height="200"
         />
       )}
+      <p>Desc: {individualCleveland.description}</p>
       <p>Location: </p>
       <p>Street: 11150 East Blvd</p>
       <p>City: Cleveland</p>

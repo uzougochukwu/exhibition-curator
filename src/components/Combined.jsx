@@ -315,13 +315,13 @@ const PaginatedItems = ({
                     <span className="font-semibold">Date:</span>{" "}
                     {isHarvard
                       ? artwork.begindate
-                      : artwork.creation_date || "N/A"}
+                      : artwork.creation_date || "Unknown"}
                   </p>
                   <p>
                     <span className="font-semibold">By:</span>{" "}
                     {isHarvard
-                      ? artwork.people?.[0]?.name || "N/A"
-                      : artwork.creators?.[0]?.description || "N/A"}
+                      ? artwork.people?.[0]?.name || "Unknown"
+                      : artwork.creators?.[0]?.description || "Unknown"}
                   </p>
                   {/* MODIFIED SECTION START: Conditionally render description */}
                   {artwork.description && (
@@ -649,7 +649,7 @@ export default function Combined() {
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
             disabled={isLoading} // Disable input while searching
           >
-            <option value="">No sort</option>
+            <option value="">Sort By Relevance</option>
             <option value="begindate-oldest">
               Date Created - oldest to newest
             </option>
