@@ -125,6 +125,8 @@ export default function SpecificCleveland() {
       
       {/* Artwork Details */}
       <p>Title: {individualCleveland.title}</p>
+      <p>Date: {individualCleveland.creation_date}</p>
+      <p>By: {individualCleveland.creators?.[0]?.description || individualCleveland.people?.[0]?.name || "Unknown"}</p>
 
       {individualCleveland.images?.web?.url && (
         <img

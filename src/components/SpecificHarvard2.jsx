@@ -128,7 +128,7 @@ export default function SpecificHarvard2() {
       {/* Artwork Details - Text content will be centered by 'alignItems: center' on the p tags */}
       <p>Title: {individualHarvard.title}</p>
       <p>Date: {individualHarvard.begindate}</p>
-      <p>By: {individualHarvard.creators?.[0]?.description || individualHarvard.people?.[0]?.name}</p>
+      <p>By: {individualHarvard.creators?.[0]?.description || individualHarvard.people?.[0]?.name || "Unknown"}</p>
 
 
       {individualHarvard.primaryimageurl && (
