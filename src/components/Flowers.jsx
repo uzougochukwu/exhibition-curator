@@ -1,7 +1,8 @@
 import React from 'react'
 
 function Flowers() {
-    const defaulthome = "/defaulthome"
+    //const defaulthome = "/defaulthome"
+    const defaulthome = "/"
 
     // --- Standard CSS Styles used in PersonalExhibition ---
     const centeredContainerStyle = {

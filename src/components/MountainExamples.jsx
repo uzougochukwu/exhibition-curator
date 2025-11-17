@@ -1,7 +1,8 @@
 import React from 'react'
 
 function MountainExamples() {
-    const defaulthome = "/defaulthome"
+    //const defaulthome = "/defaulthome"
+    const defaulthome = "/"
 
     // --- Standard CSS Styles (Copied from PersonalExhibition) ---
     const centeredContainerStyle = {
@@ -70,13 +71,21 @@ function MountainExamples() {
     };
 
     // Helper component to render the details block
-    const ArtworkItem = ({ title, desc, imgSrc, imgAlt, location, city, state, websiteUrl, source }) => {
+    const ArtworkItem = ({ title, by, date, desc, imgSrc, imgAlt, location, city, state, websiteUrl, source }) => {
         return (
             <div style={artworkCardStyle}>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>{title}</h3>
                 
                 <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
                     <span style={{ fontWeight: '600' }}>Source:</span> {source}
+                </p>
+
+                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                    <span style={{ fontWeight: '600' }}>Date:</span> {date}
+                </p>
+
+                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                    <span style={{ fontWeight: '600' }}>By:</span> {by}
                 </p>
 
                 <p style={{ fontWeight: '600', paddingTop: '8px' }}>Description:</p>
@@ -124,6 +133,8 @@ function MountainExamples() {
 
             <ArtworkItem
                 title="Mountain View and Blue Water"
+                date="early 1800s"
+                by="Tanomura Chikuden (Japanese, 1777-1835)"
                 desc="Tanomura Chikuden was an eminent painter whose adopted son, Tanomura Chokunyū (1814–1907), was Seifū Yohei III’s painting teacher. This work was displayed at a gathering commemorating the 10th anniversary of Chokunyū’s death, something we know only because its custom-made box and archival documents have been carefully kept together. The box inscription also confirms that Chikuden was emulating the style of the Mi family of painters, active during China’s Southern Song dynasty (1127–1279). The painting’s Chinese-style silk wrapper is inscribed and sealed on its interior by members of Chokunyū’s community."
                 imgSrc="https://openaccess-cdn.clevelandart.org/1985.250/1985.250_web.jpg"
                 location="11150 East Blvd"
@@ -135,6 +146,8 @@ function MountainExamples() {
             
             <ArtworkItem
                 title="Streams and Mountains without End: Landscape Paintings from China, Korea, and Japan"
+                date="1100-1150"
+                by="Unknown"
                 desc="Drawing upon the Sackler Museum’s permanent collection, as well as on one of the most distinguished private collections of Chinese painting in the country, this exhibition displays an impressive array of East Asian landscape paintings. Landscapes emerged as the principal subject of Chinese painting by the Song dynasty (960–1279) and have remained preeminent among the arts of East Asia for over 1000 years. The Chinese-style depiction of landscapes spread in the 14th and 15th centuries, soaring to popularity in Korea during the Chosŏn dynasty (1392–1910) and in Japan during the Muromachi period (1392–1573). Landscapes—whether real or imagined—reflected the philosophical search for the principles that underlie the unity and harmony of nature, a search intricately linked to Daoism."
                 imgSrc="https://ids.lib.harvard.edu/ids/view/14178745"
                 location="32 Quincy Street"
@@ -146,6 +159,8 @@ function MountainExamples() {
 
             <ArtworkItem
                 title="Miniature Mountain with Daoist Paradise"
+                date="1736-95"
+                by="Unknown"
                 desc="Sizable jade boulders of mountainous landscapes were carved to represent the search for the paradise or immortals' dwellings in the mountains. This Daoist theme has fired the Chinese imagination throughout history. Believed to have spiritual and magical properties, jade has long been used in tombs and intended for preserving the corporeal body and the soul in the quest for eternity. It is recorded that Daoist practitioners drank morning dews with scraps of jade as an elixir of immortality."
                 imgSrc="https://openaccess-cdn.clevelandart.org/1941.594/1941.594_web.jpg"
                 location="11150 East Blvd"
