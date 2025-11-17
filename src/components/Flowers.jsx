@@ -72,13 +72,21 @@ function Flowers() {
 
 
     // Helper component to render the details block for reuse
-    const ArtworkItem = ({ title, desc, imgSrc, imgAlt, location, city, state, websiteUrl, source }) => {
+    const ArtworkItem = ({ title, date, by, desc, imgSrc, imgAlt, location, city, state, websiteUrl, source }) => {
         return (
             <div style={artworkCardStyle}>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>{title}</h3>
                 
                 <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
                     <span style={{ fontWeight: '600' }}>Source:</span> {source}
+                </p>
+
+                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                    <span style={{ fontWeight: '600' }}>Date:</span> {date}
+                </p>
+
+                <p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                    <span style={{ fontWeight: '600' }}>By:</span> {by}
                 </p>
 
                 <p style={{ fontWeight: '600', paddingTop: '8px' }}>Description:</p>
@@ -125,6 +133,8 @@ function Flowers() {
 
             <ArtworkItem
                 title="Cultivating Virtue: Botanical Motifs and Symbols in East Asian Art"
+                date="2012-05-12"
+                by="Robert D. Mowry"
                 desc="Inspired by the beauty and resilience of plants and flowers, East Asian poets and artists have imbued them with auspicious meaning, literary resonance, and moral overtones. For example, because they survive the harsh winter months, the pine, bamboo, and Chinese plum (Prunus mume) symbolize strength in the face of adversity and are referred to as the “Three Friends of Winter.” Flowers affiliated with the four seasons and twelve months are also pervasive themes. This gallery rotation presents a small selection of later East Asian paintings that feature popular botanical themes and symbols, complemented by an array of ceramics with similar motifs. Organized by Robert D. Mowry, Alan J. Dworsky Curator of Chinese Art; and Melissa A. Moy, Cunningham Assistant Curator of Asian Art, both in the Division of Asian and Mediterranean Art, Harvard Art Museums."
                 imgSrc="https://nrs.harvard.edu/urn-3:HUAM:51754_dynmc"
                 location="32 Quincy Street"
@@ -136,6 +146,8 @@ function Flowers() {
             
             <ArtworkItem
                 title="Flowers in a Glass"
+                date="1606"
+                by="Ambrosius Bosschaert (Dutch, 1573-1621)"
                 desc="One of the first artists to specialize in flower painting, Ambrosius Bosschaert may have been inspired by the botanical gardens and scientific collections in his hometown of Middelburg. The flowers in this bouquet might be common today, but in the 1600s they were costly rarities. Bosschaert captured their fragile beauty with luminous colors and exquisite detail."
                 imgSrc="https://openaccess-cdn.clevelandart.org/1960.108/1960.108_web.jpg"
                 location="11150 East Blvd"
@@ -147,6 +159,8 @@ function Flowers() {
             
             <ArtworkItem
                 title="Vase of Flowers"    
+                date="1916"
+                by="Odilon Redon (French, 1840-1916)"
                 desc="Inspired by Cleveland’s groundbreaking acquisitions of Odilon Redon’s artworks during the 1920s, local philanthropist and collector Leonard C. Hanna Jr. purchased this luminous pastel of a floral still life in 1937. Hanna acquired it from Jacques Seligmann, a dealer based in New York City and Paris who was fundamental in bringing 19th-century French art to American audiences. In 1939, Hanna loaned the pastel to the New York World’s Fair, where it represented Redon’s work. Those who saw it there were attracted to the vivid color and timeless subject, which preoccupied the artist at the end of his life."
                 imgSrc="https://openaccess-cdn.clevelandart.org/1958.46/1958.46_web.jpg"
                 location="11150 East Blvd"
