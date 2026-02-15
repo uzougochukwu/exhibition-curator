@@ -664,7 +664,7 @@ export default function Home() {
           {" "}
           
           {/* 1. ABSOLUTE TOP PAGE SELECTION: Harvard Only */}
-          {harvardPageCount > 1 && (
+          {/* {harvardPageCount > 1 && (
             <LabeledPaginationControls
               label="Harvard Art Museums"
               currentPage={harvardCurrentPage}
@@ -672,10 +672,10 @@ export default function Home() {
               handlePageClick={handleHarvardPageClick}
               displayCurrentPage={harvardDisplayPage}
             />
-          )}
+          )} */}
 
           {/* Harvard Results Section */}
-          <PaginatedItems
+          {/* <PaginatedItems
             items={filteredHarvardData} 
             currentPage={harvardCurrentPage}
             itemsPerPage={itemsPerPage}
@@ -683,10 +683,10 @@ export default function Home() {
             title="Harvard Results"
             isHarvard={true}
             addToCollection={addToCollectionHarvard}
-          />
+          /> */}
           
           {/* Cleveland Results Section */}
-          <PaginatedItems
+          {/* <PaginatedItems
             items={filteredClevelandData} 
             currentPage={clevelandCurrentPage}
             itemsPerPage={itemsPerPage}
@@ -694,10 +694,10 @@ export default function Home() {
             title="Cleveland Results"
             isHarvard={false}
             addToCollection={addToCollectionCleveland}
-          />
+          /> */}
           
           {/* 2. ABSOLUTE BOTTOM PAGE SELECTION: Cleveland Only */}
-          {clevelandPageCount > 1 && (
+          {/* {clevelandPageCount > 1 && (
             <LabeledPaginationControls
               label="Cleveland Museum of Art"
               currentPage={clevelandCurrentPage}
@@ -705,10 +705,10 @@ export default function Home() {
               handlePageClick={handleClevelandPageClick}
               displayCurrentPage={clevelandDisplayPage}
             />
-          )}
+          )} */}
 
           {/* 3. SCROLL BACK TO TOP BUTTON */}
-          {(filteredHarvardData.length > 0 ||
+          {/* {(filteredHarvardData.length > 0 ||
             filteredClevelandData.length > 0) && (
             <div className="flex justify-center pt-8">
               <button
@@ -718,7 +718,7 @@ export default function Home() {
                 Back to Top of Results
               </button>
             </div>
-          )}
+          )} */}
         </div>
       )}
     </div>
