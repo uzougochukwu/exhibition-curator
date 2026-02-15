@@ -8,13 +8,13 @@ import harvard_api_key from "../extra/API-KEY";
 // Wrap the ResponsiveReactGridLayout with WidthProvider
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-// --- MODIFIED STANDALONE COMPONENT: PaginationControls (Now uses combined props) ---
+// --- MODIFIED STANDALONE COMPONENT: PaginationControls ---
 const BasePaginationControls = React.memo(
   ({
     currentPage,
     totalPages,
     handlePageClick,
-    displayCurrentPage, // This is currentPage + 1
+    displayCurrentPage, 
   }) => {
     if (totalPages <= 1) return null;
 
@@ -35,7 +35,6 @@ const BasePaginationControls = React.memo(
 
     return (
       <div className="flex flex-col sm:flex-row justify-center items-center my-4 space-y-2 sm:space-y-0 sm:space-x-4">
-        {/* Previous Button */}
         <button
           onClick={goToPrevious}
           disabled={prevDisabled}
@@ -48,13 +47,11 @@ const BasePaginationControls = React.memo(
           &lt; Previous
         </button>
 
-        {/* Page X of Y Display */}
         <div className="text-sm font-medium text-gray-700 whitespace-nowrap">
           Page <span className="font-bold">{displayCurrentPage}</span> of{" "}
           <span className="font-bold">{totalPages}</span>
         </div>
 
-        {/* Next Button */}
         <button
           onClick={goToNext}
           disabled={nextDisabled}
@@ -71,11 +68,9 @@ const BasePaginationControls = React.memo(
   }
 );
 
-// --- NEW COMPONENT: LabeledPaginationControls (Simplified for combined list) ---
+// --- NEW COMPONENT: LabeledPaginationControls ---
 const LabeledPaginationControls = ({ label, ...props }) => {
     if (props.totalPages <= 1) return null;
-
-    // Use a neutral color since it controls the whole list
     const borderColor = 'border-indigo-400';
 
     return (
@@ -88,14 +83,12 @@ const LabeledPaginationControls = ({ label, ...props }) => {
     );
 };
 
-// --- Helper Component for Rendering Artworks and Handling Pagination (MODIFIED FOR COMBINED DATA) ---
+// --- Helper Component for Rendering Artworks ---
 const PaginatedItems = ({
-  items, // Now the COMBINED array
+  items, 
   currentPage,
   itemsPerPage,
-  // Removed totalPages as it's passed below, but keeping it in props for cleanliness
-  // Removed isHarvard, title as they are now derived from the item's 'source'
-  addToCollection, // The base function to save the item (now handles any item)
+  addToCollection, 
 }) => {
   const [addedState, setAddedState] = useState({});
 
@@ -106,11 +99,8 @@ const PaginatedItems = ({
     setAddedState({});
   }, [currentPage, items]);
 
-  // Handler that calls the parent function and sets the "Added!" state
   const handleAddToCollection = useCallback((artwork) => {
-    // We use the combinedId for state tracking
     const artworkId = artwork.combinedId; 
-    
     addToCollection(artwork);
 
     setAddedState(prev => ({
@@ -126,14 +116,12 @@ const PaginatedItems = ({
     }, 2000);
   }, [addToCollection]);
 
-
-  // MODIFIED useMemo to create a responsive layout object
   const layouts = useMemo(() => {
     const createLayout = (cols, items) => items.map((artwork, index) => {
         const row = Math.floor(index / cols);
         const col = index % cols;
         return {
-          i: artwork.combinedId, // Use the combinedId
+          i: artwork.combinedId,
           x: col,
           y: row * 12, 
           w: 1,
@@ -143,15 +131,14 @@ const PaginatedItems = ({
       });
 
     return {
-      lg: createLayout(3, currentItems), // Large (default)
-      md: createLayout(3, currentItems), // Medium
-      sm: createLayout(2, currentItems), // Small (tablet)
-      xs: createLayout(1, currentItems), // Extra small (mobile)
-      xxs: createLayout(1, currentItems), // Tiny
+      lg: createLayout(3, currentItems),
+      md: createLayout(3, currentItems),
+      sm: createLayout(2, currentItems),
+      xs: createLayout(1, currentItems),
+      xxs: createLayout(1, currentItems),
     };
   }, [currentItems]);
   
-  // MODIFIED CollectionButton to derive colors from artwork.source
   const CollectionButton = ({ artwork }) => {
     const artworkId = artwork.combinedId;
     const isAdded = addedState[artworkId];
@@ -173,10 +160,7 @@ const PaginatedItems = ({
     );
   };
 
-  // Safe early exit
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   return (
     <section>
@@ -192,38 +176,32 @@ const PaginatedItems = ({
             const isHarvard = artwork.source === 'harvard';
             const artworkId = artwork.combinedId;
 
-            // Determine URL and border color based on source
             const harvardPage = "/exhibition/" + artwork.id + `?apikey=${harvard_api_key}`;
             const clevelandPage = "/artworks/" + artwork.id;
             const detailUrl = isHarvard ? harvardPage : clevelandPage;
             const borderColor = isHarvard ? "border-blue-200" : "border-orange-200";
 
-            // Determine image URL
             const imageUrl = isHarvard 
                 ? artwork.primaryimageurl 
                 : artwork.images?.web?.url;
 
-            // Determine date
             const date = isHarvard 
                 ? artwork.begindate 
                 : artwork.creation_date || "Unknown";
 
-            // Determine Creator/Artist
             const creator = isHarvard
                 ? artwork.people?.[0]?.name || "Unknown"
                 : artwork.creators?.[0]?.description || "Unknown";
 
-
             return (
               <div
-                key={artworkId} // Using combinedId here
+                key={artworkId}
                 className={`p-4 border ${borderColor} rounded-xl shadow-lg bg-white flex flex-col items-center text-center space-y-2 h-full w-full`}
               >
                 <h3 className="text-sm font-bold line-clamp-2 min-h-[2.5rem] mt-1">
                   {artwork.title}
                 </h3>
 
-                {/* IMAGE BLOCK */}
                 {imageUrl ? (
                   <div className="relative w-full h-20">
                     <a
@@ -248,7 +226,6 @@ const PaginatedItems = ({
 
                 <CollectionButton artwork={artwork} />
 
-                {/* INFO BLOCK */}
                 <div className="text-xs w-full text-left p-1 space-y-0.5">
                   <p>
                     <span className="font-semibold">From:</span>{" "}
@@ -262,7 +239,6 @@ const PaginatedItems = ({
                     <span className="font-semibold">By:</span>{" "}
                     {creator}
                   </p>
-                  {/* description is required for display, no need to check here */}
                   <div className="pt-1 text-center">
                     <a
                       href={detailUrl}
@@ -281,11 +257,9 @@ const PaginatedItems = ({
   );
 };
 
-// --- Main Component (MODIFIED) ---
+// --- Main Component ---
 export default function Combined() {
   const topRef = useRef(null);
-
-  // 🚩 UNIFIED STATE 🚩
   const [combinedFullData, setCombinedFullData] = useState([]);
   const [combinedCurrentPage, setCombinedCurrentPage] = useState(0); 
 
@@ -300,30 +274,18 @@ export default function Combined() {
   const link = "/personalexhibition";
   const home_link = "/";
 
-  // FUNCTION: Scroll to the top of the search results
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
-  // NEW HELPER FUNCTION to filter data by description
   const filterData = (data) => {
-    // Only display items that have a description (since this was a filter used before)
     return data.filter((item) => item.description);
   };
 
-  // --- DERIVED/FILTERED DATA (UNIFIED) ---
-  const filteredCombinedData = useMemo(() => {
-    // Reset page on new filter applied to the same data set
-    // setCombinedCurrentPage(0); // Removing reset to allow smooth filtering
-    return filterData(combinedFullData);
-  }, [combinedFullData]);
-  // -----------------------------
-
   const harvardSearch = async () => {
-    // 1. Setup: Reset states and show loading
-    setCombinedCurrentPage(0); // Reset unified page
+    setCombinedCurrentPage(0);
     setError(null);
-    setCombinedFullData([]); // Clear combined raw data
+    setCombinedFullData([]);
     setHasSearched(true);
     setIsLoading(true);
 
@@ -331,141 +293,76 @@ export default function Combined() {
       topRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
-    let harvard_before_year = "";
-    if (beforeYear) {
-      harvard_before_year = beforeYear + "-01-01";
-    } 
     let harvard_url = `https://api.harvardartmuseums.org/exhibition?apikey=${harvard_api_key}&q=${term}&size=100&hasimage=1`;
-    
-    if (harvard_before_year) {
-      harvard_url += `&before=${harvard_before_year}`;
-    }
+    if (beforeYear) harvard_url += `&before=${beforeYear}-01-01`;
 
     let cleveland_url = `https://openaccess-api.clevelandart.org/api/artworks/?q=${term}&limit=100&has_image=1`;
-    
-    if (beforeYear) {
-      cleveland_url += `&created_before=${beforeYear}`;
-    }
+    if (beforeYear) cleveland_url += `&created_before=${beforeYear}`;
 
-    // 2. Execute Calls (using Promise.allSettled for parallel fetching)
     try {
       const [harvardResponse, clevelandResponse] = await Promise.allSettled([
         axios.get(harvard_url),
         axios.get(cleveland_url),
       ]);
 
-      let errorMessages = [];
-      let harvardRecords = [];
-      let clevelandRecords = [];
+      let hRecords = harvardResponse.status === "fulfilled" ? (harvardResponse.value.data.records || []) : [];
+      let cRecords = clevelandResponse.status === "fulfilled" ? (clevelandResponse.value.data.data || []) : [];
 
-      // Handle Harvard Result
-      if (harvardResponse.status === "fulfilled") {
-        harvardRecords = harvardResponse.value.data.records || [];
-      } else {
-        console.error("Harvard API error:", harvardResponse.reason);
-        errorMessages.push(
-          "Harvard Museum search failed or returned no results."
-        );
+      // Add source tags and unique IDs
+      let taggedH = hRecords.map(item => ({ ...item, source: 'harvard', combinedId: `h-${item.id}` }));
+      let taggedC = cRecords.map(item => ({ ...item, source: 'cleveland', combinedId: `c-${item.id}` }));
+
+      // Filter based on your original requirement
+      taggedH = filterData(taggedH);
+      taggedC = filterData(taggedC);
+
+      // --- Individual Sorting Logic ---
+      const sortFn = (a, b) => {
+        if (orderby === "title-A-first") return a.title > b.title ? 1 : -1;
+        if (orderby === "title-Z-first") return a.title < b.title ? 1 : -1;
+        
+        const dateA = a.begindate || a.creation_date || 0;
+        const dateB = b.begindate || b.creation_date || 0;
+        
+        if (orderby === "begindate-oldest") return dateA > dateB ? 1 : -1;
+        if (orderby === "begindate-newest") return dateA < dateB ? 1 : -1;
+        return 0;
+      };
+
+      if (orderby !== "") {
+        taggedH.sort(sortFn);
+        taggedC.sort(sortFn);
       }
 
-      // Handle Cleveland Result
-      if (clevelandResponse.status === "fulfilled") {
-        clevelandRecords = clevelandResponse.value.data.data || [];
-      } else {
-        console.error("Cleveland API error:", clevelandResponse.reason);
-        errorMessages.push(
-          "Cleveland Museum search failed or returned no results."
-        );
-      }
-      
-      // 🚩 COMBINING LOGIC START 🚩
-      // 3. Add Source Tag and Combine
-      const taggedHarvard = harvardRecords.map(item => ({
-        ...item,
-        source: 'harvard', 
-        combinedId: `h-${item.id}` // Unique ID for combined list
-      }));
-
-      const taggedCleveland = clevelandRecords.map(item => ({
-        ...item,
-        source: 'cleveland', 
-        combinedId: `c-${item.id}` // Unique ID for combined list
-      }));
-
-      let combinedRecords = taggedHarvard.concat(taggedCleveland);
-      
-      // 4. Sort the Combined List
-      if (orderby === "title-A-first") {
-        combinedRecords.sort((a, b) => (a.title > b.title ? 1 : -1));
-      } else if (orderby === "title-Z-first") {
-        combinedRecords.sort((a, b) => (a.title < b.title ? 1 : -1));
-      } else if (orderby === "begindate-oldest") {
-        // Use a consistent date field for sorting
-        combinedRecords.sort((a, b) => {
-          const dateA = a.begindate || a.creation_date;
-          const dateB = b.begindate || b.creation_date;
-          return (dateA > dateB ? 1 : -1)
-        });
-      } else if (orderby === "begindate-newest") {
-        combinedRecords.sort((a, b) => {
-          const dateA = a.begindate || a.creation_date;
-          const dateB = b.begindate || b.creation_date;
-          return (dateA < dateB ? 1 : -1)
-        });
+      // --- INTERLEAVING LOGIC (Harvard then Cleveland) ---
+      let interleaved = [];
+      const maxLength = Math.max(taggedH.length, taggedC.length);
+      for (let i = 0; i < maxLength; i++) {
+        if (i < taggedH.length) interleaved.push(taggedH[i]);
+        if (i < taggedC.length) interleaved.push(taggedC[i]);
       }
 
-      // 5. Final Checks and State Update
-      setCombinedFullData(combinedRecords);
-      // 🚩 COMBINING LOGIC END 🚩
+      setCombinedFullData(interleaved);
       
-      // Final Error Check based on combined data
-      if (combinedRecords.length === 0) {
+      if (interleaved.length === 0) {
         setError("Your search returned no results from either museum.");
-      } else if (errorMessages.length > 0) {
-        setError(errorMessages.join(" "));
-      } else {
-        const allDataFilteredOut = filterData(combinedRecords).length === 0;
-        if (allDataFilteredOut) {
-          setError(
-            "We found some artworks, but none of them had a complete description, so they couldn't be displayed."
-          );
-        }
       }
     } catch (err) {
-      console.error("System Network Error:", err);
       setError("A critical network error occurred during the search.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- Handle Page Change for Pagination (UNIFIED) ---
   const handleCombinedPageClick = useCallback((event) => {
     setCombinedCurrentPage(event.selected);
   }, []);
 
-  // MODIFIED: Single save function that handles either type of artwork
   const addToCollection = useCallback((artwork) => {
-    // We use the combinedId for saving to sessionStorage
-    console.log(`saving artwork (${artwork.source}):`, artwork.combinedId);
     sessionStorage.setItem(artwork.combinedId, JSON.stringify(artwork));
   }, []);
-  // END MODIFIED
 
-  // Use filtered data for page calculations (UNIFIED)
-  const combinedPageCount = Math.ceil(filteredCombinedData.length / itemsPerPage);
-  const combinedDisplayPage = combinedCurrentPage + 1;
-
-  // --- Render Logic ---
-  const showResults =
-    !isLoading &&
-    filteredCombinedData.length > 0;
-
-  const showNoResultsMessage =
-    hasSearched &&
-    !isLoading &&
-    !error &&
-    filteredCombinedData.length === 0;
+  const combinedPageCount = Math.ceil(combinedFullData.length / itemsPerPage);
 
   return (
     <div className="p-4 space-y-4 max-w-7xl mx-auto font-inter">
@@ -477,7 +374,6 @@ export default function Combined() {
               Home
             </button>
           </a>
-          <p></p>
           <a href={link}>
             <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
               Go to Personal Exhibition
@@ -485,18 +381,11 @@ export default function Combined() {
           </a>
         </div>
       </header>
-      <p></p>
-      {/* Search/Filter Controls (Unchanged) */}
+
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
         <div className="flex-grow">
-          <label
-            htmlFor="search-term"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Search Term &nbsp;
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Search Term</label>
           <input
-            id="search-term"
             type="text"
             value={term}
             onChange={(e) => setTerm(e.target.value)}
@@ -505,45 +394,24 @@ export default function Combined() {
             disabled={isLoading} 
           />
         </div>
-        <p></p>
-        <p></p>
         <div className="w-full sm:w-1/4">
-          <label
-            htmlFor="sort-order"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Sort By &nbsp;
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
           <select
-            id="sort-order"
             value={orderby}
             onChange={(e) => setOrderBy(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-indigo-500 focus:border-indigo-500"
             disabled={isLoading} 
           >
             <option value="">Relevance</option>
-            <option value="begindate-oldest">
-              Date Created - oldest to newest
-            </option>
-            <option value="begindate-newest">
-              Date Created - newest to oldest
-            </option>
+            <option value="begindate-oldest">Date Created - oldest to newest</option>
+            <option value="begindate-newest">Date Created - newest to oldest</option>
             <option value="title-A-first">Title A - Z</option>
             <option value="title-Z-first">Title Z - A</option>
           </select>
         </div>
-        <p></p>
-        <p></p>
-
         <div className="flex-grow">
-          <label
-            htmlFor="before"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Made before year: &nbsp;
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Made before year:</label>
           <input
-            id="before"
             type="text"
             value={beforeYear}
             onChange={(e) => setBeforeYear(e.target.value)}
@@ -552,7 +420,6 @@ export default function Combined() {
             disabled={isLoading} 
           />
         </div>
-        <p></p>
         <button
           onClick={harvardSearch}
           disabled={isLoading} 
@@ -565,62 +432,44 @@ export default function Combined() {
           {isLoading ? "Searching..." : "Search"}
         </button>
       </div>
-      <p></p>
 
-      {/* ERROR MESSAGE DISPLAY */}
       {error && hasSearched && (
         <div className="text-red-700 p-3 bg-red-100 border border-red-300 rounded-lg font-medium">
           Error: {error}
         </div>
       )}
 
-      {/* LOADING INDICATOR */}
       {isLoading && (
         <div className="flex justify-center items-center py-10 text-xl font-semibold text-gray-600">
           Searching... please wait.
         </div>
       )}
 
-      {/* NO RESULTS MESSAGE */}
-      {showNoResultsMessage && (
-        <div className="flex justify-center items-center py-10 text-xl font-medium text-gray-500">
-          No artworks found matching your criteria. Try a different search term.
-        </div>
-      )}
-
-      {/* RESULTS SECTION (UNIFIED) */}
-      {showResults && (
+      {!isLoading && hasSearched && combinedFullData.length > 0 && (
         <div className="pt-4 space-y-8" ref={topRef}>
-          {" "}
-          
-          {/* 1. TOP PAGE SELECTION: UNIFIED */}
           <LabeledPaginationControls
             label="Combined Search Results"
             currentPage={combinedCurrentPage}
             totalPages={combinedPageCount}
             handlePageClick={handleCombinedPageClick}
-            displayCurrentPage={combinedDisplayPage}
+            displayCurrentPage={combinedCurrentPage + 1}
           />
 
-          {/* Combined Results Section */}
           <PaginatedItems
-            items={filteredCombinedData} 
+            items={combinedFullData} 
             currentPage={combinedCurrentPage}
             itemsPerPage={itemsPerPage}
-            totalPages={combinedPageCount}
             addToCollection={addToCollection}
           />
           
-          {/* 2. BOTTOM PAGE SELECTION: UNIFIED */}
           <LabeledPaginationControls
             label="Combined Search Results"
             currentPage={combinedCurrentPage}
             totalPages={combinedPageCount}
             handlePageClick={handleCombinedPageClick}
-            displayCurrentPage={combinedDisplayPage}
+            displayCurrentPage={combinedCurrentPage + 1}
           />
 
-          {/* 3. SCROLL BACK TO TOP BUTTON */}
           <div className="flex justify-center pt-8">
             <button
               onClick={scrollToTop}
